@@ -24,7 +24,7 @@ class _StatsPageState extends State<StatsPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: SongProviderService.getSongData(),
+      future: SongProviderService.getSongData(withSkipped: true),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -54,7 +54,7 @@ class _StatsPageState extends State<StatsPage> {
               ),
             ),
             Column(
-              children: songs.sublist(0,min(7, songs.length)).map((e) => LatestSongTile(songData: e)).toList(),
+              children: SongProviderService.removeSkips(songs).sublist(0,min(7, songs.length)).map((e) => LatestSongTile(songData: e)).toList(),
             ),
             const SizedBox(height: 10),
             Center(

@@ -1,8 +1,10 @@
-package io.github.chikyukido.music_tracker;
+package io.github.chikyukido.scrobblium;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
@@ -15,36 +17,44 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.FileNotFoundException;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import io.github.chikyukido.music_tracker.database.SongData;
-import io.github.chikyukido.music_tracker.database.SongDatabase;
-import io.github.chikyukido.music_tracker.util.BitmapUtil;
-import io.github.chikyukido.music_tracker.util.ConfigUtil;
+import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.database.SongDatabase;
+import io.github.chikyukido.scrobblium.util.BitmapUtil;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
 
 public class MusicListenerService extends NotificationListenerService {
-    private static MusicListenerService INSTANCE = null;
     private static final String TAG = "MusicListenerService";
     private static final int NOTIFICATION_ID = 1956;
     private static final String CHANNEL_ID = "MusicListenerServiceChannel";
-
+    private static MusicListenerService INSTANCE = null;
     private static String MUSIC_PACKAGE_NAME = "";
 
     private static SongDatabase database;
-    private MediaController currentMediaController;
     private static SongData currentSong = new SongData("", "", "", "", -1L, -1L, LocalDateTime.MIN,
             LocalDateTime.MIN, -1);
+    private MediaController currentMediaController;
     private Timer timer;
+
+    public static SongDatabase getDatabase() {
+        return database;
+    }
+
+    public static SongData getCurrentSong() {
+        return currentSong;
+    }
+
+    public static void setMusicPackage(String musicPackage) {
+        MUSIC_PACKAGE_NAME = musicPackage;
+        INSTANCE.startTimer();
+        Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
+    }
 
     @Override
     public void onCreate() {
@@ -56,9 +66,9 @@ public class MusicListenerService extends NotificationListenerService {
                 "song_database"
         ).build();
         MUSIC_PACKAGE_NAME = ConfigUtil.getMusicPackage(getBaseContext());
-        if(MUSIC_PACKAGE_NAME.isEmpty()) {
+        if (MUSIC_PACKAGE_NAME.isEmpty()) {
             Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
-        }else {
+        } else {
             startForegroundService();
             startTimer();
         }
@@ -87,7 +97,7 @@ public class MusicListenerService extends NotificationListenerService {
             public void run() {
                 fetchActiveNotifications();
             }
-        },5000, timerPeriod);
+        }, 5000, timerPeriod);
 
     }
 
@@ -113,7 +123,7 @@ public class MusicListenerService extends NotificationListenerService {
             return Arrays.stream(getActiveNotifications())
                     .filter(sbn -> sbn.getPackageName().equals(MUSIC_PACKAGE_NAME))
                     .findFirst().orElse(null);
-        }catch (SecurityException e) {
+        } catch (SecurityException e) {
             Log.w(TAG, "getMusicNotification: Could not get Music-notification because a security issue." +
                     " This shouldn't be a issue this occurs on the app startup");
             return null;
@@ -123,7 +133,7 @@ public class MusicListenerService extends NotificationListenerService {
     private void fetchActiveNotifications() {
         StatusBarNotification sbn = getMusicNotification();
         if (sbn == null) {
-             return;
+            return;
         }
         if (currentMediaController == null || currentMediaController.getPlaybackState() == null) {
             Log.i(TAG, "fetchActiveNotifications: Current media controller is null. Retrieving from the notification.");
@@ -165,19 +175,6 @@ public class MusicListenerService extends NotificationListenerService {
         MediaSession.Token mediaSessionToken = sbn.getNotification().extras.getParcelable("android.mediaSession", MediaSession.Token.class);
         if (mediaSessionToken == null) return null;
         return new MediaController(getApplicationContext(), mediaSessionToken);
-    }
-
-    public static SongDatabase getDatabase() {
-        return database;
-    }
-
-    public static SongData getCurrentSong() {
-        return currentSong;
-    }
-    public static void setMusicPackage(String musicPackage) {
-        MUSIC_PACKAGE_NAME = musicPackage;
-        INSTANCE.startTimer();
-        Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
     }
 
     private void saveArt() {

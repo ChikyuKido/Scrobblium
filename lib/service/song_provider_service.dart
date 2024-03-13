@@ -13,14 +13,24 @@ class SongProviderService {
     await platform.invokeMethod("setMusicPackage", {"package":package});
   }
 
-  static Future<List<SongData>> getSongData() async {
+  static Future<List<SongData>> getSongData({withSkipped = false}) async {
     Stopwatch stopwatch = Stopwatch()..start();
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);
+    if(!withSkipped) {
+        int cap = int.tryParse(Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ?? 20;
+        songs.removeWhere((element) => element.timeListened <= cap);
+    }
     stopwatch.stop();
     logger.i(
         'Elapsed time: ${stopwatch.elapsedMilliseconds} milliseconds. Size of the json: ${jsonData.length / 1024}kb');
     return songs;
+  }
+  static List<SongData> removeSkips(List<SongData> songs) {
+    List<SongData> newSongs = List.of(songs);
+    int cap = int.tryParse(Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ?? 20;
+    newSongs.removeWhere((element) => element.timeListened <= cap);
+    return newSongs;
   }
 
   static Future<SongData?> getCurrentSong() async {

@@ -1,4 +1,4 @@
-package io.github.chikyukido.music_tracker.util;
+package io.github.chikyukido.scrobblium.util;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,12 +10,10 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class ConfigUtil {
-    public static String getMusicPackage(Context context)  {
+    public static String getMusicPackage(Context context) {
         try {
             XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = xmlFactoryObject.newPullParser();
@@ -33,11 +31,11 @@ public class ConfigUtil {
                 eventType = xmlPullParser.next();
             }
             return "";
-        }catch (FileNotFoundException e) {
-            Log.w("ConfigUtil","Could not get the MusicPackage. XML files does not exists");
+        } catch (FileNotFoundException e) {
+            Log.w("ConfigUtil", "Could not get the MusicPackage. XML files does not exists");
             return "";
         } catch (IOException | XmlPullParserException e) {
-            Log.w("ConfigUtil","Could not get the MusicPackage. "+ e.getMessage());
+            Log.w("ConfigUtil", "Could not get the MusicPackage. " + e.getMessage());
             return "";
         }
     }

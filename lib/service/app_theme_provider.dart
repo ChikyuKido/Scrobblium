@@ -15,8 +15,7 @@ class AppThemeProvider extends ChangeNotifier {
   }
 
   AppThemeProvider._internal() {
-    _trueDarkMode = true;
-    _loadprefs();
+    _loadPrefs();
   }
 
   switchThemeDark() {
@@ -24,8 +23,8 @@ class AppThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  _loadprefs() async {
-    _trueDarkMode = await Settings.getValue("true-dark-mode");
+  _loadPrefs() {
+    _trueDarkMode = Settings.getValue<bool>("true-dark-mode",defaultValue: false)??false;
     notifyListeners();
   }
 }

@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
               title: 'Scrobblium',
               theme: FlexThemeData.light(scheme: FlexScheme.hippieBlue),
               darkTheme:
-                  FlexThemeData.dark(useMaterial3: true, darkIsTrueBlack: state.trueDarkMode),
+              FlexThemeData.dark(scheme: FlexScheme.wasabi, darkIsTrueBlack: state.trueDarkMode),
               themeMode: ThemeMode.dark,
               debugShowCheckedModeBanner: false,
               home: const MainPage(),

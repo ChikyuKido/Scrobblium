@@ -1,30 +1,26 @@
-package io.github.chikyukido.music_tracker.database;
+package io.github.chikyukido.scrobblium.database;
 
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-
-import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import io.github.chikyukido.music_tracker.util.BitmapUtil;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity(tableName = "played_songs")
 public class SongData {
-    @PrimaryKey(autoGenerate = true)
-    private long id;
-
     private final String artist;
     private final String title;
     private final String album;
     private final String albumAuthor;
-    private long progress;
     private final long maxProgress;
     private final LocalDateTime startTime;
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+    private long progress;
     private LocalDateTime endTime;
     private int timeListened;
 
@@ -48,15 +44,17 @@ public class SongData {
         String albumAuthor = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST);
         long progress = mediaController.getPlaybackState().getPosition();
         long maxProgress = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
-        return new SongData(artist,title,album,albumAuthor,progress,maxProgress,LocalDateTime.now(),null,0);
+        return new SongData(artist, title, album, albumAuthor, progress, maxProgress, LocalDateTime.now(), null, 0);
     }
 
     public String getIdentifier() {
         return artist + "," + title + "," + album;
     }
+
     public void incrementTimeListened() {
         this.timeListened++;
     }
+
     public long getId() {
         return id;
     }
@@ -64,6 +62,7 @@ public class SongData {
     public void setId(long id) {
         this.id = id;
     }
+
     public String getArtist() {
         return artist;
     }
@@ -84,6 +83,10 @@ public class SongData {
         return progress;
     }
 
+    public void setProgress(long progress) {
+        this.progress = progress;
+    }
+
     public long getMaxProgress() {
         return maxProgress;
     }
@@ -96,22 +99,17 @@ public class SongData {
         return endTime;
     }
 
-    public int getTimeListened() {
-        return timeListened;
-    }
-
-    public void setProgress(long progress) {
-        this.progress = progress;
-    }
-
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public int getTimeListened() {
+        return timeListened;
     }
 
     public void setTimeListened(int timeListened) {
         this.timeListened = timeListened;
     }
-
 
 
     @Override

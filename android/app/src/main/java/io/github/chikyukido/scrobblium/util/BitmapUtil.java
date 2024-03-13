@@ -1,8 +1,7 @@
-package io.github.chikyukido.music_tracker.util;
+package io.github.chikyukido.scrobblium.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
@@ -18,8 +17,8 @@ public class BitmapUtil {
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
-            }catch (IOException e) {
-                Log.e("BitmapUtil","Could not create directory because: "+e.getMessage());
+            } catch (IOException e) {
+                Log.e("BitmapUtil", "Could not create directory because: " + e.getMessage());
                 return false;
             }
         }
@@ -32,14 +31,14 @@ public class BitmapUtil {
             fos.flush();
             return true;
         } catch (IOException e) {
-            Log.e("BitmapUtil","Could not write bitmap because: "+e.getMessage());
+            Log.e("BitmapUtil", "Could not write bitmap because: " + e.getMessage());
             return false;
         } finally {
             if (fos != null) {
                 try {
                     fos.close();
                 } catch (IOException e) {
-                    Log.e("BitmapUtil","Could not close FileOutputStream because: "+e.getMessage());
+                    Log.e("BitmapUtil", "Could not close FileOutputStream because: " + e.getMessage());
                 }
             }
         }

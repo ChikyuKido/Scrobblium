@@ -1,4 +1,4 @@
-package io.github.chikyukido.music_tracker.database;
+package io.github.chikyukido.scrobblium.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -10,6 +10,7 @@ import java.util.List;
 public interface SongTrackDao {
     @Query("SELECT * FROM played_songs")
     List<SongData> getAllTracks();
+
     @Insert
     void insertTrack(SongData track);
 }

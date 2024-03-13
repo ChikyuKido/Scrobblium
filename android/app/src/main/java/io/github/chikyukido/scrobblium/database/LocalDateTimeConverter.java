@@ -1,4 +1,4 @@
-package io.github.chikyukido.music_tracker.database;
+package io.github.chikyukido.scrobblium.database;
 
 import androidx.room.TypeConverter;
 
