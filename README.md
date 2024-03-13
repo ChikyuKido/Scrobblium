@@ -1,4 +1,4 @@
-# music_tracker
+# scrobblium
 
 A app to track music in the background
 

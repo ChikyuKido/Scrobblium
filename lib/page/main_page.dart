@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:music_tracker/page/settings_page.dart';
-import 'package:music_tracker/page/songs_page.dart';
-import 'package:music_tracker/page/stats_page.dart';
+import 'package:scrobblium/page/settings_page.dart';
+import 'package:scrobblium/page/songs_page.dart';
+import 'package:scrobblium/page/stats_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

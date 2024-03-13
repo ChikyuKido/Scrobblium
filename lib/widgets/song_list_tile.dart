@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:music_tracker/song_data.dart';
+import 'package:scrobblium/song_data.dart';
 import 'package:path_provider/path_provider.dart';
 
 class SongListTile extends StatelessWidget {

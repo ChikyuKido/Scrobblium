@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:music_tracker/page/main_page.dart';
-import 'package:music_tracker/service/app_theme_provider.dart';
+import 'package:scrobblium/page/main_page.dart';
+import 'package:scrobblium/service/app_theme_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {

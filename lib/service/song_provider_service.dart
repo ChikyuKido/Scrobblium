@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:logger/logger.dart';
-import 'package:music_tracker/song_data.dart';
+import 'package:scrobblium/song_data.dart';
 
 class SongProviderService {
   static final logger = Logger();

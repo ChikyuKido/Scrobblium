@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:music_tracker/service/song_provider_service.dart';
-import 'package:music_tracker/widgets/song_list_tile.dart';
+import 'package:scrobblium/service/song_provider_service.dart';
+import 'package:scrobblium/widgets/song_list_tile.dart';
 
 import '../song_data.dart';
 

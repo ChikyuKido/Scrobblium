@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_tracker/service/song_provider_service.dart';
+import 'package:scrobblium/service/song_provider_service.dart';
 
 class MusicStatsRow extends StatelessWidget {
   final SongStatistic songStatistic;

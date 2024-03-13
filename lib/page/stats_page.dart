@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:music_tracker/service/song_provider_service.dart';
-import 'package:music_tracker/widgets/latest_song_tile.dart';
-import 'package:music_tracker/widgets/music_stats_row.dart';
-import 'package:music_tracker/widgets/top_ata.dart';
+import 'package:scrobblium/service/song_provider_service.dart';
+import 'package:scrobblium/widgets/latest_song_tile.dart';
+import 'package:scrobblium/widgets/music_stats_row.dart';
+import 'package:scrobblium/widgets/top_ata.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
