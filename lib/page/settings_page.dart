@@ -64,6 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   Widget buildSkipCap() {
     return TextInputSettingsTile(
+      topPadding: 0.0,
       title: 'Skip cap',
       settingKey: 'skip-cap',
       helperText: 'The time when a track is counted as skip',
@@ -83,12 +84,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<Widget> _buildValidationInfo() async{
     SongData? s = await SongProviderService.getCurrentSong();
-    return SimpleTextSettingsTile(
-      enabled: true,
+    return SimpleSettingsTile(
       title: s == null ? "Could not find currentSong" : "Found music App",
       subtitle: s != null ? s.getIdentifier() : "Maybe start the music or the package is wrong",
-      onTap: () => setState(() {}),
-      child: const Text(''),
+      onTap: () => setState(() {})
     );
   }
 

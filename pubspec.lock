@@ -105,10 +105,9 @@ packages:
   flutter_settings_screens:
     dependency: "direct main"
     description:
-      name: flutter_settings_screens
-      sha256: da028a639710ae9d1d97eb67c2c2e541b7af4e75496104c6d20103f3dc0f2b0a
-      url: "https://pub.dev"
-    source: hosted
+      path: "externel/flutter_settings_screens-0.3.3-null-safety+2-hijacked"
+      relative: true
+    source: path
     version: "0.3.3-null-safety+2"
   flutter_test:
     dependency: "direct dev"
@@ -441,10 +440,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "464f5674532865248444b4c3daca12bd9bf2d7c47f759ce2617986e7229494a8"
+      sha256: "8cb58b45c47dcb42ab3651533626161d6b67a2921917d8d429791f76972b3480"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0"
+    version: "5.3.0"
   xdg_directories:
     dependency: transitive
     description:
