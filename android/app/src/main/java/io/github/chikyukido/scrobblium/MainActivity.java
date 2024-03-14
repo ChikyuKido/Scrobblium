@@ -31,23 +31,23 @@ public class MainActivity extends FlutterActivity {
                         (call, result) -> {
                             if (call.method.equals("list")) {
                                 new Thread(() -> {
-                                    if (MusicListenerService.getDatabase() == null) {
+                                    if (MusicListenerService.getInstance().getDatabase() == null) {
                                         new Handler(Looper.getMainLooper()).post(() -> result.success("[]"));
                                         return;
                                     }
-                                    List<SongData> tracks = MusicListenerService.getDatabase().musicTrackDao().getAllTracks();
+                                    List<SongData> tracks = MusicListenerService.getInstance().getDatabase().musicTrackDao().getAllTracks();
                                     String json = gson.toJson(tracks);
                                     new Handler(Looper.getMainLooper()).post(() -> result.success(json));
                                 }).start();
                             } else if (call.method.equals("currentSong")) {
-                                if (MusicListenerService.getCurrentSong().getMaxProgress() == -1) {
+                                if (MusicListenerService.getInstance().getCurrentSong().getMaxProgress() == -1) {
                                     result.success("[]");
                                     return;
                                 }
-                                result.success(gson.toJson(MusicListenerService.getCurrentSong()));
+                                result.success(gson.toJson(MusicListenerService.getInstance().getCurrentSong()));
                             } else if (call.method.equals("setMusicPackage")) {
                                 String argument = call.argument("package");
-                                MusicListenerService.setMusicPackage(argument);
+                                MusicListenerService.getInstance().setMusicPackage(argument);
                             } else {
                                 result.notImplemented();
                             }

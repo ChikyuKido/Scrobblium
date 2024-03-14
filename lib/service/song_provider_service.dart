@@ -12,8 +12,11 @@ class SongProviderService {
   static Future<void> setMusicPackage(String package) async {
     await platform.invokeMethod("setMusicPackage", {"package":package});
   }
+  static Future<String> getJsonData() async {
+    return await platform.invokeMethod('list');
+  }
 
-  static Future<List<SongData>> getSongData({withSkipped = false}) async {
+  static Future<List<SongData>> getSongData({withSkipped = true}) async {
     Stopwatch stopwatch = Stopwatch()..start();
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);

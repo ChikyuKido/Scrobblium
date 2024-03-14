@@ -24,7 +24,7 @@ class _StatsPageState extends State<StatsPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: SongProviderService.getSongData(withSkipped: true),
+      future: SongProviderService.getSongData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -33,7 +33,8 @@ class _StatsPageState extends State<StatsPage> {
           return const Text("No data available");
         }
         var songs = snapshot.data ?? [];
-        songs.sort((a, b) => b.endTime.compareTo(a.endTime));
+        var songsRemovedSkip = SongProviderService.removeSkips(songs);
+        songsRemovedSkip.sort((a, b) => b.endTime.compareTo(a.endTime));
         var allTimeStats = SongProviderService.getSongStatistics(songs);
         return ListView(
           children: [
@@ -53,8 +54,8 @@ class _StatsPageState extends State<StatsPage> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
-            Column(
-              children: SongProviderService.removeSkips(songs).sublist(0,min(7, songs.length)).map((e) => LatestSongTile(songData: e)).toList(),
+            songsRemovedSkip.isEmpty ? Container():Column(
+              children: songsRemovedSkip.sublist(0,min(7, songsRemovedSkip.length)).map((e) => LatestSongTile(songData: e)).toList(),
             ),
             const SizedBox(height: 10),
             Center(

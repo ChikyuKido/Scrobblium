@@ -1,10 +1,8 @@
 package io.github.chikyukido.scrobblium;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
@@ -30,31 +28,18 @@ import io.github.chikyukido.scrobblium.util.BitmapUtil;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
 
 public class MusicListenerService extends NotificationListenerService {
-    private static final String TAG = "MusicListenerService";
-    private static final int NOTIFICATION_ID = 1956;
-    private static final String CHANNEL_ID = "MusicListenerServiceChannel";
     private static MusicListenerService INSTANCE = null;
-    private static String MUSIC_PACKAGE_NAME = "";
 
-    private static SongDatabase database;
-    private static SongData currentSong = new SongData("", "", "", "", -1L, -1L, LocalDateTime.MIN,
+    private final String TAG = "MusicListenerService";
+    private final int NOTIFICATION_ID = 1956;
+    private final String CHANNEL_ID = "MusicListenerServiceChannel";
+    private String musicPackageName = "";
+
+    private SongDatabase database;
+    private SongData currentSong = new SongData("", "", "", "", -1L, -1L, LocalDateTime.MIN,
             LocalDateTime.MIN, -1);
     private MediaController currentMediaController;
     private Timer timer;
-
-    public static SongDatabase getDatabase() {
-        return database;
-    }
-
-    public static SongData getCurrentSong() {
-        return currentSong;
-    }
-
-    public static void setMusicPackage(String musicPackage) {
-        MUSIC_PACKAGE_NAME = musicPackage;
-        INSTANCE.startTimer();
-        Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
-    }
 
     @Override
     public void onCreate() {
@@ -65,13 +50,18 @@ public class MusicListenerService extends NotificationListenerService {
                 SongDatabase.class,
                 "song_database"
         ).build();
-        MUSIC_PACKAGE_NAME = ConfigUtil.getMusicPackage(getBaseContext());
-        if (MUSIC_PACKAGE_NAME.isEmpty()) {
+        musicPackageName = ConfigUtil.getMusicPackage(getBaseContext());
+        if (musicPackageName.isEmpty()) {
             Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
         } else {
             startForegroundService();
             startTimer();
         }
+    }
+    public void setMusicPackage(String musicPackage) {
+        musicPackageName = musicPackage;
+        INSTANCE.startTimer();
+        Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
     }
 
     private void startForegroundService() {
@@ -121,7 +111,7 @@ public class MusicListenerService extends NotificationListenerService {
     private StatusBarNotification getMusicNotification() {
         try {
             return Arrays.stream(getActiveNotifications())
-                    .filter(sbn -> sbn.getPackageName().equals(MUSIC_PACKAGE_NAME))
+                    .filter(sbn -> sbn.getPackageName().equals(musicPackageName))
                     .findFirst().orElse(null);
         } catch (SecurityException e) {
             Log.w(TAG, "getMusicNotification: Could not get Music-notification because a security issue." +
@@ -172,7 +162,7 @@ public class MusicListenerService extends NotificationListenerService {
     }
 
     private MediaController getMediaControllerFromNotification(StatusBarNotification sbn) {
-        MediaSession.Token mediaSessionToken = sbn.getNotification().extras.getParcelable("android.mediaSession", MediaSession.Token.class);
+        MediaSession.Token mediaSessionToken = (MediaSession.Token) sbn.getNotification().extras.getParcelable("android.mediaSession");
         if (mediaSessionToken == null) return null;
         return new MediaController(getApplicationContext(), mediaSessionToken);
     }
@@ -186,5 +176,16 @@ public class MusicListenerService extends NotificationListenerService {
         if (!Files.exists(Paths.get(getBaseContext().getFilesDir().toString()).resolve(filename))) {
             BitmapUtil.saveBitmapAsPNG(getBaseContext(), bitmap, filename);
         }
+    }
+
+    public SongDatabase getDatabase() {
+        return database;
+    }
+
+    public SongData getCurrentSong() {
+        return currentSong;
+    }
+    public static MusicListenerService getInstance() {
+        return INSTANCE;
     }
 }

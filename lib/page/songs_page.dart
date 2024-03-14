@@ -35,11 +35,7 @@ class _SongsPageState extends State<SongsPage> {
 
   List<SongTileData> _getSongTileData(List<SongData> songDatas) {
     List<SongTileData> songs = [];
-    int cap = int.tryParse(Settings.getValue('skip-cap',defaultValue: '20')??"20")??20;
     for (var item in songDatas) {
-      if (item.timeListened < cap) {
-        continue;
-      }
       var songTileData = item.toSongTileData();
       var index = songs.indexWhere((element) =>
           element.title == songTileData.title &&
@@ -58,7 +54,7 @@ class _SongsPageState extends State<SongsPage> {
   }
 
   _refreshSongs() async {
-    _songs = _getSongTileData(await SongProviderService.getSongData());
+    _songs = _getSongTileData(await SongProviderService.getSongData(withSkipped: false));
     setState(() {});
   }
 }

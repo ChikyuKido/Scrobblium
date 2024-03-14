@@ -29,7 +29,7 @@ class SongData {
       albumAuthor: json['albumAuthor'] ?? '',
       progress: json['progress'] ?? 0,
       maxProgress: json['maxProgress'] ?? 0,
-      startTime: DateTime.parse(json['startTime'] ?? ''),
+      startTime: DateTime.parse(json['startTime'] ?? '1970-01-01T00:00:00Z'),
       endTime: DateTime.parse(json['endTime'] ?? '1970-01-01T00:00:00Z'),
       timeListened: json['timeListened'] ?? 0,
     );
