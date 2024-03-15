@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/widgets/song_list_tile.dart';
-
-import '../song_data.dart';
+import 'package:scrobblium/song_data.dart';
 
 class SongsPage extends StatefulWidget {
   const SongsPage({super.key});

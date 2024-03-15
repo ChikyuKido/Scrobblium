@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/app_theme_provider.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
-import 'package:scrobblium/widgets/simple_text_settings_tile.dart';
-
-import '../song_data.dart';
+import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/util/database_util.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -92,7 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget buildExportDB() {
-    return SimpleSettingsTile(title: "Export Database", onTap: () {});
+    return SimpleSettingsTile(title: "Export Database", onTap: () async{ await exportDatabase();});
   }
 
   Widget buildImportDB() {

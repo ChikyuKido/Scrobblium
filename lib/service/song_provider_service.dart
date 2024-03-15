@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:logger/logger.dart';
 import 'package:scrobblium/song_data.dart';
 
 class SongProviderService {
-  static final logger = Logger();
   static const platform = MethodChannel('MusicListener');
 
+  static Future<void> makeWALCheckpoint() async{
+    var result = await platform.invokeMethod("makeWALCheckpoint");
+
+  }
   static Future<void> setMusicPackage(String package) async {
     await platform.invokeMethod("setMusicPackage", {"package":package});
   }
@@ -16,7 +18,7 @@ class SongProviderService {
     return await platform.invokeMethod('list');
   }
 
-  static Future<List<SongData>> getSongData({withSkipped = true}) async {
+  static Future<List<SongData>> getSongData({withSkipped = true,DateTime? afterDate}) async {
     Stopwatch stopwatch = Stopwatch()..start();
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);
@@ -24,9 +26,10 @@ class SongProviderService {
         int cap = int.tryParse(Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ?? 20;
         songs.removeWhere((element) => element.timeListened <= cap);
     }
+    if(afterDate != null) {
+      songs.removeWhere((element) => element.endTime.isBefore(afterDate));
+    }
     stopwatch.stop();
-    logger.i(
-        'Elapsed time: ${stopwatch.elapsedMilliseconds} milliseconds. Size of the json: ${jsonData.length / 1024}kb');
     return songs;
   }
   static List<SongData> removeSkips(List<SongData> songs) {

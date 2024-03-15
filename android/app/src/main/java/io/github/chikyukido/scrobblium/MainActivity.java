@@ -2,6 +2,7 @@ package io.github.chikyukido.scrobblium;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -31,7 +32,7 @@ public class MainActivity extends FlutterActivity {
                         (call, result) -> {
                             if (call.method.equals("list")) {
                                 new Thread(() -> {
-                                    if (MusicListenerService.getInstance().getDatabase() == null) {
+                                    if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null) {
                                         new Handler(Looper.getMainLooper()).post(() -> result.success("[]"));
                                         return;
                                     }
@@ -40,15 +41,25 @@ public class MainActivity extends FlutterActivity {
                                     new Handler(Looper.getMainLooper()).post(() -> result.success(json));
                                 }).start();
                             } else if (call.method.equals("currentSong")) {
-                                if (MusicListenerService.getInstance().getCurrentSong().getMaxProgress() == -1) {
+                                if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null
+                                || MusicListenerService.getInstance().getCurrentSong().getMaxProgress() == -1) {
                                     result.success("[]");
                                     return;
                                 }
                                 result.success(gson.toJson(MusicListenerService.getInstance().getCurrentSong()));
                             } else if (call.method.equals("setMusicPackage")) {
+                                if (MusicListenerService.getInstance() == null) return;
                                 String argument = call.argument("package");
                                 MusicListenerService.getInstance().setMusicPackage(argument);
-                            } else {
+                            } else if (call.method.equals("makeWALCheckpoint")) {
+                                if (MusicListenerService.getInstance() == null) return;
+                                if (MusicListenerService.getInstance().getDatabase() != null) {
+                                    MusicListenerService.getInstance().getDatabase().close();
+                                }
+                                MusicListenerService.getInstance().connectToDatabase();
+                                Log.i("MainActivity", "configureFlutterEngine: checkpoint for database");
+                                result.success("made checkpoint");
+                            }else {
                                 result.notImplemented();
                             }
                         }

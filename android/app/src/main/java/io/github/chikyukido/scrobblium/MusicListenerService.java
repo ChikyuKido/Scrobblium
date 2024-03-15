@@ -45,19 +45,24 @@ public class MusicListenerService extends NotificationListenerService {
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
-        database = Room.databaseBuilder(
-                getApplicationContext(),
-                SongDatabase.class,
-                "song_database"
-        ).build();
-        musicPackageName = ConfigUtil.getMusicPackage(getBaseContext());
-        if (musicPackageName.isEmpty()) {
+        connectToDatabase();
+        musicPackageName = ConfigUtil.getMusic3Package(getBaseContext());
+        if (musicPackageName == null || musicPackageName.isEmpty()) {
             Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
         } else {
             startForegroundService();
             startTimer();
         }
     }
+
+    public void connectToDatabase() {
+        database = Room.databaseBuilder(
+                getApplicationContext(),
+                SongDatabase.class,
+                "song_database"
+        ).build();
+    }
+
     public void setMusicPackage(String musicPackage) {
         musicPackageName = musicPackage;
         INSTANCE.startTimer();
@@ -81,13 +86,12 @@ public class MusicListenerService extends NotificationListenerService {
         }
         Log.i(TAG, "startTimer: Timer started");
         timer = new Timer();
-        long timerPeriod = 1000;
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 fetchActiveNotifications();
             }
-        }, 5000, timerPeriod);
+        }, 5000, 1000);
 
     }
 
@@ -138,14 +142,14 @@ public class MusicListenerService extends NotificationListenerService {
             saveArt();
         }
         if (isSameSong()) {
-            if (currentMediaController.getPlaybackState() != null &&
-                    currentMediaController.getPlaybackState().getState() == PlaybackState.STATE_PLAYING) {
+            if (currentMediaController.getPlaybackState() != null && currentMediaController.getPlaybackState().getState() == PlaybackState.STATE_PLAYING) {
                 currentSong.incrementTimeListened();
                 currentSong.setProgress(currentMediaController.getPlaybackState().getPosition());
             }
         } else {
             currentSong.setEndTime(LocalDateTime.now());
-            database.musicTrackDao().insertTrack(currentSong);
+            if(database.isOpen())
+                database.musicTrackDao().insertTrack(currentSong);
             currentSong = SongData.of(currentMediaController);
             saveArt();
             Log.i(TAG, "fetchActiveNotifications: New song detected.");
@@ -162,7 +166,7 @@ public class MusicListenerService extends NotificationListenerService {
     }
 
     private MediaController getMediaControllerFromNotification(StatusBarNotification sbn) {
-        MediaSession.Token mediaSessionToken = (MediaSession.Token) sbn.getNotification().extras.getParcelable("android.mediaSession");
+        MediaSession.Token mediaSessionToken = sbn.getNotification().extras.getParcelable("android.mediaSession");
         if (mediaSessionToken == null) return null;
         return new MediaController(getApplicationContext(), mediaSessionToken);
     }
