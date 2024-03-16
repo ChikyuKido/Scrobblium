@@ -115,6 +115,9 @@ class SongProviderService {
   static startForegroundProcess() async {
     await platform.invokeMethod("startForegroundProcess");
   }
+  static exportDatabase() async {
+    await platform.invokeMethod("exportDatabase");
+  }
 }
 
 class SongStatistic {

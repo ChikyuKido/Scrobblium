@@ -34,6 +34,7 @@ public class MethodChannelUtil {
         methods.put("isNotificationGranted", isNotificationPermission(context));
         methods.put("getMusicListenerServiceStatus",getMusicListenerServiceStatus());
         methods.put("startForegroundProcess",startForegroundProcess());
+        methods.put("exportDatabase",exportDatabase(context));
         methodChannel.setMethodCallHandler((call, result) -> {
            if(methods.containsKey(call.method)) {
                Log.i("MethodChannelUtil","Execute following command: " + call.method);
@@ -105,6 +106,9 @@ public class MethodChannelUtil {
             if(MusicListenerService.getInstance() == null) return;
             MusicListenerService.getInstance().startForegroundService();
         };
+    }
+    private static MethodInterface exportDatabase(Context context) {
+        return (call, result) -> BackupDatabaseUtil.launchDirectoryChooserForExport(context);
     }
 
     private interface MethodInterface {
