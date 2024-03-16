@@ -103,6 +103,18 @@ class SongProviderService {
     }
     return formattedDuration.trim();
   }
+  static Future<void> launchNotificationAccess() async{
+    await platform.invokeMethod("launchNotificationAccess");
+  }
+  static Future<bool> isNotificationPermissionGranted() async{
+    return (await platform.invokeMethod("isNotificationGranted") == "true");
+  }
+  static Future<String> getMusicListenerServiceStatus() async{
+    return (await platform.invokeMethod("getMusicListenerServiceStatus"));
+  }
+  static startForegroundProcess() async {
+    await platform.invokeMethod("startForegroundProcess");
+  }
 }
 
 class SongStatistic {

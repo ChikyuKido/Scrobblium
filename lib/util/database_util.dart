@@ -1,11 +1,6 @@
 import 'dart:io';
 
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:scrobblium/service/song_provider_service.dart';
 
 
 exportDatabase() async{
@@ -33,6 +28,13 @@ exportDatabase() async{
   //   File("$result/song_database").createSync();
   //   File("$result/song_database").writeAsBytesSync(file.readAsBytesSync());
   // }
+  //   final String uri = 'android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS';
+  //   if (await canLaunch(uri)) {
+  //     await launch(uri);
+  //   } else {
+  //     // Could not open the URI, handle the error
+  //     print('Could not open notification access settings');
+  //   }
 
 }
 

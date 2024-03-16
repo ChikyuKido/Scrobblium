@@ -53,6 +53,8 @@ class SimpleSettingsTile extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  final EdgeInsetsGeometry? padding;
+
   SimpleSettingsTile({
     required this.title,
     this.subtitle,
@@ -62,11 +64,13 @@ class SimpleSettingsTile extends StatelessWidget {
     this.enabled = true,
     this.leading,
     this.onTap,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
-    return _SettingsTile(
+    return Padding(padding: padding??EdgeInsets.zero,
+    child: _SettingsTile(
       leading: leading,
       title: title,
       subtitle: subtitle,
@@ -75,7 +79,7 @@ class SimpleSettingsTile extends StatelessWidget {
       enabled: enabled,
       onTap: () => _handleTap(context),
       child: child != null ? getIcon(context) : Text(''),
-    );
+    ));
   }
 
   Widget getIcon(BuildContext context) {

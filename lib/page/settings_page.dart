@@ -26,14 +26,13 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         SettingsGroup(title: "Tracking", children: <Widget>[
           buildMusicPackage(),
-          FutureBuilder(future: _buildValidationInfo(), builder: (context, snapshot) {
-            if(snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
-            return snapshot.data??Container();
-          }),
+          _futureWidget(_buildNotificationAccess()),
+          _futureWidget(_buildForegroundProcess()),
+          _futureWidget(_buildValidationInfo())
         ]),
-        buildSkipCap(),
+        SettingsGroup(title: "Stats", children: [
+          buildSkipCap(),
+        ]),
         SettingsGroup(
             title: "Appearance",
             children: <Widget>[buildTrueDarkMode()]),
@@ -80,14 +79,45 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
   }
+  Widget _futureWidget(Future<Widget> wid) {
+    return FutureBuilder(future: wid, builder: (context, snapshot) {
+      if(snapshot.connectionState == ConnectionState.waiting) {
+        return const CircularProgressIndicator();
+      }
+      return snapshot.data??Container();
+    });
+  }
+  Future<Widget> _buildNotificationAccess() async{
+    bool granted = await SongProviderService.isNotificationPermissionGranted();
+    return SimpleSettingsTile(
+        title: "Notification access is ${granted ? "granted" : "denied"}",
+        subtitle: "Tap to open Notification settings",
+        onTap: () => SongProviderService.launchNotificationAccess(),
+    );
+  }
+  Future<Widget> _buildForegroundProcess() async {
+    bool granted = await SongProviderService.isNotificationPermissionGranted();
+    String status = await SongProviderService.getMusicListenerServiceStatus();
+    return granted ?
+        SimpleSettingsTile(
+            title: "Tracker status: $status",
+            subtitle: "Tap to start the background process",
+            onTap: () async {
+              await SongProviderService.startForegroundProcess();
+              setState(() {});
+            },
+        )
+        : Container();
+  }
 
   Future<Widget> _buildValidationInfo() async{
     SongData? s = await SongProviderService.getCurrentSong();
-    return SimpleSettingsTile(
+    String status = await SongProviderService.getMusicListenerServiceStatus();
+    return status == "TRACKING" ? SimpleSettingsTile(
       title: s == null ? "Could not find currentSong" : "Found music App",
       subtitle: s != null ? s.getIdentifier() : "Maybe start the music or the package is wrong",
       onTap: () => setState(() {})
-    );
+    ) : Container();
   }
 
   Widget buildExportDB() {

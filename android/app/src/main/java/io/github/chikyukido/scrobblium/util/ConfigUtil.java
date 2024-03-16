@@ -2,7 +2,6 @@ package io.github.chikyukido.scrobblium.util;
 
 import android.content.Context;
 import android.util.Log;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;

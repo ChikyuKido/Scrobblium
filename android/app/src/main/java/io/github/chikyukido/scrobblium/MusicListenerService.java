@@ -1,8 +1,10 @@
 package io.github.chikyukido.scrobblium;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
@@ -11,23 +13,24 @@ import android.media.session.PlaybackState;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
-
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.room.Room;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.database.SongDatabase;
 import io.github.chikyukido.scrobblium.util.BitmapUtil;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MusicListenerService extends NotificationListenerService {
+    public static MusicListenerServiceStatus status = MusicListenerServiceStatus.NOT_INITIALIZED;
     private static MusicListenerService INSTANCE = null;
 
     private final String TAG = "MusicListenerService";
@@ -46,13 +49,8 @@ public class MusicListenerService extends NotificationListenerService {
         super.onCreate();
         INSTANCE = this;
         connectToDatabase();
-        musicPackageName = ConfigUtil.getMusic3Package(getBaseContext());
-        if (musicPackageName == null || musicPackageName.isEmpty()) {
-            Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
-        } else {
-            startForegroundService();
-            startTimer();
-        }
+        startForegroundService();
+
     }
 
     public void connectToDatabase() {
@@ -69,14 +67,27 @@ public class MusicListenerService extends NotificationListenerService {
         Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
     }
 
-    private void startForegroundService() {
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                "Music Listener Service",
-                NotificationManager.IMPORTANCE_DEFAULT);
-        NotificationManager manager = getSystemService(NotificationManager.class);
-        manager.createNotificationChannel(channel);
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID).build();
-        startForeground(NOTIFICATION_ID, notification);
+    public void startForegroundService() {
+        musicPackageName = ConfigUtil.getMusicPackage(getBaseContext());
+        if (musicPackageName == null || musicPackageName.isEmpty()) {
+            Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
+            status = MusicListenerServiceStatus.NO_PACKAGE;
+            return;
+        }
+        if(!isPermissionGranted()) {
+            status = MusicListenerServiceStatus.NO_PERMISSION;
+            return;
+        }
+        if(!isServiceRunning(this.getClass())) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                    "Music Listener Service",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID).build();
+            startForeground(NOTIFICATION_ID, notification);
+        }
+        if(status != MusicListenerServiceStatus.TRACKING) startTimer();
     }
 
     private void startTimer() {
@@ -85,6 +96,7 @@ public class MusicListenerService extends NotificationListenerService {
             return;
         }
         Log.i(TAG, "startTimer: Timer started");
+        status = MusicListenerServiceStatus.TRACKING;
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -97,6 +109,7 @@ public class MusicListenerService extends NotificationListenerService {
 
     private void stopTimer() {
         if (timer != null) {
+            status = MusicListenerServiceStatus.PAUSED;
             Log.i(TAG, "stopTimer: Timer stopped");
             timer.cancel();
             timer = null;
@@ -182,6 +195,7 @@ public class MusicListenerService extends NotificationListenerService {
         }
     }
 
+
     public SongDatabase getDatabase() {
         return database;
     }
@@ -191,5 +205,27 @@ public class MusicListenerService extends NotificationListenerService {
     }
     public static MusicListenerService getInstance() {
         return INSTANCE;
+    }
+
+    private boolean isPermissionGranted() {
+        Set<String> enabledListenerPackages = NotificationManagerCompat.getEnabledListenerPackages(getBaseContext());
+        return enabledListenerPackages.contains(getBaseContext().getPackageName());
+    }
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public enum MusicListenerServiceStatus {
+        NOT_INITIALIZED,
+        NO_PACKAGE,
+        NO_PERMISSION,
+        TRACKING,
+        PAUSED,
     }
 }
