@@ -25,8 +25,8 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.all(8.0),
       children: [
         SettingsGroup(title: "Tracking", children: <Widget>[
-          buildMusicPackage(),
           _futureWidget(_buildNotificationAccess()),
+          _futureWidget(buildMusicPackage()),
           _futureWidget(_buildForegroundProcess()),
           _futureWidget(_buildValidationInfo())
         ]),
@@ -50,15 +50,17 @@ class _SettingsPageState extends State<SettingsPage> {
         onChange: (p0) => AppThemeProvider().switchThemeDark(),
     );
   }
-  Widget buildMusicPackage() {
-    return TextInputSettingsTile(
+  Future<Widget> buildMusicPackage() async{
+    bool granted = await SongProviderService.isNotificationPermissionGranted();
+    return granted ? TextInputSettingsTile(
+      topPadding: 0.0,
       title: 'Music app package',
       settingKey: 'music-app-package',
       initialValue: '',
       onChange: (p0) {
         SongProviderService.setMusicPackage(p0);
       },
-    );
+    ) : Container();
   }
   Widget buildSkipCap() {
     return TextInputSettingsTile(
@@ -90,6 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<Widget> _buildNotificationAccess() async{
     bool granted = await SongProviderService.isNotificationPermissionGranted();
     return SimpleSettingsTile(
+        padding: const EdgeInsets.only(top: 16.0),
         title: "Notification access is ${granted ? "granted" : "denied"}",
         subtitle: "Tap to open Notification settings",
         onTap: () => SongProviderService.launchNotificationAccess(),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
-import 'package:scrobblium/widgets/song_list_tile.dart';
 import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/widgets/song_list_tile.dart';
 
 class SongsPage extends StatefulWidget {
   const SongsPage({super.key});

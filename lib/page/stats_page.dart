@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/latest_song_tile.dart';
