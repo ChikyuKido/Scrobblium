@@ -8,7 +8,7 @@ class SongProviderService {
   static const platform = MethodChannel('MusicListener');
 
   static Future<void> makeWALCheckpoint() async{
-    var result = await platform.invokeMethod("makeWALCheckpoint");
+    await platform.invokeMethod("makeWALCheckpoint");
 
   }
   static Future<void> setMusicPackage(String package) async {

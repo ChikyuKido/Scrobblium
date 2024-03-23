@@ -35,6 +35,7 @@ public class MethodChannelUtil {
         methods.put("getMusicListenerServiceStatus",getMusicListenerServiceStatus());
         methods.put("startForegroundProcess",startForegroundProcess());
         methods.put("exportDatabase",exportDatabase(context));
+        methods.put("test",test(context));
         methodChannel.setMethodCallHandler((call, result) -> {
            if(methods.containsKey(call.method)) {
                Log.i("MethodChannelUtil","Execute following command: " + call.method);
@@ -43,6 +44,12 @@ public class MethodChannelUtil {
                result.notImplemented();
            }
         });
+    }
+
+    private static MethodInterface test(Context context) {
+        return (call, result) ->  {
+            result.success("test");
+        };
     }
 
     private static MethodInterface getSongList() {

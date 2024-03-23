@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scrobblium/page/song_tile_info_page.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/widgets/song_list_tile.dart';
@@ -11,7 +12,8 @@ class SongsPage extends StatefulWidget {
 }
 
 class _SongsPageState extends State<SongsPage> {
-  List<SongTileData> _songs = [];
+  List<SongTileData> _tileSongs = [];
+  List<SongData> _songs = [];
 
   @override
   void initState() {
@@ -23,12 +25,21 @@ class _SongsPageState extends State<SongsPage> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
         onRefresh: () async => _refreshSongs(),
-        child: _songs.isEmpty
+        child: _tileSongs.isEmpty
             ? Container()
             : ListView.builder(
-              itemCount: _songs.length,
+              itemCount: _tileSongs.length,
                 itemBuilder: (BuildContext context, int index) =>
-                    SongListTile(songData: _songs[index])));
+                    SongListTile(
+                        songData: _tileSongs[index],
+                        onTap: () {
+                          List<SongData> songs = _songs.where((element) => _tileSongs[index].getIdentifier() == element.getIdentifier()).toList();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SongTileInfoPage(songs: songs)));
+                      },
+                    )
+        ));
   }
 
   List<SongTileData> _getSongTileData(List<SongData> songDatas) {
@@ -52,7 +63,8 @@ class _SongsPageState extends State<SongsPage> {
   }
 
   _refreshSongs() async {
-    _songs = _getSongTileData(await SongProviderService.getSongData(withSkipped: false));
+    _songs = await SongProviderService.getSongData();
+    _tileSongs = _getSongTileData(SongProviderService.removeSkips(_songs));
     setState(() {});
   }
 }

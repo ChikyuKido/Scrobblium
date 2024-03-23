@@ -1,66 +1,43 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:scrobblium/song_data.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:scrobblium/util/image_util.dart';
+import 'package:scrobblium/util/util.dart';
 
 class SongListTile extends StatelessWidget {
   final SongTileData songData;
+  final GestureTapCallback onTap;
 
-  const SongListTile({super.key, required this.songData});
+  const SongListTile({super.key, required this.songData, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: _getAppFilesPath(),
+    return FutureBuilder<FileImage?>(
+      future: getSongImageFromTile(songData),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          final appFilesPath = snapshot.data ?? '';
-          String imagePath =
-              '$appFilesPath/arts/${songData.getIdentifier()}.png';
-          bool imageExists = File(imagePath).existsSync();
-
           return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: imageExists ? FileImage(File(imagePath)) : null,
-              child: imageExists ? null : Text(songData.title[0]),
+            onTap: onTap,
+            leading:  CircleAvatar(
+              backgroundImage: snapshot.data,
+              child: snapshot.data != null ? null : Text(songData.title[0]),
             ),
-            title: Text(songData.title),
-            subtitle: Text("${songData.artist} - ${songData.album}"),
+            title: Text(songData.title, softWrap: false),
+            subtitle: Text(songData.artist, softWrap: false),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text("Listens: ${songData.listenCount}"),
-                Text("Time: ${_formatDuration(songData.allTimeListened)}"),
+                Text("Time: ${formatDuration(songData.allTimeListened)}"),
               ],
             ),
           );
         }
       },
     );
-  }
-
-  Future<String> _getAppFilesPath() async {
-    try {
-      Directory appDocDir = await getApplicationCacheDirectory();
-      String appFilesPath = appDocDir.path;
-      return appFilesPath;
-    } catch (e) {
-      print("Error getting app files directory: $e");
-      return '';
-    }
-  }
-
-  String _formatDuration(int durationInSeconds) {
-    Duration duration = Duration(seconds: durationInSeconds);
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${duration.inHours}:$twoDigitMinutes:$twoDigitSeconds";
   }
 }
