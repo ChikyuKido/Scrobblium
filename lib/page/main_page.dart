@@ -23,8 +23,8 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(_titles[_selectedIndex]),
-        elevation: 8,
       ),
       body: Center(
         child: _pages.elementAt(_selectedIndex), //New

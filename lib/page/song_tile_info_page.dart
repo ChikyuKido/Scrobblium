@@ -10,6 +10,7 @@ import '../util/image_util.dart';
 
 class SongTileInfoPage extends StatefulWidget {
   final List<SongData> songs;
+
   const SongTileInfoPage({super.key, required this.songs});
 
   @override
@@ -18,11 +19,13 @@ class SongTileInfoPage extends StatefulWidget {
 
 class _SongTileInfoPageState extends State<SongTileInfoPage> {
   late final SongData song;
+
   @override
   void initState() {
     song = widget.songs[0];
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     SongStatistic stats = SongProviderService.getSongStatistics(widget.songs);
@@ -36,19 +39,22 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
           getSongInfo(),
           MusicStatsRow(songStatistic: stats),
           Column(
-            children: widget.songs.indexed.map((e) => getSongTile(e.$2, e.$1+1)).toList(),
+            children: widget.songs.indexed
+                .map((e) => getSongTile(e.$2, e.$1 + 1))
+                .toList(),
           ),
         ],
       ),
     );
   }
-  Widget getSongTile(SongData song,int index) {
+
+  Widget getSongTile(SongData song, int index) {
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: null,
         child: Text("$index"),
       ),
-      title:Text(
+      title: Text(
         "Time Listened: ${formatDuration(song.timeListened)}",
       ),
       subtitle: Text(
@@ -56,10 +62,12 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
       ),
     );
   }
+
   String _formatDate(DateTime dateTime) {
     // Format the date as per your requirement
     return "${dateTime.day}.${dateTime.month}.${dateTime.year}";
   }
+
   Widget getSongInfo() {
     return FutureBuilder<FileImage?>(
       future: getSongImage(song),

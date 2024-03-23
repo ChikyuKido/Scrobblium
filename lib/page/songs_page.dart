@@ -28,18 +28,22 @@ class _SongsPageState extends State<SongsPage> {
         child: _tileSongs.isEmpty
             ? Container()
             : ListView.builder(
-              itemCount: _tileSongs.length,
-                itemBuilder: (BuildContext context, int index) =>
-                    SongListTile(
-                        songData: _tileSongs[index],
-                        onTap: () {
-                          List<SongData> songs = _songs.where((element) => _tileSongs[index].getIdentifier() == element.getIdentifier()).toList();
+                itemCount: _tileSongs.length,
+                itemBuilder: (BuildContext context, int index) => SongListTile(
+                      songData: _tileSongs[index],
+                      onTap: () {
+                        List<SongData> songs = _songs
+                            .where((element) =>
+                                _tileSongs[index].getIdentifier() ==
+                                element.getIdentifier())
+                            .toList();
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SongTileInfoPage(songs: songs)));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    SongTileInfoPage(songs: songs)));
                       },
-                    )
-        ));
+                    )));
   }
 
   List<SongTileData> _getSongTileData(List<SongData> songDatas) {

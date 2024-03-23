@@ -16,6 +16,7 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   int _currentDateSelected = 3;
+
   @override
   void initState() {
     super.initState();
@@ -24,9 +25,14 @@ class _StatsPageState extends State<StatsPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: SongProviderService.getSongData(afterDate: _currentDateSelected == 0 ? DateTime.now().subtract(const Duration(days: 7)) :
-                  _currentDateSelected == 1 ? DateTime.now().subtract(const Duration(days: 30)):
-                  _currentDateSelected == 2 ? DateTime.now().subtract(const Duration(days: 365)): null),
+      future: SongProviderService.getSongData(
+          afterDate: _currentDateSelected == 0
+              ? DateTime.now().subtract(const Duration(days: 7))
+              : _currentDateSelected == 1
+                  ? DateTime.now().subtract(const Duration(days: 30))
+                  : _currentDateSelected == 2
+                      ? DateTime.now().subtract(const Duration(days: 365))
+                      : null),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -51,18 +57,30 @@ class _StatsPageState extends State<StatsPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    DateOption(text: 'Last Week',selected: _currentDateSelected == 0,onTap: () => setState(() {
-                      _currentDateSelected = 0;
-                    })),
-                    DateOption(text: 'Last Month',selected: _currentDateSelected == 1,onTap: () => setState(() {
-                      _currentDateSelected = 1;
-                    })),
-                    DateOption(text: 'Last Year',selected: _currentDateSelected == 2,onTap: () => setState(() {
-                      _currentDateSelected = 2;
-                    })),
-                    DateOption(text: 'All Time',selected: _currentDateSelected == 3,onTap: () => setState(() {
-                      _currentDateSelected = 3;
-                    })),
+                    DateOption(
+                        text: 'Last Week',
+                        selected: _currentDateSelected == 0,
+                        onTap: () => setState(() {
+                              _currentDateSelected = 0;
+                            })),
+                    DateOption(
+                        text: 'Last Month',
+                        selected: _currentDateSelected == 1,
+                        onTap: () => setState(() {
+                              _currentDateSelected = 1;
+                            })),
+                    DateOption(
+                        text: 'Last Year',
+                        selected: _currentDateSelected == 2,
+                        onTap: () => setState(() {
+                              _currentDateSelected = 2;
+                            })),
+                    DateOption(
+                        text: 'All Time',
+                        selected: _currentDateSelected == 3,
+                        onTap: () => setState(() {
+                              _currentDateSelected = 3;
+                            })),
                   ],
                 ),
               ),
@@ -70,9 +88,7 @@ class _StatsPageState extends State<StatsPage> {
             const SizedBox(height: 10),
             Center(
               child: Text(
-                'Your ${_currentDateSelected == 0 ? "Last Week" :
-                _currentDateSelected == 1 ? "Last Month" :
-                _currentDateSelected == 2 ? "Last Year" : "All Time"} Stats',
+                'Your ${_currentDateSelected == 0 ? "Last Week" : _currentDateSelected == 1 ? "Last Month" : _currentDateSelected == 2 ? "Last Year" : "All Time"} Stats',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
@@ -85,9 +101,14 @@ class _StatsPageState extends State<StatsPage> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
-            songsRemovedSkip.isEmpty ? Container():Column(
-              children: songsRemovedSkip.sublist(0,min(7, songsRemovedSkip.length)).map((e) => LatestSongTile(songData: e)).toList(),
-            ),
+            songsRemovedSkip.isEmpty
+                ? Container()
+                : Column(
+                    children: songsRemovedSkip
+                        .sublist(0, min(7, songsRemovedSkip.length))
+                        .map((e) => LatestSongTile(songData: e))
+                        .toList(),
+                  ),
             const SizedBox(height: 10),
             Center(
               child: Text(
