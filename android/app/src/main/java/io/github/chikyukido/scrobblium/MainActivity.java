@@ -10,6 +10,7 @@ import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 
 import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_EXPORT;
+import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_IMPORT;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "MusicListener";
@@ -22,9 +23,12 @@ public class MainActivity extends FlutterActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             if (data != null && data.getData() != null) {
-                BackupDatabaseUtil.exportDatabase(getApplicationContext(),data.getData());
+                if(requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT)
+                    BackupDatabaseUtil.exportDatabase(getApplicationContext(),data.getData());
+                else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT)
+                    BackupDatabaseUtil.importDatabase(getApplicationContext(),data.getData());
             }
         }
     }

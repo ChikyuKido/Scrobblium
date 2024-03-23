@@ -35,6 +35,7 @@ public class MethodChannelUtil {
         methods.put("getMusicListenerServiceStatus",getMusicListenerServiceStatus());
         methods.put("startForegroundProcess",startForegroundProcess());
         methods.put("exportDatabase",exportDatabase(context));
+        methods.put("importDatabase",importDatabase(context));
         methods.put("test",test(context));
         methodChannel.setMethodCallHandler((call, result) -> {
            if(methods.containsKey(call.method)) {
@@ -45,6 +46,7 @@ public class MethodChannelUtil {
            }
         });
     }
+
 
     private static MethodInterface test(Context context) {
         return (call, result) ->  {
@@ -116,6 +118,9 @@ public class MethodChannelUtil {
     }
     private static MethodInterface exportDatabase(Context context) {
         return (call, result) -> BackupDatabaseUtil.launchDirectoryChooserForExport(context);
+    }
+    private static MethodInterface importDatabase(Context context) {
+        return (call, result) -> BackupDatabaseUtil.launchFileChooserForImport(context);
     }
 
     private interface MethodInterface {

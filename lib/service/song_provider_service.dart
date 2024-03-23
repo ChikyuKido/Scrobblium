@@ -118,6 +118,9 @@ class SongProviderService {
   static exportDatabase() async {
     await platform.invokeMethod("exportDatabase");
   }
+  static importDatabase() async {
+    await platform.invokeMethod("importDatabase");
+  }
 }
 
 class SongStatistic {
