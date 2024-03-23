@@ -3,17 +3,16 @@ import 'package:scrobblium/service/song_provider_service.dart';
 
 class MusicStatsRow extends StatelessWidget {
   final SongStatistic songStatistic;
+
   const MusicStatsRow({super.key, required this.songStatistic});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        _allTimeStats(context),
-        _allTimeSkippedRatio(context)
-      ],
+      children: [_allTimeStats(context), _allTimeSkippedRatio(context)],
     );
   }
+
   Row _allTimeStats(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -86,7 +85,6 @@ class MusicStatsRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-
         Expanded(
           child: Column(
             children: [
@@ -125,7 +123,8 @@ class MusicStatsRow extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               Text(
-                songStatistic.ratioBetweenTimeListenedAndMaxProgress.toStringAsFixed(2),
+                songStatistic.ratioBetweenTimeListenedAndMaxProgress
+                    .toStringAsFixed(2),
                 style: Theme.of(context).textTheme.labelSmall,
               ),
             ],
@@ -134,4 +133,4 @@ class MusicStatsRow extends StatelessWidget {
       ],
     );
   }
-} 
+}

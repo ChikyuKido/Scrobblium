@@ -13,20 +13,31 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   final List<List<FlexScheme>> colors = [
-    [FlexScheme.amber,FlexScheme.wasabi,FlexScheme.deepBlue,FlexScheme.aquaBlue],
-    [FlexScheme.damask,FlexScheme.espresso,FlexScheme.gold,FlexScheme.green],
-    [FlexScheme.dellGenoa,FlexScheme.jungle,FlexScheme.mango,FlexScheme.red],
-    [FlexScheme.yellowM3,FlexScheme.shark,FlexScheme.sakura,FlexScheme.rosewood],
+    [
+      FlexScheme.amber,
+      FlexScheme.wasabi,
+      FlexScheme.deepBlue,
+      FlexScheme.aquaBlue
+    ],
+    [FlexScheme.damask, FlexScheme.espresso, FlexScheme.gold, FlexScheme.green],
+    [FlexScheme.dellGenoa, FlexScheme.jungle, FlexScheme.mango, FlexScheme.red],
+    [
+      FlexScheme.yellowM3,
+      FlexScheme.shark,
+      FlexScheme.sakura,
+      FlexScheme.rosewood
+    ],
   ];
   FlexScheme? selectedColor;
 
   @override
   void initState() {
     super.initState();
-    var color = Settings.getValue("theme-color",defaultValue: "amber")??"amber";
-    selectedColor = FlexScheme.values.where((element) => element.name == color).first;
+    var color =
+        Settings.getValue("theme-color", defaultValue: "amber") ?? "amber";
+    selectedColor =
+        FlexScheme.values.where((element) => element.name == color).first;
   }
 
   @override
@@ -206,7 +217,6 @@ class _SettingsPageState extends State<SettingsPage> {
         });
   }
 
-
   void selectColor(FlexScheme color) {
     selectedColor = color;
     Settings.setValue("theme-color", color.name);
@@ -250,5 +260,4 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
 }

@@ -44,6 +44,10 @@ public class MusicListenerService extends NotificationListenerService {
     private MediaController currentMediaController;
     private Timer timer;
 
+    public static MusicListenerService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -74,11 +78,11 @@ public class MusicListenerService extends NotificationListenerService {
             status = MusicListenerServiceStatus.NO_PACKAGE;
             return;
         }
-        if(!isPermissionGranted()) {
+        if (!isPermissionGranted()) {
             status = MusicListenerServiceStatus.NO_PERMISSION;
             return;
         }
-        if(!isServiceRunning(this.getClass())) {
+        if (!isServiceRunning(this.getClass())) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                     "Music Listener Service",
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -87,7 +91,7 @@ public class MusicListenerService extends NotificationListenerService {
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID).build();
             startForeground(NOTIFICATION_ID, notification);
         }
-        if(status != MusicListenerServiceStatus.TRACKING) startTimer();
+        if (status != MusicListenerServiceStatus.TRACKING) startTimer();
     }
 
     private void startTimer() {
@@ -161,7 +165,7 @@ public class MusicListenerService extends NotificationListenerService {
             }
         } else {
             currentSong.setEndTime(LocalDateTime.now());
-            if(database.isOpen())
+            if (database.isOpen())
                 database.musicTrackDao().insertTrack(currentSong);
             currentSong = SongData.of(currentMediaController);
             saveArt();
@@ -195,7 +199,6 @@ public class MusicListenerService extends NotificationListenerService {
         }
     }
 
-
     public SongDatabase getDatabase() {
         return database;
     }
@@ -203,14 +206,12 @@ public class MusicListenerService extends NotificationListenerService {
     public SongData getCurrentSong() {
         return currentSong;
     }
-    public static MusicListenerService getInstance() {
-        return INSTANCE;
-    }
 
     private boolean isPermissionGranted() {
         Set<String> enabledListenerPackages = NotificationManagerCompat.getEnabledListenerPackages(getBaseContext());
         return enabledListenerPackages.contains(getBaseContext().getPackageName());
     }
+
     private boolean isServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

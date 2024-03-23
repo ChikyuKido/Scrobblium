@@ -3,38 +3,46 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/util/util.dart';
 
 class SongProviderService {
   static const platform = MethodChannel('MusicListener');
 
-  static Future<void> makeWALCheckpoint() async{
+  static Future<void> makeWALCheckpoint() async {
     await platform.invokeMethod("makeWALCheckpoint");
+  }
 
-  }
   static Future<void> setMusicPackage(String package) async {
-    await platform.invokeMethod("setMusicPackage", {"package":package});
+    await platform.invokeMethod("setMusicPackage", {"package": package});
   }
+
   static Future<String> getJsonData() async {
     return await platform.invokeMethod('list');
   }
 
-  static Future<List<SongData>> getSongData({withSkipped = true,DateTime? afterDate}) async {
+  static Future<List<SongData>> getSongData(
+      {withSkipped = true, DateTime? afterDate}) async {
     Stopwatch stopwatch = Stopwatch()..start();
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);
-    if(!withSkipped) {
-        int cap = int.tryParse(Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ?? 20;
-        songs.removeWhere((element) => element.timeListened <= cap);
+    if (!withSkipped) {
+      int cap = int.tryParse(
+              Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ??
+          20;
+      songs.removeWhere((element) => element.timeListened <= cap);
     }
-    if(afterDate != null) {
+    if (afterDate != null) {
       songs.removeWhere((element) => element.endTime.isBefore(afterDate));
     }
     stopwatch.stop();
     return songs;
   }
+
   static List<SongData> removeSkips(List<SongData> songs) {
     List<SongData> newSongs = List.of(songs);
-    int cap = int.tryParse(Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ?? 20;
+    int cap = int.tryParse(
+            Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ??
+        20;
     newSongs.removeWhere((element) => element.timeListened <= cap);
     return newSongs;
   }
@@ -61,63 +69,49 @@ class SongProviderService {
     int timeListened = 0;
     int songsSkipped = 0;
 
-    for(var song in songs) {
-      int cap = int.tryParse(Settings.getValue('skip-cap',defaultValue: '20')??"20")??20;
-      if(song.timeListened < cap) {
+    for (var song in songs) {
+      int cap = int.tryParse(
+              Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ??
+          20;
+      if (song.timeListened < cap) {
         songsSkipped++;
-      }else {
+      } else {
         songsListened++;
-        songsListenedByProgress += song.progress~/1000;
-        songsListenedByMaxProgress += song.maxProgress~/1000;
+        songsListenedByProgress += song.progress ~/ 1000;
+        songsListenedByMaxProgress += song.maxProgress ~/ 1000;
       }
       timeListened += song.timeListened;
-
     }
-    return SongStatistic(songsListened,
-        _formatDuration(timeListened),
+    return SongStatistic(
+        songsListened,
+        formatDuration(timeListened),
         songsSkipped,
-        _formatDuration(songsListenedByProgress),
-        _formatDuration(songsListenedByMaxProgress),
-        songsListenedByProgress/songsListenedByMaxProgress,
-        timeListened/songsListenedByMaxProgress);
+        formatDuration(songsListenedByProgress),
+        formatDuration(songsListenedByMaxProgress),
+        songsListenedByProgress / songsListenedByMaxProgress,
+        timeListened / songsListenedByMaxProgress);
   }
-  static String _formatDuration(int durationInSeconds) {
-    Duration duration = Duration(seconds: durationInSeconds);
-    int days = duration.inDays;
-    int hours = duration.inHours.remainder(24);
-    int minutes = duration.inMinutes.remainder(60);
-    int seconds = duration.inSeconds.remainder(60);
 
-    String formattedDuration = '';
-    if (days > 0) {
-      formattedDuration += '${days}d ';
-    }
-    if (hours > 0) {
-      formattedDuration += '${hours}h ';
-    }
-    if (minutes > 0) {
-      formattedDuration += '${minutes}m ';
-    }
-    if (seconds > 0 || formattedDuration.isEmpty) {
-      formattedDuration += '${seconds}s';
-    }
-    return formattedDuration.trim();
-  }
-  static Future<void> launchNotificationAccess() async{
+  static Future<void> launchNotificationAccess() async {
     await platform.invokeMethod("launchNotificationAccess");
   }
-  static Future<bool> isNotificationPermissionGranted() async{
+
+  static Future<bool> isNotificationPermissionGranted() async {
     return (await platform.invokeMethod("isNotificationGranted") == "true");
   }
-  static Future<String> getMusicListenerServiceStatus() async{
+
+  static Future<String> getMusicListenerServiceStatus() async {
     return (await platform.invokeMethod("getMusicListenerServiceStatus"));
   }
+
   static startForegroundProcess() async {
     await platform.invokeMethod("startForegroundProcess");
   }
+
   static exportDatabase() async {
     await platform.invokeMethod("exportDatabase");
   }
+
   static importDatabase() async {
     await platform.invokeMethod("importDatabase");
   }
@@ -132,5 +126,12 @@ class SongStatistic {
   final double ratioBetweenProgressAndMaxProgress;
   final double ratioBetweenTimeListenedAndMaxProgress;
 
-  SongStatistic(this.songsListened, this.timeListened, this.songsSkipped, this.timeListenedByProgress, this.timeListenedByMaxProgress, this.ratioBetweenProgressAndMaxProgress, this.ratioBetweenTimeListenedAndMaxProgress);
+  SongStatistic(
+      this.songsListened,
+      this.timeListened,
+      this.songsSkipped,
+      this.timeListenedByProgress,
+      this.timeListenedByMaxProgress,
+      this.ratioBetweenProgressAndMaxProgress,
+      this.ratioBetweenTimeListenedAndMaxProgress);
 }

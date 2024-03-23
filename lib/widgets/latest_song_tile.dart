@@ -5,6 +5,7 @@ import '../song_data.dart';
 
 class LatestSongTile extends StatelessWidget {
   final SongData songData;
+
   const LatestSongTile({super.key, required this.songData});
 
   @override
@@ -18,7 +19,8 @@ class LatestSongTile extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0,horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -29,12 +31,12 @@ class LatestSongTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text("${songData.artist} - ${songData.title}", style: Theme.of(context).textTheme.labelSmall),
+                  child: Text("${songData.artist} - ${songData.title}",
+                      style: Theme.of(context).textTheme.labelSmall),
                 ),
               ],
             ),
           );
-
         }
       },
     );

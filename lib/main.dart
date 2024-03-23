@@ -28,10 +28,15 @@ class MyApp extends StatelessWidget {
         create: (context) => AppThemeProvider(),
         child: Consumer<AppThemeProvider>(
           builder: (context, state, child) {
-            ThemeData data = FlexThemeData.dark(useMaterial3: state.materialTheme,scheme: state.materialTheme ? null : state.colorScheme,
+            ThemeData data = FlexThemeData.dark(
+                useMaterial3: state.materialTheme,
+                scheme: state.materialTheme ? null : state.colorScheme,
                 darkIsTrueBlack: state.trueDarkMode);
             // somehow the canvas color is not true black when darkIsTrueBlack is set on.
-            data = data.copyWith(canvasColor: state.trueDarkMode ? const Color(0x00000000) : data.canvasColor);
+            data = data.copyWith(
+                canvasColor: state.trueDarkMode
+                    ? const Color(0x00000000)
+                    : data.canvasColor);
             return MaterialApp(
               title: 'Scrobblium',
               darkTheme: data,
@@ -43,4 +48,3 @@ class MyApp extends StatelessWidget {
         ));
   }
 }
-

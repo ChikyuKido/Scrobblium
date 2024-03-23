@@ -5,7 +5,11 @@ class DateOption extends StatelessWidget {
   final bool selected;
   final GestureTapCallback onTap;
 
-  const DateOption({super.key, required this.text, required this.selected, required this.onTap});
+  const DateOption(
+      {super.key,
+      required this.text,
+      required this.selected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +19,12 @@ class DateOption extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Text(
           text,
-          style: selected ?
-          Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).primaryColorDark):
-          Theme.of(context).textTheme.bodyMedium,
+          style: selected
+              ? Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: Theme.of(context).primaryColorDark)
+              : Theme.of(context).textTheme.bodyMedium,
         ),
       ),
     );

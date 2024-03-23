@@ -19,7 +19,7 @@ public class BackupDatabaseUtil {
     public static final int REQUEST_CODE_PICK_DIRECTORY_IMPORT = 124;
     public static final int REQUEST_CODE_PICK_DIRECTORY_BACKUP = 125;
 
-    public static void importDatabase(Context context,Uri databaseFile) {
+    public static void importDatabase(Context context, Uri databaseFile) {
         if (MusicListenerService.getInstance() == null) return;
         if (MusicListenerService.getInstance().getDatabase() == null) return;
 
@@ -45,28 +45,31 @@ public class BackupDatabaseUtil {
         MusicListenerService.getInstance().connectToDatabase();
     }
 
-    public static void exportDatabase(Context context,Uri outputDir) {
+    public static void exportDatabase(Context context, Uri outputDir) {
         makeWALCheckpoint();
         Path file = context.getDataDir().toPath().resolve("databases/song_database");
-        try (OutputStream os = context.getContentResolver().openOutputStream(outputDir)){
+        try (OutputStream os = context.getContentResolver().openOutputStream(outputDir)) {
             os.write(Files.readAllBytes(file));
         } catch (IOException e) {
             Log.e("BackupDatabaseUtil", "exportDatabase: Could not export database", e);
         }
     }
+
     public static void launchDirectoryChooserForExport(Context context) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
                 .setType("data/json")
-                .putExtra(Intent.EXTRA_TITLE,"song_database");
+                .putExtra(Intent.EXTRA_TITLE, "song_database");
         ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY_EXPORT);
     }
+
     public static void launchFileChooserForImport(Context context) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY_IMPORT);
     }
+
     public static void makeWALCheckpoint() {
         if (MusicListenerService.getInstance() == null) return;
         if (MusicListenerService.getInstance().getDatabase() != null) {

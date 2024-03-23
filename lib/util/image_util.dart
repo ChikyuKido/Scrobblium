@@ -10,21 +10,21 @@ Future<FileImage?> getSongImage(SongData songData) async {
   appFilesPath ??= await _getAppFilesPath();
   String imagePath = '$appFilesPath/arts/${songData.getIdentifier()}.png';
   File f = File(imagePath);
-  if(!f.existsSync()) {
-    return null;
-  }
-  return FileImage(f);
-}
-Future<FileImage?> getSongImageFromTile(SongTileData songData) async {
-  appFilesPath ??= await _getAppFilesPath();
-  String imagePath = '$appFilesPath/arts/${songData.getIdentifier()}.png';
-  File f = File(imagePath);
-  if(!f.existsSync()) {
+  if (!f.existsSync()) {
     return null;
   }
   return FileImage(f);
 }
 
+Future<FileImage?> getSongImageFromTile(SongTileData songData) async {
+  appFilesPath ??= await _getAppFilesPath();
+  String imagePath = '$appFilesPath/arts/${songData.getIdentifier()}.png';
+  File f = File(imagePath);
+  if (!f.existsSync()) {
+    return null;
+  }
+  return FileImage(f);
+}
 
 Future<String> _getAppFilesPath() async {
   try {

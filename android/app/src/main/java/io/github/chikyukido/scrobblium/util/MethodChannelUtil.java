@@ -20,39 +20,32 @@ import java.util.Set;
 
 public class MethodChannelUtil {
 
-    private static final HashMap<String,MethodInterface> methods = new HashMap<>();
+    private static final HashMap<String, MethodInterface> methods = new HashMap<>();
     private static Gson gson = new Gson();
 
     public static void configureMethodChannel(MethodChannel methodChannel, Context context) {
         gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
                 (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context1) -> new JsonPrimitive(src.toString())).create();
-        methods.put("list",getSongList());
-        methods.put("currentSong",getCurrentSong());
-        methods.put("setMusicPackage",setPackage());
-        methods.put("makeWALCheckpoint",makeWALCheckpoint());
-        methods.put("launchNotificationAccess",launchNotificationAccess(context));
+        methods.put("list", getSongList());
+        methods.put("currentSong", getCurrentSong());
+        methods.put("setMusicPackage", setPackage());
+        methods.put("makeWALCheckpoint", makeWALCheckpoint());
+        methods.put("launchNotificationAccess", launchNotificationAccess(context));
         methods.put("isNotificationGranted", isNotificationPermission(context));
-        methods.put("getMusicListenerServiceStatus",getMusicListenerServiceStatus());
-        methods.put("startForegroundProcess",startForegroundProcess());
-        methods.put("exportDatabase",exportDatabase(context));
-        methods.put("importDatabase",importDatabase(context));
-        methods.put("test",test(context));
+        methods.put("getMusicListenerServiceStatus", getMusicListenerServiceStatus());
+        methods.put("startForegroundProcess", startForegroundProcess());
+        methods.put("exportDatabase", exportDatabase(context));
+        methods.put("importDatabase", importDatabase(context));
         methodChannel.setMethodCallHandler((call, result) -> {
-           if(methods.containsKey(call.method)) {
-               Log.i("MethodChannelUtil","Execute following command: " + call.method);
-               methods.get(call.method).run(call,result);
-           }else {
-               result.notImplemented();
-           }
+            if (methods.containsKey(call.method)) {
+                Log.i("MethodChannelUtil", "Execute following command: " + call.method);
+                methods.get(call.method).run(call, result);
+            } else {
+                result.notImplemented();
+            }
         });
     }
 
-
-    private static MethodInterface test(Context context) {
-        return (call, result) ->  {
-            result.success("test");
-        };
-    }
 
     private static MethodInterface getSongList() {
         return (call, result) -> new Thread(() -> {
@@ -65,6 +58,7 @@ public class MethodChannelUtil {
             result.success(json);
         }).start();
     }
+
     private static MethodInterface getCurrentSong() {
         return (call, result) -> {
             if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null
@@ -75,6 +69,7 @@ public class MethodChannelUtil {
             result.success(gson.toJson(MusicListenerService.getInstance().getCurrentSong()));
         };
     }
+
     private static MethodInterface setPackage() {
         return (call, result) -> {
             if (MusicListenerService.getInstance() == null) return;
@@ -82,6 +77,7 @@ public class MethodChannelUtil {
             MusicListenerService.getInstance().setMusicPackage(argument);
         };
     }
+
     private static MethodInterface makeWALCheckpoint() {
         return (call, result) -> {
             if (MusicListenerService.getInstance() == null) return;
@@ -93,6 +89,7 @@ public class MethodChannelUtil {
             result.success("made checkpoint");
         };
     }
+
     private static MethodInterface launchNotificationAccess(Context context) {
         return (call, result) -> {
             Intent intent = new Intent();
@@ -101,24 +98,29 @@ public class MethodChannelUtil {
             context.startActivity(intent);
         };
     }
+
     private static MethodInterface isNotificationPermission(Context context) {
         return (call, result) -> {
             Set<String> enabledListenerPackages = NotificationManagerCompat.getEnabledListenerPackages(context);
             result.success(String.valueOf(enabledListenerPackages.contains(context.getPackageName())));
         };
     }
+
     private static MethodInterface getMusicListenerServiceStatus() {
         return (call, result) -> result.success(MusicListenerService.status.toString());
     }
+
     private static MethodInterface startForegroundProcess() {
         return (call, result) -> {
-            if(MusicListenerService.getInstance() == null) return;
+            if (MusicListenerService.getInstance() == null) return;
             MusicListenerService.getInstance().startForegroundService();
         };
     }
+
     private static MethodInterface exportDatabase(Context context) {
         return (call, result) -> BackupDatabaseUtil.launchDirectoryChooserForExport(context);
     }
+
     private static MethodInterface importDatabase(Context context) {
         return (call, result) -> BackupDatabaseUtil.launchFileChooserForImport(context);
     }

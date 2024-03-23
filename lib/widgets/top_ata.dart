@@ -17,7 +17,10 @@ class TopATA extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(getTextFromAta(),style: Theme.of(context).textTheme.bodyMedium,),
+        Text(
+          getTextFromAta(),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
         SfCartesianChart(
             primaryXAxis: const CategoryAxis(
               isVisible: false,
@@ -41,9 +44,7 @@ class TopATA extends StatelessWidget {
                   xValueMapper: (_ChartData data, _) => data.x,
                   yValueMapper: (_ChartData data, _) => data.y,
                   name: getTextFromAta(),
-                  color: Theme
-                      .of(context)
-                      .highlightColor)
+                  color: Theme.of(context).highlightColor)
             ])
       ],
     );
@@ -53,10 +54,12 @@ class TopATA extends StatelessWidget {
     return ata == ATA.artist
         ? "Artist"
         : ata == ATA.track
-        ? "Track"
-        : ata == ATA.album
-        ? "Album" : "";
+            ? "Track"
+            : ata == ATA.album
+                ? "Album"
+                : "";
   }
+
   List<_ChartData> getData() {
     List<_ChartData> chartData = [];
     for (var song in songs) {
@@ -95,13 +98,9 @@ class TopATA extends StatelessWidget {
       }
     }
     chartData.sort((a, b) => b.y - a.y);
-    return chartData
-        .sublist(0, min(7, chartData.length))
-        .reversed
-        .toList();
+    return chartData.sublist(0, min(7, chartData.length)).reversed.toList();
   }
 }
-
 
 class _ChartData {
   _ChartData(this.x, this.id, this.y);

@@ -21,7 +21,7 @@ class SongListTile extends StatelessWidget {
         } else {
           return ListTile(
             onTap: onTap,
-            leading:  CircleAvatar(
+            leading: CircleAvatar(
               backgroundImage: snapshot.data,
               child: snapshot.data != null ? null : Text(songData.title[0]),
             ),

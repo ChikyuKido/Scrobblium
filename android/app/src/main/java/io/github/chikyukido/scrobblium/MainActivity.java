@@ -18,17 +18,17 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
-        MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL),this);
+        MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (data != null && data.getData() != null) {
-                if(requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT)
-                    BackupDatabaseUtil.exportDatabase(getApplicationContext(),data.getData());
-                else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT)
-                    BackupDatabaseUtil.importDatabase(getApplicationContext(),data.getData());
+                if (requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT)
+                    BackupDatabaseUtil.exportDatabase(getApplicationContext(), data.getData());
+                else if (requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT)
+                    BackupDatabaseUtil.importDatabase(getApplicationContext(), data.getData());
             }
         }
     }
