@@ -851,6 +851,7 @@ class SwitchSettingsTile extends StatelessWidget {
   /// A List of widgets that will be displayed when the switch is set to enable
   /// state, Any flutter widget can be added in this list
   final List<Widget>? childrenIfEnabled;
+  final double topPadding;
 
   SwitchSettingsTile({
     required this.title,
@@ -865,6 +866,7 @@ class SwitchSettingsTile extends StatelessWidget {
     this.subtitle = '',
     this.titleTextStyle,
     this.subtitleTextStyle,
+    this.topPadding = 16.0,
   });
 
   @override
@@ -924,6 +926,7 @@ class SwitchSettingsTile extends StatelessWidget {
       bool currentValue, List<Widget>? childrenIfEnabled) {
     if (childrenIfEnabled == null || !currentValue) {
       return SettingsContainer(
+        topPadding: topPadding,
         children: [mainWidget],
       );
     }

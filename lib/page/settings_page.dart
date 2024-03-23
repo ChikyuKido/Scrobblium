@@ -35,20 +35,42 @@ class _SettingsPageState extends State<SettingsPage> {
         ]),
         SettingsGroup(
             title: "Appearance",
-            children: <Widget>[buildTrueDarkMode()]),
+            children: <Widget>[
+              buildTrueDarkMode(),
+              buildMaterialTheme(),
+              buildThemeColorPicker()
+            ]),
         SettingsGroup(
             title: "Save/Load",
             children: <Widget>[buildExportDB(), buildImportDB()]),
       ],
     ));
   }
-
   Widget buildTrueDarkMode() {
     return SwitchSettingsTile(
+        topPadding: 0.0,
         title: "Use true dark mode",
         settingKey: "true-dark-mode",
-        onChange: (p0) => AppThemeProvider().switchThemeDark(),
+        defaultValue: false,
+        onChange: (p0) => AppThemeProvider().setTrueDarkMode(p0),
     );
+  }
+  Widget buildMaterialTheme() {
+    return SwitchSettingsTile(
+      topPadding: 0.0,
+      title: "Use material theme",
+      settingKey: "material-theme",
+      defaultValue: false,
+      onChange: (p0) {
+        AppThemeProvider().setMaterialTheme(p0);
+        setState(() {});
+      },
+    );
+  }
+  Widget buildThemeColorPicker() {
+    bool active = Settings.getValue("material-theme",defaultValue: false)??false;
+    return active?Container():
+    SimpleSettingsTile(title: "Pick color theme");
   }
   Future<Widget> buildMusicPackage() async{
     bool granted = await SongProviderService.isNotificationPermissionGranted();
@@ -64,7 +86,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   Widget buildSkipCap() {
     return TextInputSettingsTile(
-      topPadding: 0.0,
       title: 'Skip cap',
       settingKey: 'skip-cap',
       helperText: 'The time when a track is counted as skip',
