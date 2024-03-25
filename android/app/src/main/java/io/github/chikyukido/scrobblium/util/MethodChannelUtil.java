@@ -36,6 +36,7 @@ public class MethodChannelUtil {
         methods.put("startForegroundProcess", startForegroundProcess());
         methods.put("exportDatabase", exportDatabase(context));
         methods.put("importDatabase", importDatabase(context));
+        methods.put("deleteEntry",deleteEntry());
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
@@ -44,6 +45,18 @@ public class MethodChannelUtil {
                 result.notImplemented();
             }
         });
+    }
+
+    private static MethodInterface deleteEntry() {
+        return (call, result) -> {
+            if (MusicListenerService.getInstance() == null) return;
+            String argument = call.argument("id");
+            if(argument == null) return;
+            int id = Integer.parseInt(argument);
+            new Thread(() -> {
+                MusicListenerService.getInstance().getDatabase().musicTrackDao().deleteTrack(id);
+            }).start();
+        };
     }
 
 

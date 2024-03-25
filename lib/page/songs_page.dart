@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scrobblium/page/song_tile_info_page.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/widgets/song_list_tile.dart';
 
 class SongsPage extends StatefulWidget {
@@ -41,7 +42,7 @@ class _SongsPageState extends State<SongsPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    SongTileInfoPage(songs: songs)));
+                                    SongTileInfoPage(songs: songs))).then((value) => _refreshSongs());
                       },
                     )));
   }
@@ -67,8 +68,10 @@ class _SongsPageState extends State<SongsPage> {
   }
 
   _refreshSongs() async {
-    _songs = await SongProviderService.getSongData();
-    _tileSongs = _getSongTileData(SongProviderService.removeSkips(_songs));
+    _songs = await SongProviderService.getSongData(withSkipped: getValueBool("show-skipped-in-songs-page",false));
+    _tileSongs = _getSongTileData(_songs);
     setState(() {});
   }
+
+
 }

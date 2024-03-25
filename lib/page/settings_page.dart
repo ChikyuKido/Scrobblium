@@ -4,6 +4,7 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/app_theme_provider.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/util/settings_helper.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -23,7 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
     [FlexScheme.damask, FlexScheme.espresso, FlexScheme.gold, FlexScheme.green],
     [FlexScheme.dellGenoa, FlexScheme.jungle, FlexScheme.mango, FlexScheme.red],
     [
-      FlexScheme.yellowM3,
+      FlexScheme.flutterDash,
       FlexScheme.shark,
       FlexScheme.sakura,
       FlexScheme.rosewood
@@ -34,10 +35,8 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    var color =
-        Settings.getValue("theme-color", defaultValue: "amber") ?? "amber";
-    selectedColor =
-        FlexScheme.values.where((element) => element.name == color).first;
+    var color = getValueString("theme-color", "amber");
+    selectedColor = FlexScheme.values.where((element) => element.name == color).first;
   }
 
   @override
@@ -54,6 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ]),
         SettingsGroup(title: "Stats", children: [
           buildSkipCap(),
+          buildShowSkippedInSongs(),
         ]),
         SettingsGroup(title: "Appearance", children: <Widget>[
           buildTrueDarkMode(),
@@ -91,8 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget buildThemeColorPicker() {
-    bool active =
-        Settings.getValue("material-theme", defaultValue: false) ?? false;
+    bool active = getValueBool("material-theme", false);
     return active
         ? Container()
         : SimpleSettingsTile(
@@ -258,6 +257,16 @@ class _SettingsPageState extends State<SettingsPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget buildShowSkippedInSongs() {
+    return SwitchSettingsTile(
+      topPadding: 0.0,
+      title: 'Show skipped in songs page',
+      subtitle: 'Whether skipped songs should be shown in the songs page',
+      settingKey: 'show-skipped-in-songs-page',
+      defaultValue: false,
     );
   }
 }

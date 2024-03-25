@@ -29,10 +29,9 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
   @override
   Widget build(BuildContext context) {
     SongStatistic stats = SongProviderService.getSongStatistics(widget.songs);
-    SongData song = widget.songs[0];
     return Scaffold(
       appBar: AppBar(
-        title: Text("Song statistic"),
+        title: const Text("Song statistic"),
       ),
       body: Column(
         children: [
@@ -45,7 +44,7 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
           ),
         ],
       ),
-    );
+  );
   }
 
   Widget getSongTile(SongData song, int index) {
@@ -54,6 +53,11 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
         backgroundImage: null,
         child: Text("$index"),
       ),
+      onLongPress: () async {
+        SongProviderService.deleteEntry(song.id);
+        widget.songs.removeWhere((element) => element.id == song.id);
+        setState(() {});
+      },
       title: Text(
         "Time Listened: ${formatDuration(song.timeListened)}",
       ),

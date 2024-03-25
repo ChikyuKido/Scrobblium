@@ -10,7 +10,8 @@ import java.util.List;
 public interface SongTrackDao {
     @Query("SELECT * FROM played_songs")
     List<SongData> getAllTracks();
-
     @Insert
     void insertTrack(SongData track);
+    @Query("DELETE FROM played_songs WHERE id = :id")
+    void deleteTrack(int id);
 }

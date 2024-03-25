@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/util/util.dart';
 
 class SongProviderService {
@@ -26,9 +26,7 @@ class SongProviderService {
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);
     if (!withSkipped) {
-      int cap = int.tryParse(
-              Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ??
-          20;
+      int cap = getValueInt("skip-cap", 20);
       songs.removeWhere((element) => element.timeListened <= cap);
     }
     if (afterDate != null) {
@@ -40,9 +38,7 @@ class SongProviderService {
 
   static List<SongData> removeSkips(List<SongData> songs) {
     List<SongData> newSongs = List.of(songs);
-    int cap = int.tryParse(
-            Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ??
-        20;
+    int cap = getValueInt("skip-cap", 20);
     newSongs.removeWhere((element) => element.timeListened <= cap);
     return newSongs;
   }
@@ -70,9 +66,7 @@ class SongProviderService {
     int songsSkipped = 0;
 
     for (var song in songs) {
-      int cap = int.tryParse(
-              Settings.getValue('skip-cap', defaultValue: '20') ?? "20") ??
-          20;
+      int cap = getValueInt("skip-cap", 20);
       if (song.timeListened < cap) {
         songsSkipped++;
       } else {
@@ -114,6 +108,9 @@ class SongProviderService {
 
   static importDatabase() async {
     await platform.invokeMethod("importDatabase");
+  }
+  static deleteEntry(int id) async {
+    await platform.invokeMethod("deleteEntry",{"id":"$id"});
   }
 }
 

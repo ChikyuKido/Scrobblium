@@ -1,4 +1,5 @@
 class SongData {
+  final int id;
   final String artist;
   final String title;
   final String album;
@@ -10,6 +11,7 @@ class SongData {
   final int timeListened;
 
   SongData({
+    required this.id,
     required this.artist,
     required this.title,
     required this.album,
@@ -23,6 +25,7 @@ class SongData {
 
   factory SongData.fromJson(Map<String, dynamic> json) {
     return SongData(
+      id: json['id'] ?? 0,
       artist: json['artist'] ?? '',
       title: json['title'] ?? '',
       album: json['album'] ?? '',

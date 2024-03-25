@@ -1,20 +1,18 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flex_color_scheme/src/flex_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:scrobblium/util/settings_helper.dart';
 
 class AppThemeProvider extends ChangeNotifier {
   final String key = "theme";
   late bool _trueDarkMode;
   late bool _materialTheme;
-  late bool _darkMode;
   late FlexScheme _colorScheme;
 
   bool get trueDarkMode => _trueDarkMode;
 
   bool get materialTheme => _materialTheme;
 
-  bool get darkMode => _darkMode;
 
   FlexScheme get colorScheme => _colorScheme;
 
@@ -38,22 +36,12 @@ class AppThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  setDarkMode(bool darkMode) {
-    _materialTheme = materialTheme;
-    notifyListeners();
-  }
 
   _loadPrefs() {
-    _trueDarkMode =
-        Settings.getValue<bool>("true-dark-mode", defaultValue: false) ?? false;
-    _materialTheme =
-        Settings.getValue<bool>("material-theme", defaultValue: false) ?? false;
-    _darkMode =
-        Settings.getValue<bool>("dark-mode", defaultValue: true) ?? true;
-    var c = Settings.getValue<String>("theme-color", defaultValue: "amber") ??
-        "amber";
-    _colorScheme =
-        FlexScheme.values.where((element) => element.name == c).first;
+    _trueDarkMode = getValueBool("true-dark-mode", false);
+    _materialTheme = getValueBool("material-theme", false);
+    var c = getValueString("theme-color", "amber");
+    _colorScheme = FlexScheme.values.where((element) => element.name == c).first;
     notifyListeners();
   }
 
