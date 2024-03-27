@@ -852,6 +852,8 @@ class SwitchSettingsTile extends StatelessWidget {
   /// state, Any flutter widget can be added in this list
   final List<Widget>? childrenIfEnabled;
   final double topPadding;
+  final bool reverseChildrenIfEnabled;
+  final EdgeInsets childrenPadding;
 
   SwitchSettingsTile({
     required this.title,
@@ -867,6 +869,8 @@ class SwitchSettingsTile extends StatelessWidget {
     this.titleTextStyle,
     this.subtitleTextStyle,
     this.topPadding = 16.0,
+    this.reverseChildrenIfEnabled = false,
+    this.childrenPadding = const EdgeInsets.only(left: 8.0),
   });
 
   @override
@@ -924,16 +928,18 @@ class SwitchSettingsTile extends StatelessWidget {
 
   Widget getFinalWidget(BuildContext context, Widget mainWidget,
       bool currentValue, List<Widget>? childrenIfEnabled) {
-    if (childrenIfEnabled == null || !currentValue) {
+    var reversed = !reverseChildrenIfEnabled == currentValue;
+    if (childrenIfEnabled == null || !reversed) {
       return SettingsContainer(
         topPadding: topPadding,
         children: [mainWidget],
       );
     }
-    var _children = getPaddedParentChildrenList(childrenIfEnabled);
+    var _children = getPaddedParentChildrenList(childrenIfEnabled,padding: childrenPadding);
     _children.insert(0, mainWidget);
 
     return SettingsContainer(
+      topPadding: topPadding,
       children: _children,
     );
   }

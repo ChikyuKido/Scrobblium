@@ -20,8 +20,10 @@ public class MainActivity extends FlutterActivity {
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //catching activity results for the backups cause its using the main activities context.
         if (resultCode == Activity.RESULT_OK) {
             if (data != null && data.getData() != null) {
                 if (requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT)

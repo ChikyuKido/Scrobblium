@@ -65,15 +65,13 @@ public class MethodChannelUtil {
     }
 
     private static MethodInterface deleteEntry() {
-        return (call, result) -> {
+        return (call, result) -> new Thread(() -> {
             if (MusicListenerService.getInstance() == null) return;
             String argument = call.argument("id");
             if(argument == null) return;
             int id = Integer.parseInt(argument);
-            new Thread(() -> {
-                MusicListenerService.getInstance().getDatabase().musicTrackDao().deleteTrack(id);
-            }).start();
-        };
+            MusicListenerService.getInstance().getDatabase().musicTrackDao().deleteTrack(id);
+        }).start();
     }
 
 
@@ -105,6 +103,7 @@ public class MethodChannelUtil {
             if (MusicListenerService.getInstance() == null) return;
             String argument = call.argument("package");
             MusicListenerService.getInstance().setMusicPackage(argument);
+            result.success(null);
         };
     }
 
@@ -116,7 +115,7 @@ public class MethodChannelUtil {
             }
             MusicListenerService.getInstance().connectToDatabase();
             Log.i("MainActivity", "configureFlutterEngine: checkpoint for database");
-            result.success("made checkpoint");
+            result.success(null);
         };
     }
 
@@ -126,6 +125,7 @@ public class MethodChannelUtil {
             intent.setAction("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+            result.success(null);
         };
     }
 
@@ -144,15 +144,22 @@ public class MethodChannelUtil {
         return (call, result) -> {
             if (MusicListenerService.getInstance() == null) return;
             MusicListenerService.getInstance().startForegroundService();
+            result.success(null);
         };
     }
 
     private static MethodInterface exportDatabase(Context context) {
-        return (call, result) -> BackupDatabaseUtil.launchDirectoryChooserForExport(context);
+        return (call, result) -> {
+            BackupDatabaseUtil.launchDirectoryChooserForExport(context);
+            result.success(null);
+        };
     }
 
     private static MethodInterface importDatabase(Context context) {
-        return (call, result) -> BackupDatabaseUtil.launchFileChooserForImport(context);
+        return (call, result) -> {
+            BackupDatabaseUtil.launchFileChooserForImport(context);
+            result.success(null);
+        };
     }
 
     private interface MethodInterface {

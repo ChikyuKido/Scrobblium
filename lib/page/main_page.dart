@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scrobblium/page/settings_page.dart';
+import 'package:scrobblium/page/settings/settings_page.dart';
 import 'package:scrobblium/page/songs_page.dart';
 import 'package:scrobblium/page/stats_page.dart';
 

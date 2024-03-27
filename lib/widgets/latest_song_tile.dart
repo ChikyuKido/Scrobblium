@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/image_util.dart';
-
-import '../song_data.dart';
 
 class LatestSongTile extends StatelessWidget {
   final SongData songData;

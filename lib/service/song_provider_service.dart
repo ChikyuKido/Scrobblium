@@ -5,24 +5,21 @@ import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/util/util.dart';
 
-class SongProviderService {
+class MethodChannelService {
   static const platform = MethodChannel('MusicListener');
 
   static Future<void> makeWALCheckpoint() async {
     await platform.invokeMethod("makeWALCheckpoint");
   }
-
   static Future<void> setMusicPackage(String package) async {
     await platform.invokeMethod("setMusicPackage", {"package": package});
   }
-
   static Future<String> getJsonData() async {
     return await platform.invokeMethod('list');
   }
 
   static Future<List<SongData>> getSongData(
       {withSkipped = true, DateTime? afterDate}) async {
-    Stopwatch stopwatch = Stopwatch()..start();
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);
     if (!withSkipped) {
@@ -32,7 +29,6 @@ class SongProviderService {
     if (afterDate != null) {
       songs.removeWhere((element) => element.endTime.isBefore(afterDate));
     }
-    stopwatch.stop();
     return songs;
   }
 
@@ -47,8 +43,7 @@ class SongProviderService {
     String currentSongJson = await platform.invokeMethod('currentSong');
     SongData? songData;
     if (currentSongJson != "[]") {
-      songData = SongData.fromJson(
-          jsonDecode(currentSongJson).cast<String, dynamic>());
+      songData = SongData.fromJson(jsonDecode(currentSongJson).cast<String, dynamic>());
     }
     return songData;
   }
@@ -101,7 +96,6 @@ class SongProviderService {
   static startForegroundProcess() async {
     await platform.invokeMethod("startForegroundProcess");
   }
-
   static exportDatabase() async {
     await platform.invokeMethod("exportDatabase");
   }

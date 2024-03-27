@@ -68,7 +68,7 @@ class _SongsPageState extends State<SongsPage> {
   }
 
   _refreshSongs() async {
-    _songs = await SongProviderService.getSongData(withSkipped: getValueBool("show-skipped-in-songs-page",false));
+    _songs = await MethodChannelService.getSongData(withSkipped: getValueBool("show-skipped-in-songs-page",false));
     _tileSongs = _getSongTileData(_songs);
     setState(() {});
   }

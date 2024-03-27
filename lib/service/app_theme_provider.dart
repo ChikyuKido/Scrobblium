@@ -4,16 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 
 class AppThemeProvider extends ChangeNotifier {
-  final String key = "theme";
   late bool _trueDarkMode;
   late bool _materialTheme;
   late FlexScheme _colorScheme;
 
   bool get trueDarkMode => _trueDarkMode;
-
   bool get materialTheme => _materialTheme;
-
-
   FlexScheme get colorScheme => _colorScheme;
 
   static final AppThemeProvider _instance = AppThemeProvider._internal();

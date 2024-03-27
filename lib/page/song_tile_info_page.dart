@@ -3,10 +3,10 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/util/image_util.dart';
 import 'package:scrobblium/util/util.dart';
 import 'package:scrobblium/widgets/music_stats_row.dart';
 
-import '../util/image_util.dart';
 
 class SongTileInfoPage extends StatefulWidget {
   final List<SongData> songs;
@@ -28,7 +28,7 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    SongStatistic stats = SongProviderService.getSongStatistics(widget.songs);
+    SongStatistic stats = MethodChannelService.getSongStatistics(widget.songs);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Song statistic"),
@@ -54,7 +54,7 @@ class _SongTileInfoPageState extends State<SongTileInfoPage> {
         child: Text("$index"),
       ),
       onLongPress: () async {
-        SongProviderService.deleteEntry(song.id);
+        MethodChannelService.deleteEntry(song.id);
         widget.songs.removeWhere((element) => element.id == song.id);
         setState(() {});
       },

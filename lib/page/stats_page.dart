@@ -25,7 +25,7 @@ class _StatsPageState extends State<StatsPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: SongProviderService.getSongData(
+      future: MethodChannelService.getSongData(
           afterDate: _currentDateSelected == 0
               ? DateTime.now().subtract(const Duration(days: 7))
               : _currentDateSelected == 1
@@ -42,9 +42,9 @@ class _StatsPageState extends State<StatsPage> {
         }
         var songs = snapshot.data ?? [];
 
-        var songsRemovedSkip = SongProviderService.removeSkips(songs);
+        var songsRemovedSkip = MethodChannelService.removeSkips(songs);
         songsRemovedSkip.sort((a, b) => b.endTime.compareTo(a.endTime));
-        var allTimeStats = SongProviderService.getSongStatistics(songs);
+        var allTimeStats = MethodChannelService.getSongStatistics(songs);
         return ListView(
           children: [
             Center(

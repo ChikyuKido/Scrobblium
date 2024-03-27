@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:scrobblium/song_data.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../song_data.dart';
 
 enum ATA { artist, album, track }
 

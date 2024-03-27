@@ -34,8 +34,6 @@ public class MusicListenerService extends NotificationListenerService {
     private static MusicListenerService INSTANCE = null;
 
     private final String TAG = "MusicListenerService";
-    private final int NOTIFICATION_ID = 1956;
-    private final String CHANNEL_ID = "MusicListenerServiceChannel";
     private String musicPackageName = "";
 
     private SongDatabase database;
@@ -83,12 +81,14 @@ public class MusicListenerService extends NotificationListenerService {
             return;
         }
         if (!isServiceRunning(this.getClass())) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+            String channelID = "MusicListenerServiceChannel";
+            NotificationChannel channel = new NotificationChannel(channelID,
                     "Music Listener Service",
                     NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID).build();
+            Notification notification = new NotificationCompat.Builder(this, channelID).build();
+            int NOTIFICATION_ID = 1956;
             startForeground(NOTIFICATION_ID, notification);
         }
         if (status != MusicListenerServiceStatus.TRACKING) startTimer();
@@ -198,6 +198,7 @@ public class MusicListenerService extends NotificationListenerService {
             BitmapUtil.saveBitmapAsPNG(getBaseContext(), bitmap, filename);
         }
     }
+
 
     public SongDatabase getDatabase() {
         return database;
