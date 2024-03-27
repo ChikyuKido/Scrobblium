@@ -9,8 +9,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 
-import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_EXPORT;
-import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_IMPORT;
+import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.*;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "MusicListener";
@@ -29,6 +28,8 @@ public class MainActivity extends FlutterActivity {
                     BackupDatabaseUtil.exportDatabase(getApplicationContext(), data.getData());
                 else if (requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT)
                     BackupDatabaseUtil.importDatabase(getApplicationContext(), data.getData());
+                else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_BACKUP)
+                    BackupDatabaseUtil.saveBackupDatabasePath(getApplicationContext(),data.getData());
             }
         }
     }

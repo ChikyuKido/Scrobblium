@@ -112,6 +112,13 @@ class SongProviderService {
   static deleteEntry(int id) async {
     await platform.invokeMethod("deleteEntry",{"id":"$id"});
   }
+
+  static backupDatabasePathPicker() async {
+    await platform.invokeMethod("backupDatabasePicker");
+  }
+  static Future<String> getBackupDatabasePath() async {
+    return await platform.invokeMethod("getBackupDatabasePath");
+  }
 }
 
 class SongStatistic {

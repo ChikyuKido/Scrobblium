@@ -15,20 +15,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final List<List<FlexScheme>> colors = [
-    [
-      FlexScheme.amber,
-      FlexScheme.wasabi,
-      FlexScheme.deepBlue,
-      FlexScheme.aquaBlue
-    ],
+    [FlexScheme.amber, FlexScheme.wasabi, FlexScheme.deepBlue, FlexScheme.aquaBlue],
     [FlexScheme.damask, FlexScheme.espresso, FlexScheme.gold, FlexScheme.green],
     [FlexScheme.dellGenoa, FlexScheme.jungle, FlexScheme.mango, FlexScheme.red],
-    [
-      FlexScheme.flutterDash,
-      FlexScheme.shark,
-      FlexScheme.sakura,
-      FlexScheme.rosewood
-    ],
+    [FlexScheme.flutterDash, FlexScheme.shark, FlexScheme.sakura, FlexScheme.rosewood],
   ];
   FlexScheme? selectedColor;
 
@@ -62,7 +52,12 @@ class _SettingsPageState extends State<SettingsPage> {
         ]),
         SettingsGroup(
             title: "Save/Load",
-            children: <Widget>[buildExportDB(), buildImportDB()]),
+            children: <Widget>[
+              buildExportDB(),
+              buildImportDB(),
+              buildBackupOption(),
+              _futureWidget(buildBackupPicker()),
+            ]),
       ],
     ));
   }
@@ -268,5 +263,25 @@ class _SettingsPageState extends State<SettingsPage> {
       settingKey: 'show-skipped-in-songs-page',
       defaultValue: false,
     );
+  }
+
+  Widget buildBackupOption() {
+    return SwitchSettingsTile(
+      topPadding: 0.0,
+      title: 'Backup database',
+      settingKey: 'backup-database',
+      defaultValue: false,
+      onChange: (p0) => setState(() {}),
+    );
+  }
+
+  Future<Widget> buildBackupPicker() async{
+    bool active = getValueBool("backup-database", false);
+    var path = await SongProviderService.getBackupDatabasePath();
+    return active ? SimpleSettingsTile(
+        title: "Backup path",
+        subtitle: "Path: ${path.isEmpty ? "Non" : path}",
+        onTap: () => SongProviderService.backupDatabasePathPicker(),
+    ) : Container();
   }
 }

@@ -2,6 +2,7 @@ package io.github.chikyukido.scrobblium.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import androidx.core.app.NotificationManagerCompat;
 import com.google.gson.Gson;
@@ -37,6 +38,8 @@ public class MethodChannelUtil {
         methods.put("exportDatabase", exportDatabase(context));
         methods.put("importDatabase", importDatabase(context));
         methods.put("deleteEntry",deleteEntry());
+        methods.put("backupDatabasePicker",backupDatabasePicker(context));
+        methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
@@ -45,6 +48,20 @@ public class MethodChannelUtil {
                 result.notImplemented();
             }
         });
+    }
+
+    private static MethodInterface getBackupDatabasePath(Context context) {
+        return (call, result) -> {
+            Uri u = BackupDatabaseUtil.readBackupDatabasePath(context);
+            result.success(u == null ? "" : u.getPath());
+        };
+    }
+
+    private static MethodInterface backupDatabasePicker(Context context) {
+        return (call, result) -> {
+            BackupDatabaseUtil.launchFileChooserForBackup(context);
+            result.success(null);
+        };
     }
 
     private static MethodInterface deleteEntry() {
