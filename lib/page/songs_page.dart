@@ -5,6 +5,8 @@ import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/widgets/song_list_tile.dart';
 
+import 'main_page.dart';
+
 class SongsPage extends StatefulWidget {
   const SongsPage({super.key});
 
@@ -20,7 +22,11 @@ class _SongsPageState extends State<SongsPage> {
   void initState() {
     super.initState();
     _refreshSongs();
+    Future.delayed(Duration.zero, () {
+      SettingsProvider().updateSelectedPage(getDropdownItems(), handleDropdownClick());
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,5 +79,16 @@ class _SongsPageState extends State<SongsPage> {
     setState(() {});
   }
 
+  List<PopupMenuItem<String>> getDropdownItems() {
+    return [PopupMenuItem<String>(child: Text("test2"),value: "test",)];
+  }
+
+  PopupMenuItemSelected<String>? handleDropdownClick() {
+    return (value) {
+      if(value == "test") {
+        print("hello2");
+      }
+    };
+  }
 
 }

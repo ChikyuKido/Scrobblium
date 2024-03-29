@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:scrobblium/page/main_page.dart';
 import 'package:scrobblium/service/song_provider_service.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/latest_song_tile.dart';
@@ -16,10 +17,12 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   int _currentDateSelected = 3;
-
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, () {
+      SettingsProvider().updateSelectedPage(getDropdownItems(), handleDropdownClick());
+    });
   }
 
   @override
@@ -124,5 +127,17 @@ class _StatsPageState extends State<StatsPage> {
         );
       },
     );
+  }
+
+  List<PopupMenuItem<String>> getDropdownItems() {
+    return [PopupMenuItem<String>(child: Text("test"),value: "test",)];
+  }
+
+  PopupMenuItemSelected<String>? handleDropdownClick() {
+    return (value) {
+      if(value == "test") {
+        print("hello");
+      }
+    };
   }
 }

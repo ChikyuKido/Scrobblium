@@ -10,14 +10,14 @@ import 'package:scrobblium/widgets/music_stats_row.dart';
 
 class SongTileInfoPage extends StatefulWidget {
   final List<SongData> songs;
-
   const SongTileInfoPage({super.key, required this.songs});
 
   @override
   State<SongTileInfoPage> createState() => _SongTileInfoPageState();
+
 }
 
-class _SongTileInfoPageState extends State<SongTileInfoPage> {
+class _SongTileInfoPageState extends State<SongTileInfoPage>{
   late final SongData song;
 
   @override
