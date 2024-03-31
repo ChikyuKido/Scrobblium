@@ -35,6 +35,7 @@ public class MusicListenerService extends NotificationListenerService {
 
     private final String TAG = "MusicListenerService";
     private String musicPackageName = "";
+    private StatusBarNotification currentNotification;
 
     private SongDatabase database;
     private SongData currentSong = new SongData("", "", "", "", -1L, -1L, LocalDateTime.MIN,
@@ -143,6 +144,7 @@ public class MusicListenerService extends NotificationListenerService {
 
     private void fetchActiveNotifications() {
         StatusBarNotification sbn = getMusicNotification();
+        currentNotification = sbn;
         if (sbn == null) {
             return;
         }
@@ -194,6 +196,13 @@ public class MusicListenerService extends NotificationListenerService {
         if (metadata == null) return;
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ART);
         if (bitmap == null) bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART);
+        if(bitmap == null && currentNotification.getNotification().getLargeIcon() != null) {
+            bitmap = BitmapUtil.drawableToBitmap(currentNotification.getNotification().getLargeIcon().loadDrawable(getBaseContext()));
+        }
+        if(bitmap == null && currentNotification.getNotification().getSmallIcon() != null) {
+            bitmap = BitmapUtil.drawableToBitmap(currentNotification.getNotification().getSmallIcon().loadDrawable(getBaseContext()));
+        }
+        if(bitmap == null) return;
         if (!Files.exists(Paths.get(getBaseContext().getFilesDir().toString()).resolve(filename))) {
             BitmapUtil.saveBitmapAsPNG(getBaseContext(), bitmap, filename);
         }

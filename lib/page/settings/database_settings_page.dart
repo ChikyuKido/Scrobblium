@@ -51,7 +51,7 @@ class DatabaseSettingsPage extends StatelessWidget {
 
   _buildBackupPicker() {
     return SimpleSettingsTile(
-      title: "Backup path",
+      title: "Backup path (Not working yet)",
       subtitle: "Path: ${path.isEmpty ? "Non" : path}",
       onTap: () => MethodChannelService.backupDatabasePathPicker(),
     );

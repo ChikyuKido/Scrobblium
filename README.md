@@ -1,16 +1,10 @@
-# scrobblium
+# Scrobblium
 
-A app to track music in the background
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Supported Music apps
+Most music apps should work when they use MediaSession the app can grab in the notification. <br>
+### Tried apps:
+####  Working
+- [Metro](https://github.com/MuntashirAkon/Metro)
+- Spotify. I think advertisement gets tracked too
+#### Half Working
+#### Not Working
