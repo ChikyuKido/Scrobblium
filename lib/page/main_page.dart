@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:scrobblium/page/settings/settings_page.dart';
-import 'package:scrobblium/page/songs_page.dart';
+import 'package:scrobblium/page/songs/songs_page.dart';
 import 'package:scrobblium/page/stats_page.dart';
+import 'package:scrobblium/service/song_data_service.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -14,6 +16,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  final PageController _pageController = PageController();
   static const List<Widget> _pages = [
     StatsPage(),
     SongsPage(),
@@ -22,8 +25,12 @@ class _MainPageState extends State<MainPage> {
   static const List<String> _titles = ["Stats", "Songs", "Settings"];
 
   @override
+  void initState() {
+    super.initState();
+    SongDataService().fetchData();
+  }
+  @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -35,13 +42,11 @@ class _MainPageState extends State<MainPage> {
               return Consumer<SettingsProvider>(builder: (context, state, child) {
                 return PopupMenuButton(
                   icon: const Icon(Icons.more_vert),
+                  elevation: 3.2,
                   itemBuilder: (BuildContext context) {
                     List<PopupMenuEntry> list = [];
                     list.addAll(state.dropdownItems);
-                    if(list.isNotEmpty) {
-                      list.add(const PopupMenuDivider());
-                    }
-                    list.add(const PopupMenuItem(child: const Text("About"),value: "about",));
+                    list.add(const PopupMenuItem(value: "about",child: Text("About"),));
                     return list;
                   },
                   onSelected: (value) {
@@ -55,34 +60,50 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
-      body: Center(
-        child: _pages.elementAt(_selectedIndex), //New
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 0,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.query_stats),
-            label: 'Stats',
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => _selectedIndex = index);
+          },
+          children: _pages,
+        ),
+      bottomNavigationBar: Container(
+        color: Theme.of(context).canvasColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 12.0),
+          child: GNav(
+            selectedIndex: _selectedIndex,
+            backgroundColor: Theme.of(context).canvasColor,
+            tabBackgroundColor: Theme.of(context).focusColor,
+            padding: const EdgeInsets.all(12),
+            gap: 8,
+            tabs: const [
+              GButton(
+                icon: Icons.query_stats,
+                text: 'Stats',
+              ),
+              GButton(
+                icon: Icons.music_note,
+                text: 'Songs',
+              ),
+              GButton(
+                icon: Icons.settings,
+                text: 'Settings',
+              ),
+            ],
+            onTabChange: _onItemTapped,
+            //currentIndex: _selectedIndex,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.music_note),
-            label: 'Songs',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
+        ),
+      )
     );
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _pageController.animateToPage(index,
+          duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
     });
   }
 }

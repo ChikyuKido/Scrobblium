@@ -14,29 +14,11 @@ class MethodChannelService {
   static Future<void> setMusicPackage(String package) async {
     await platform.invokeMethod("setMusicPackage", {"package": package});
   }
-  static Future<String> getJsonData() async {
-    return await platform.invokeMethod('list');
-  }
 
-  static Future<List<SongData>> getSongData(
-      {withSkipped = true, DateTime? afterDate}) async {
+  static Future<List<SongData>> getSongData() async {
     String jsonData = await platform.invokeMethod('list');
     List<SongData> songs = _parseSongDataList(jsonData);
-    if (!withSkipped) {
-      int cap = getValueInt("skip-cap", 20);
-      songs.removeWhere((element) => element.timeListened <= cap);
-    }
-    if (afterDate != null) {
-      songs.removeWhere((element) => element.endTime.isBefore(afterDate));
-    }
     return songs;
-  }
-
-  static List<SongData> removeSkips(List<SongData> songs) {
-    List<SongData> newSongs = List.of(songs);
-    int cap = getValueInt("skip-cap", 20);
-    newSongs.removeWhere((element) => element.timeListened <= cap);
-    return newSongs;
   }
 
   static Future<SongData?> getCurrentSong() async {

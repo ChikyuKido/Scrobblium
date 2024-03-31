@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:scrobblium/service/song_provider_service.dart';
+import 'package:scrobblium/service/method_channel_service.dart';
 
 class DatabaseSettingsPage extends StatelessWidget {
   DatabaseSettingsPage({super.key});

@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:scrobblium/service/song_provider_service.dart';
+import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/image_util.dart';
 import 'package:scrobblium/util/util.dart';

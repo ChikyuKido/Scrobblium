@@ -2,7 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:scrobblium/page/main_page.dart';
-import 'package:scrobblium/service/song_provider_service.dart';
+import 'package:scrobblium/service/method_channel_service.dart';
+import 'package:scrobblium/service/song_data_service.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/latest_song_tile.dart';
 import 'package:scrobblium/widgets/music_stats_row.dart';
@@ -17,45 +18,39 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   int _currentDateSelected = 3;
+
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      SettingsProvider().updateSelectedPage(getDropdownItems(), handleDropdownClick());
+      SettingsProvider()
+          .updateSelectedPage(getDropdownItems(), handleDropdownClick());
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: MethodChannelService.getSongData(
-          afterDate: _currentDateSelected == 0
-              ? DateTime.now().subtract(const Duration(days: 7))
-              : _currentDateSelected == 1
-                  ? DateTime.now().subtract(const Duration(days: 30))
-                  : _currentDateSelected == 2
-                      ? DateTime.now().subtract(const Duration(days: 365))
-                      : null),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        }
-        if (snapshot.data == null) {
-          return const Text("No data available");
-        }
-        var songs = snapshot.data ?? [];
-
-        var songsRemovedSkip = MethodChannelService.removeSkips(songs);
-        songsRemovedSkip.sort((a, b) => b.endTime.compareTo(a.endTime));
-        var allTimeStats = MethodChannelService.getSongStatistics(songs);
-        return ListView(
+    var songs = SongDataService().getSongs(
+        afterDate: _currentDateSelected == 0
+            ? DateTime.now().subtract(const Duration(days: 7))
+            : _currentDateSelected == 1
+                ? DateTime.now().subtract(const Duration(days: 30))
+                : _currentDateSelected == 2
+                    ? DateTime.now().subtract(const Duration(days: 365))
+                    : null, withSkipped: false);
+    songs.sort((a, b) => b.endTime.compareTo(a.endTime));
+    var allTimeStats = MethodChannelService.getSongStatistics(songs);
+    return RefreshIndicator(
+        child: ListView(
           children: [
             Center(
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10)),
+                  borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -104,11 +99,11 @@ class _StatsPageState extends State<StatsPage> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
-            songsRemovedSkip.isEmpty
+            songs.isEmpty
                 ? Container()
                 : Column(
-                    children: songsRemovedSkip
-                        .sublist(0, min(7, songsRemovedSkip.length))
+                    children: songs
+                        .sublist(0, min(7, songs.length))
                         .map((e) => LatestSongTile(songData: e))
                         .toList(),
                   ),
@@ -124,20 +119,17 @@ class _StatsPageState extends State<StatsPage> {
             TopATA(ata: ATA.track, songs: songs),
             TopATA(ata: ATA.album, songs: songs),
           ],
-        );
-      },
-    );
+        ),
+        onRefresh: () => SongDataService().fetchData());
   }
 
   List<PopupMenuItem<String>> getDropdownItems() {
-    return [PopupMenuItem<String>(child: Text("test"),value: "test",)];
+    return [];
   }
 
   PopupMenuItemSelected<String>? handleDropdownClick() {
     return (value) {
-      if(value == "test") {
-        print("hello");
-      }
+
     };
   }
 }
