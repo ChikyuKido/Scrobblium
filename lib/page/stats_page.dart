@@ -30,16 +30,17 @@ class _StatsPageState extends State<StatsPage> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime? selectedDate = _currentDateSelected == 0
+        ? DateTime.now().subtract(const Duration(days: 7))
+        : _currentDateSelected == 1
+        ? DateTime.now().subtract(const Duration(days: 30))
+        : _currentDateSelected == 2
+        ? DateTime.now().subtract(const Duration(days: 365))
+        : null;
     var songs = SongDataService().getSongs(
-        afterDate: _currentDateSelected == 0
-            ? DateTime.now().subtract(const Duration(days: 7))
-            : _currentDateSelected == 1
-                ? DateTime.now().subtract(const Duration(days: 30))
-                : _currentDateSelected == 2
-                    ? DateTime.now().subtract(const Duration(days: 365))
-                    : null, withSkipped: false);
+        afterDate: selectedDate, withSkipped: false);
     songs.sort((a, b) => b.endTime.compareTo(a.endTime));
-    var allTimeStats = MethodChannelService.getSongStatistics(songs);
+    var allTimeStats = MethodChannelService.getSongStatistics(SongDataService().getSongs(afterDate: selectedDate));
     return RefreshIndicator(
         child: ListView(
           children: [
