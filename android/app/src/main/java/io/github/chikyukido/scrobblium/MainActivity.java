@@ -32,6 +32,9 @@ public class MainActivity extends FlutterActivity {
                     BackupDatabaseUtil.importDatabase(getApplicationContext(), data.getData());
                 else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_BACKUP)
                     BackupDatabaseUtil.saveBackupDatabasePath(getApplicationContext(),data.getData());
+                    getContext().getContentResolver().takePersistableUriPermission(data.getData(),
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
             }
         }
     }

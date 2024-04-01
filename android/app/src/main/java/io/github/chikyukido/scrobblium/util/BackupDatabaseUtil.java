@@ -95,6 +95,7 @@ public class BackupDatabaseUtil {
         DocumentFile fileToWrite = docFile.createFile("application/vnd.sqlite3",fileName);
         if(fileToWrite == null) {
             Log.w(TAG, "backupDatabase: Could not write document because could not create file");
+            return;
         }
         exportDatabase(context,fileToWrite.getUri());
     }
