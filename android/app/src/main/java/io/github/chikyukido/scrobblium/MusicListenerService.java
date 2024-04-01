@@ -18,6 +18,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.room.Room;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.database.SongDatabase;
+import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.BitmapUtil;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
 
@@ -32,6 +33,8 @@ import java.util.TimerTask;
 public class MusicListenerService extends NotificationListenerService {
     public static MusicListenerServiceStatus status = MusicListenerServiceStatus.NOT_INITIALIZED;
     private static MusicListenerService INSTANCE = null;
+
+    private int lastBackupTime;
 
     private final String TAG = "MusicListenerService";
     private String musicPackageName = "";
@@ -51,6 +54,8 @@ public class MusicListenerService extends NotificationListenerService {
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
+        //set it to zero so every time it starts it also makes a backup
+        lastBackupTime = 0;
         connectToDatabase();
         startForegroundService();
 
@@ -107,6 +112,12 @@ public class MusicListenerService extends NotificationListenerService {
             @Override
             public void run() {
                 fetchActiveNotifications();
+                //every 24hours backup
+                if(lastBackupTime <= 0) {
+                    BackupDatabaseUtil.backupDatabase(getBaseContext());
+                    lastBackupTime = 60*60*24;
+                }
+                lastBackupTime--;
             }
         }, 5000, 1000);
 
@@ -148,6 +159,7 @@ public class MusicListenerService extends NotificationListenerService {
         if (sbn == null) {
             return;
         }
+
         if (currentMediaController == null || currentMediaController.getPlaybackState() == null) {
             Log.i(TAG, "fetchActiveNotifications: Current media controller is null. Retrieving from the notification.");
             currentMediaController = getMediaControllerFromNotification(sbn);

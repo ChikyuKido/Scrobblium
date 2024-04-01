@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import androidx.documentfile.provider.DocumentFile;
 import io.github.chikyukido.scrobblium.MusicListenerService;
 
 import java.io.*;
@@ -13,7 +14,9 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
 public class BackupDatabaseUtil {
+    private static String TAG = "BackupDatabaseUtil";
     public static final int REQUEST_CODE_PICK_DIRECTORY_EXPORT = 123;
     public static final int REQUEST_CODE_PICK_DIRECTORY_IMPORT = 124;
     public static final int REQUEST_CODE_PICK_DIRECTORY_BACKUP = 125;
@@ -23,14 +26,14 @@ public class BackupDatabaseUtil {
         if (MusicListenerService.getInstance() == null) return;
         if (MusicListenerService.getInstance().getDatabase() == null) return;
 
-        Log.i("test", "importDatabase: "+databaseFile);
+        Log.i(TAG, "importDatabase: "+databaseFile);
         MusicListenerService.getInstance().getDatabase().close();
         try {
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database"));
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database-wal"));
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database-shm"));
         } catch (IOException e) {
-            Log.e("BackupDatabaseUtil", "importDatabase: Could not delete database. Maybe do not exists or is still in use", e);
+            Log.e(TAG, "importDatabase: Could not delete database. Maybe do not exists or is still in use", e);
         }
         Path file = context.getDataDir().toPath().resolve("databases/song_database");
         try (FileOutputStream fos = new FileOutputStream(file.toFile());
@@ -41,7 +44,7 @@ public class BackupDatabaseUtil {
                 fos.write(buffer, 0, bytesRead);
             }
         } catch (IOException e) {
-            Log.e("BackupDatabaseUtil", "importDatabase: Error while writing database file", e);
+            Log.e(TAG, "importDatabase: Error while writing database file", e);
         }
         MusicListenerService.getInstance().connectToDatabase();
     }
@@ -52,7 +55,7 @@ public class BackupDatabaseUtil {
         try (OutputStream os = context.getContentResolver().openOutputStream(outputDir)) {
             os.write(Files.readAllBytes(file));
         } catch (IOException e) {
-            Log.e("BackupDatabaseUtil", "exportDatabase: Could not export database", e);
+            Log.e(TAG, "exportDatabase: Could not export database", e);
         }
     }
 
@@ -64,20 +67,36 @@ public class BackupDatabaseUtil {
             FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
             fos.write(data.getBytes());
             fos.close();
-            Log.i("FileHelper", "URI saved successfully.");
+            Log.i(TAG, "URI saved successfully.");
         } catch (IOException e) {
-            Log.e("FileHelper", "Error saving URI: " + e.getMessage());
+            Log.e(TAG, "Error saving URI: " + e.getMessage());
         }
-        backupDatabase(context);
     }
 
     public static void backupDatabase(Context context) {
         Uri backupDatabasePath = readBackupDatabasePath(context);
         if (backupDatabasePath == null) return;
 
-        String filename = new SimpleDateFormat("dd.MM.yyyy").format(new Date()) + ".db";
+        DocumentFile docFile = DocumentFile.fromTreeUri(context,backupDatabasePath);
+        DocumentFile[] currentBackups = docFile.listFiles();
+        if(currentBackups.length >= 3) {
+            DocumentFile oldest = currentBackups[0];
+            for (int i = 1;i<currentBackups.length;i++) {
+                if(currentBackups[i].lastModified() < oldest.lastModified()) {
+                    oldest = currentBackups[i];
+                }
+            }
+            Log.i(TAG, "backupDatabase: More than 3 backups found delete one");
+            oldest.delete();
+        }
 
-//        exportDatabase(context, backupFileUri);
+        String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".db";
+
+        DocumentFile fileToWrite = docFile.createFile("application/vnd.sqlite3",fileName);
+        if(fileToWrite == null) {
+            Log.w(TAG, "backupDatabase: Could not write document because could not create file");
+        }
+        exportDatabase(context,fileToWrite.getUri());
     }
 
     public static Uri readBackupDatabasePath(Context context) {
@@ -88,7 +107,7 @@ public class BackupDatabaseUtil {
             BufferedReader br = new BufferedReader(isr);
             String path = br.readLine();
             if (path != null && !path.isEmpty()) {
-                backupDatabasePath = Uri.parse(path);
+                backupDatabasePath = Uri.parse(path.trim());
             }
             br.close();
             isr.close();
