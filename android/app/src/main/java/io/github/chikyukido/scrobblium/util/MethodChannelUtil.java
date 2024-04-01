@@ -13,6 +13,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.MusicListenerService;
 import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.intergrations.LastFMIntegration;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class MethodChannelUtil {
         methods.put("deleteEntry",deleteEntry());
         methods.put("backupDatabasePicker",backupDatabasePicker(context));
         methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
+        methods.put("signInLastFMUser",signInLastFMUser());
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
@@ -48,6 +50,16 @@ public class MethodChannelUtil {
                 result.notImplemented();
             }
         });
+    }
+
+    private static MethodInterface signInLastFMUser() {
+        return (call, result) -> {
+            String username = call.argument("username");
+            String password = call.argument("password");
+            new Thread(() -> {
+                result.success(new LastFMIntegration().signIn(username,password));
+            }).start();
+        };
     }
 
     private static MethodInterface getBackupDatabasePath(Context context) {

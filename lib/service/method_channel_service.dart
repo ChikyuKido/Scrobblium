@@ -30,6 +30,10 @@ class MethodChannelService {
     return songData;
   }
 
+  static Future<bool> signInLastFMUser(String username,String password) async{
+    return await platform.invokeMethod("signInLastFMUser",{"username":username,"password":password});
+  }
+
   static List<SongData> _parseSongDataList(String responseBody) {
     final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
     return parsed.map<SongData>((json) => SongData.fromJson(json)).toList();
