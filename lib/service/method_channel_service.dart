@@ -99,6 +99,7 @@ class MethodChannelService {
   static Future<String> getBackupDatabasePath() async {
     return await platform.invokeMethod("getBackupDatabasePath");
   }
+
 }
 
 class SongStatistic {

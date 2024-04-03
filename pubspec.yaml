@@ -45,7 +45,9 @@ dependencies:
   file_picker: ^6.2.0
   dynamic_color: ^1.7.0
   google_nav_bar: ^5.0.6
-
+  #installed_apps: ^1.5.0
+  installed_apps:
+    path: externel/installed_apps
 dev_dependencies:
   flutter_test:
     sdk: flutter
