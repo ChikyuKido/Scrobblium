@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
       return ChangeNotifierProvider(
           create: (context) => AppThemeProvider(),
