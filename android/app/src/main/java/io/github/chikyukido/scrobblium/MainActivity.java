@@ -26,14 +26,15 @@ public class MainActivity extends FlutterActivity {
         //catching activity results for the backups cause its using the main activities context.
         if (resultCode == Activity.RESULT_OK) {
             if (data != null && data.getData() != null) {
-                if (requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT)
+                if (requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT) {
                     BackupDatabaseUtil.exportDatabase(getApplicationContext(), data.getData());
-                else if (requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT)
+                } else if (requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT) {
                     BackupDatabaseUtil.importDatabase(getApplicationContext(), data.getData());
-                else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_BACKUP)
-                    BackupDatabaseUtil.saveBackupDatabasePath(getApplicationContext(),data.getData());
+                } else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_BACKUP) {
+                    BackupDatabaseUtil.saveBackupDatabasePath(getApplicationContext(), data.getData());
                     getContext().getContentResolver().takePersistableUriPermission(data.getData(),
                             Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
 
             }
         }

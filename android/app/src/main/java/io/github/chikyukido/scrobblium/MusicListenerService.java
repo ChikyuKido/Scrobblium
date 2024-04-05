@@ -177,7 +177,7 @@ public class MusicListenerService extends NotificationListenerService {
             status = MusicListenerServiceStatus.NO_NOTIFICATION;
             return;
         }
-
+        status = MusicListenerServiceStatus.TRACKING;
         checkForUpdates(sbn);
     }
 

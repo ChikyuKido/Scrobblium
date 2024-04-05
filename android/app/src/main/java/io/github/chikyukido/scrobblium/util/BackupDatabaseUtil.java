@@ -28,7 +28,7 @@ public class BackupDatabaseUtil {
 
         Log.i(TAG, "importDatabase: Import file: "+databaseFile);
         MusicListenerService.getInstance().getDatabase().close();
-        Log.d(TAG, "importDatabase: closed database connection");
+        Log.i(TAG, "importDatabase: closed database connection");
         try {
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database"));
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database-wal"));
