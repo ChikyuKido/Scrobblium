@@ -16,7 +16,7 @@ import java.util.Date;
 
 
 public class BackupDatabaseUtil {
-    private static String TAG = "BackupDatabaseUtil";
+    private static final String TAG = "BackupDatabaseUtil";
     public static final int REQUEST_CODE_PICK_DIRECTORY_EXPORT = 123;
     public static final int REQUEST_CODE_PICK_DIRECTORY_IMPORT = 124;
     public static final int REQUEST_CODE_PICK_DIRECTORY_BACKUP = 125;
@@ -26,15 +26,18 @@ public class BackupDatabaseUtil {
         if (MusicListenerService.getInstance() == null) return;
         if (MusicListenerService.getInstance().getDatabase() == null) return;
 
-        Log.i(TAG, "importDatabase: "+databaseFile);
+        Log.i(TAG, "importDatabase: Import file: "+databaseFile);
         MusicListenerService.getInstance().getDatabase().close();
+        Log.d(TAG, "importDatabase: closed database connection");
         try {
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database"));
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database-wal"));
             Files.deleteIfExists(context.getDataDir().toPath().resolve("databases/song_database-shm"));
+            Log.i(TAG, "importDatabase: deleted old database");
         } catch (IOException e) {
             Log.e(TAG, "importDatabase: Could not delete database. Maybe do not exists or is still in use", e);
         }
+
         Path file = context.getDataDir().toPath().resolve("databases/song_database");
         try (FileOutputStream fos = new FileOutputStream(file.toFile());
              InputStream in = context.getContentResolver().openInputStream(databaseFile)) {
@@ -43,10 +46,12 @@ public class BackupDatabaseUtil {
             while ((bytesRead = in.read(buffer)) != -1) {
                 fos.write(buffer, 0, bytesRead);
             }
+            Log.i(TAG, "importDatabase: successfully imported database");
         } catch (IOException e) {
             Log.e(TAG, "importDatabase: Error while writing database file", e);
         }
         MusicListenerService.getInstance().connectToDatabase();
+        Log.i(TAG, "importDatabase: connected to database");
     }
 
     public static void exportDatabase(Context context, Uri outputDir) {
@@ -54,6 +59,7 @@ public class BackupDatabaseUtil {
         Path file = context.getDataDir().toPath().resolve("databases/song_database");
         try (OutputStream os = context.getContentResolver().openOutputStream(outputDir)) {
             os.write(Files.readAllBytes(file));
+            Log.i(TAG, "exportDatabase: successfully exported database");
         } catch (IOException e) {
             Log.e(TAG, "exportDatabase: Could not export database", e);
         }
@@ -67,9 +73,9 @@ public class BackupDatabaseUtil {
             FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
             fos.write(data.getBytes());
             fos.close();
-            Log.i(TAG, "URI saved successfully.");
+            Log.i(TAG, "saveBackupDatabasePath: BackupDatabasePath saved successfully.");
         } catch (IOException e) {
-            Log.e(TAG, "Error saving URI: " + e.getMessage());
+            Log.e(TAG, "saveBackupDatabasePath: Error saving BackupDatabasePath: " + e.getMessage());
         }
     }
 
@@ -90,14 +96,19 @@ public class BackupDatabaseUtil {
             oldest.delete();
         }
 
-        String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".db";
-
-        DocumentFile fileToWrite = docFile.createFile("application/vnd.sqlite3",fileName);
-        if(fileToWrite == null) {
-            Log.w(TAG, "backupDatabase: Could not write document because could not create file");
-            return;
+        String fileName = new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".db";
+        if(docFile.findFile(fileName) == null) {
+            DocumentFile fileToWrite = docFile.createFile("application/vnd.sqlite3",fileName);
+            if(fileToWrite == null) {
+                Log.w(TAG, "backupDatabase: Could not write document because could not create file");
+                return;
+            }
+            exportDatabase(context,fileToWrite.getUri());
+        }else {
+            Log.i(TAG, "backupDatabase: Already found a file with the same name. Overwrite it");
+            exportDatabase(context,docFile.findFile(fileName).getUri());
         }
-        exportDatabase(context,fileToWrite.getUri());
+        Log.i(TAG, "backupDatabase: Successfully created a backup");
     }
 
     public static Uri readBackupDatabasePath(Context context) {

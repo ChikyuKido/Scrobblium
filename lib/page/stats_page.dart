@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:scrobblium/page/main_page.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/service/song_data_service.dart';
+import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/latest_song_tile.dart';
 import 'package:scrobblium/widgets/music_stats_row.dart';
 import 'package:scrobblium/widgets/top_ata.dart';
+
+import 'songs/song_tile_info_page.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -18,6 +21,7 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   int _currentDateSelected = 3;
+  final List<String> dates = ["Last Week","Last Month","Last Year","All Time"];
 
   @override
   void initState() {
@@ -41,53 +45,16 @@ class _StatsPageState extends State<StatsPage> {
         afterDate: selectedDate, withSkipped: false);
     songs.sort((a, b) => b.endTime.compareTo(a.endTime));
     var allTimeStats = MethodChannelService.getSongStatistics(SongDataService().getSongs(afterDate: selectedDate));
+    
+    
     return RefreshIndicator(
         child: ListView(
           children: [
-            Center(
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    DateOption(
-                        text: 'Last Week',
-                        selected: _currentDateSelected == 0,
-                        onTap: () => setState(() {
-                              _currentDateSelected = 0;
-                            })),
-                    DateOption(
-                        text: 'Last Month',
-                        selected: _currentDateSelected == 1,
-                        onTap: () => setState(() {
-                              _currentDateSelected = 1;
-                            })),
-                    DateOption(
-                        text: 'Last Year',
-                        selected: _currentDateSelected == 2,
-                        onTap: () => setState(() {
-                              _currentDateSelected = 2;
-                            })),
-                    DateOption(
-                        text: 'All Time',
-                        selected: _currentDateSelected == 3,
-                        onTap: () => setState(() {
-                              _currentDateSelected = 3;
-                            })),
-                  ],
-                ),
-              ),
-            ),
+            dateChooser(context),
             const SizedBox(height: 10),
             Center(
               child: Text(
-                'Your ${_currentDateSelected == 0 ? "Last Week" : _currentDateSelected == 1 ? "Last Month" : _currentDateSelected == 2 ? "Last Year" : "All Time"} Stats',
+                'Your ${dates[_currentDateSelected]} Stats',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
@@ -100,14 +67,7 @@ class _StatsPageState extends State<StatsPage> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
-            songs.isEmpty
-                ? Container()
-                : Column(
-                    children: songs
-                        .sublist(0, min(7, songs.length))
-                        .map((e) => LatestSongTile(songData: e))
-                        .toList(),
-                  ),
+            _latestSongs(songs, context),
             const SizedBox(height: 10),
             Center(
               child: Text(
@@ -121,9 +81,60 @@ class _StatsPageState extends State<StatsPage> {
             TopATA(ata: ATA.album, songs: songs),
           ],
         ),
-        onRefresh: () => SongDataService().fetchData());
+        onRefresh: () => _refresh());
   }
 
+  Center dateChooser(BuildContext context) {
+    return Center(
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: dates.indexed.map((e) => DateOption(
+                    text: e.$2,
+                    selected: e.$1 == _currentDateSelected,
+                    onTap: () => setState(() => _currentDateSelected = e.$1 )))
+                    .toList(),
+              ),
+            ),
+          );
+  }
+
+  Widget _latestSongs(List<SongData> songs, BuildContext context) {
+    return songs.isEmpty
+              ? Container()
+              : Column(
+                  children: songs
+                      .sublist(0, min(7, songs.length))
+                      .map((e) => LatestSongTile(
+                      songData: e,
+                      onTap: () {
+                        List<SongData> songs = SongDataService().getSongs()
+                            .where((element) =>
+                            e.getIdentifier() ==
+                            element.getIdentifier())
+                            .toList();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    SongTileInfoPage(songs: songs))).then((value) => _refresh());
+                      },
+                      ))
+                      .toList(),
+                );
+  }
+
+  _refresh() async {
+    await SongDataService().fetchData();
+    setState(() {});
+  }
   List<PopupMenuItem<String>> getDropdownItems() {
     return [];
   }

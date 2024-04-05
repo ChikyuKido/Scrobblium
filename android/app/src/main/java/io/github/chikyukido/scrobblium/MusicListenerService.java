@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MusicListenerService extends NotificationListenerService {
     public static MusicListenerServiceStatus status = MusicListenerServiceStatus.NOT_INITIALIZED;
@@ -36,6 +38,7 @@ public class MusicListenerService extends NotificationListenerService {
 
     private int lastBackupTime;
 
+    private final Executor executor = Executors.newSingleThreadExecutor();
     private final String TAG = "MusicListenerService";
     private String musicPackageName = "";
     private StatusBarNotification currentNotification;
@@ -69,9 +72,16 @@ public class MusicListenerService extends NotificationListenerService {
         ).build();
     }
 
+    @Override
+    public void onNotificationPosted(StatusBarNotification sbn) {
+        if(sbn.getPackageName().equals(musicPackageName)) {
+            checkForUpdates(sbn);
+        }
+    }
+
     public void setMusicPackage(String musicPackage) {
         musicPackageName = musicPackage;
-        INSTANCE.startTimer();
+        startTimer();
         Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
     }
 
@@ -86,6 +96,7 @@ public class MusicListenerService extends NotificationListenerService {
             status = MusicListenerServiceStatus.NO_PERMISSION;
             return;
         }
+        Log.i(TAG, "startForegroundService: "+isServiceRunning(this.getClass()));
         if (!isServiceRunning(this.getClass())) {
             String channelID = "MusicListenerServiceChannel";
             NotificationChannel channel = new NotificationChannel(channelID,
@@ -93,12 +104,18 @@ public class MusicListenerService extends NotificationListenerService {
                     NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(this, channelID).build();
+            Notification notification = new NotificationCompat.Builder(this, channelID)
+                    .setContentTitle("Music Listener Service")
+                    .setContentText("Tracking music notifications")
+                    .build();
+
             int NOTIFICATION_ID = 1956;
             startForeground(NOTIFICATION_ID, notification);
+            Log.i(TAG, "startForegroundService: started foreground process");
         }
         if (status != MusicListenerServiceStatus.TRACKING) startTimer();
     }
+
 
     private void startTimer() {
         if (timer != null) {
@@ -112,10 +129,10 @@ public class MusicListenerService extends NotificationListenerService {
             @Override
             public void run() {
                 fetchActiveNotifications();
-                //every 24hours backup
+                //every 1hours backup
                 if(lastBackupTime <= 0) {
                     BackupDatabaseUtil.backupDatabase(getBaseContext());
-                    lastBackupTime = 60*60*24;
+                    lastBackupTime = 60*60;
                 }
                 lastBackupTime--;
             }
@@ -157,18 +174,25 @@ public class MusicListenerService extends NotificationListenerService {
         StatusBarNotification sbn = getMusicNotification();
         currentNotification = sbn;
         if (sbn == null) {
+            status = MusicListenerServiceStatus.NO_NOTIFICATION;
             return;
         }
 
+        checkForUpdates(sbn);
+    }
+
+    private void checkForUpdates(StatusBarNotification sbn) {
         if (currentMediaController == null || currentMediaController.getPlaybackState() == null) {
             Log.i(TAG, "fetchActiveNotifications: Current media controller is null. Retrieving from the notification.");
             currentMediaController = getMediaControllerFromNotification(sbn);
             if (currentMediaController == null) {
                 Log.e(TAG, "fetchActiveNotifications: Could not get MediaController from notification: " + sbn.getNotification().toString());
+                status = MusicListenerServiceStatus.NO_MEDIA_CONTROLLER;
                 return;
             }
         }
         if (currentSong.getTimeListened() == -1) {
+            Log.i(TAG, "fetchActiveNotifications: New song detected.");
             currentSong = SongData.of(currentMediaController);
             saveArt();
         }
@@ -178,12 +202,15 @@ public class MusicListenerService extends NotificationListenerService {
                 currentSong.setProgress(currentMediaController.getPlaybackState().getPosition());
             }
         } else {
-            currentSong.setEndTime(LocalDateTime.now());
-            if (database.isOpen())
-                database.musicTrackDao().insertTrack(currentSong);
-            currentSong = SongData.of(currentMediaController);
-            saveArt();
-            Log.i(TAG, "fetchActiveNotifications: New song detected.");
+            executor.execute(() -> {
+                currentSong.setEndTime(LocalDateTime.now());
+                if (database.isOpen()) {
+                    database.musicTrackDao().insertTrack(currentSong);
+                }
+                currentSong = SongData.of(currentMediaController);
+                saveArt();
+                Log.i(TAG, "fetchActiveNotifications: New song detected.");
+            });
         }
     }
 
@@ -221,6 +248,7 @@ public class MusicListenerService extends NotificationListenerService {
     }
 
 
+
     public SongDatabase getDatabase() {
         return database;
     }
@@ -248,6 +276,8 @@ public class MusicListenerService extends NotificationListenerService {
         NOT_INITIALIZED,
         NO_PACKAGE,
         NO_PERMISSION,
+        NO_NOTIFICATION,
+        NO_MEDIA_CONTROLLER,
         TRACKING,
         PAUSED,
     }

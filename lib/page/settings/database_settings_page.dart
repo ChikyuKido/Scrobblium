@@ -45,7 +45,7 @@ class DatabaseSettingsPage extends StatelessWidget {
       settingKey: 'backup-database',
       defaultValue: false,
       childrenPadding: EdgeInsets.zero,
-      childrenIfEnabled: [_buildBackupPicker()],
+      childrenIfEnabled: [_buildMakeBackup(),_buildBackupPicker()],
     );
   }
 
@@ -59,5 +59,12 @@ class DatabaseSettingsPage extends StatelessWidget {
 
   initVariables() async {
     path = await MethodChannelService.getBackupDatabasePath();
+  }
+
+  _buildMakeBackup() {
+    return SimpleSettingsTile(
+        title: "Create backup now",
+        onTap: () => MethodChannelService.backupDatabaseNow(),
+    );
   }
 }

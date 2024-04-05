@@ -100,6 +100,10 @@ class MethodChannelService {
     return await platform.invokeMethod("getBackupDatabasePath");
   }
 
+  static backupDatabaseNow() async {
+    await platform.invokeMethod("backupDatabaseNow");
+  }
+
 }
 
 class SongStatistic {

@@ -42,6 +42,7 @@ public class MethodChannelUtil {
         methods.put("backupDatabasePicker",backupDatabasePicker(context));
         methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
         methods.put("signInLastFMUser",signInLastFMUser());
+        methods.put("backupDatabaseNow",backupDatabaseNow(context));
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
@@ -50,6 +51,12 @@ public class MethodChannelUtil {
                 result.notImplemented();
             }
         });
+    }
+
+    private static MethodInterface backupDatabaseNow(Context context) {
+        return (call, result) -> {
+            BackupDatabaseUtil.backupDatabase(context);
+        };
     }
 
     private static MethodInterface signInLastFMUser() {
