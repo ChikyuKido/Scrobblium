@@ -124,4 +124,19 @@ public class SongData {
     public int hashCode() {
         return Objects.hash(artist, title, album, albumAuthor);
     }
+
+    @Override
+    public String toString() {
+        return "SongData{" +
+                "artist='" + artist + '\'' +
+                ", title='" + title + '\'' +
+                ", album='" + album + '\'' +
+                ", albumAuthor='" + albumAuthor + '\'' +
+                ", maxProgress=" + maxProgress +
+                ", startTime=" + startTime +
+                ", progress=" + progress +
+                ", endTime=" + endTime +
+                ", timeListened=" + timeListened +
+                '}';
+    }
 }
