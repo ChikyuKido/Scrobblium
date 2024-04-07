@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:scrobblium/page/main_page.dart';
 import 'package:scrobblium/page/settings/appearance_settings_page.dart';
 import 'package:scrobblium/page/settings/database_settings_page.dart';
 import 'package:scrobblium/page/settings/integration_settings_page.dart';
@@ -18,22 +16,51 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      SettingsProvider().updateSelectedPage([], null);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: ListView(padding: const EdgeInsets.all(8.0), children:
-        [
-        SimpleSettingsTile(title: "Tracking", child: TrackingSettingsPage()),
-        SimpleSettingsTile(title: "Stats", child: const StatsSettingsPage()),
-        SimpleSettingsTile(
-            title: "Appearance", child: const AppearanceSettingsPage()),
-        SimpleSettingsTile(title: "Database", child: DatabaseSettingsPage()),
-        SimpleSettingsTile(title: "Integrations", child: const IntegrationSettingsPage()),
-    ]));
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Settings"),
+        centerTitle: true,
+      ),
+      body:  SafeArea(
+          child: ListView(padding: const EdgeInsets.all(8.0), children:
+          [
+            addSettingsPage("Tracking", Icons.music_note, TrackingSettingsPage()),
+            addSettingsPage("Stats", Icons.insert_chart, const StatsSettingsPage()),
+            addSettingsPage("Appearance", Icons.palette, const AppearanceSettingsPage()),
+            addSettingsPage("Database", Icons.storage, DatabaseSettingsPage()),
+            addSettingsPage("Integrations", Icons.network_check, const IntegrationSettingsPage())
+          ])),
+    );
+  }
+
+  Widget addSettingsPage(String title, IconData icon, Widget page) {
+    return ListTile(
+      title: Text(title,style: Theme.of(context).textTheme.bodyLarge),
+      leading: Icon(icon),
+      trailing: const Icon(Icons.arrow_forward_ios),
+      onTap: () => navigate(page),
+    );
+  }
+  void navigate(Widget page) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (_, __, ___) => page,
+        transitionsBuilder: (_, animation, __, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          );
+        },
+      ),
+    );
   }
 }

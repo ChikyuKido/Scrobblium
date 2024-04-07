@@ -6,8 +6,6 @@ import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/widgets/song_list_tile.dart';
 
-import '../main_page.dart';
-
 class SongsPage extends StatefulWidget {
   const SongsPage({super.key});
 
@@ -19,26 +17,73 @@ class _SongsPageState extends State<SongsPage> {
   List<SongTileData> _tileSongs = [];
   List<SongListTile> _tiles = [];
 
+  bool _isSearching = false;
+
   @override
   void initState() {
     super.initState();
     if(_tiles.isEmpty) {
       _refresh(withoutFetch: true);
     }
-    Future.delayed(Duration.zero, () {
-      SettingsProvider().updateSelectedPage(getDropdownItems(), handleDropdownClick());
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
+    return Scaffold(
+      appBar: AppBar(
+        title: _isSearching ? TextField(
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            hintStyle: Theme.of(context).textTheme.bodyMedium
+          ),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ) : const Text("Songs"),
+        centerTitle: true,
+        actions: _buildAppBarActions(),
+      ),
+      body: RefreshIndicator(
         onRefresh: () async => await _refresh(),
-        child: _tileSongs.isEmpty
-            ? Container()
-            : ListView.builder(
-                itemCount: _tileSongs.length,
-                itemBuilder: (BuildContext context, int index) => _tiles[index]));
+        child: _tileSongs.isEmpty ? Container() :
+            ListView.builder(
+              itemCount: _tileSongs.length + (_isSearching ? 1 : 0),
+              itemBuilder: (BuildContext context, int index) {
+                if(_isSearching && index == 0) {
+                  return _extraSearchOptions();
+                }
+                return _tiles[index];
+              },
+            ),
+      )
+    );
+  }
+
+
+  Widget _extraSearchOptions() {
+    return Container();
+  }
+
+  List<Widget> _buildAppBarActions() {
+    if (_isSearching) {
+      return [
+        IconButton(onPressed: () {
+          setState(() {
+            _isSearching = false;
+          });
+        },
+            icon: const Icon(Icons.cancel))
+      ];
+    } else {
+      return [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _isSearching = true;
+            });
+          },
+          icon: const Icon(Icons.search),
+        ),
+      ];
+    }
   }
 
   List<SongListTile> _getSongListTiles() {

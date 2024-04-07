@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:scrobblium/page/main_page.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/service/song_data_service.dart';
 import 'package:scrobblium/song_data.dart';
@@ -26,10 +25,6 @@ class _StatsPageState extends State<StatsPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      SettingsProvider()
-          .updateSelectedPage(getDropdownItems(), handleDropdownClick());
-    });
   }
 
   @override
@@ -45,43 +40,48 @@ class _StatsPageState extends State<StatsPage> {
         afterDate: selectedDate, withSkipped: false);
     songs.sort((a, b) => b.endTime.compareTo(a.endTime));
     var allTimeStats = MethodChannelService.getSongStatistics(SongDataService().getSongs(afterDate: selectedDate));
-    
-    
-    return RefreshIndicator(
-        child: ListView(
-          children: [
-            dateChooser(context),
-            const SizedBox(height: 10),
-            Center(
-              child: Text(
-                'Your ${dates[_currentDateSelected]} Stats',
-                style: Theme.of(context).textTheme.bodyLarge,
+
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Stats"),
+      ),
+      body: RefreshIndicator(
+          child: ListView(
+            children: [
+              dateChooser(context),
+              const SizedBox(height: 10),
+              Center(
+                child: Text(
+                  'Your ${dates[_currentDateSelected]} Stats',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            MusicStatsRow(songStatistic: allTimeStats),
-            const SizedBox(height: 20),
-            Center(
-              child: Text(
-                'Last 7 Songs',
-                style: Theme.of(context).textTheme.bodyLarge,
+              const SizedBox(height: 10),
+              MusicStatsRow(songStatistic: allTimeStats),
+              const SizedBox(height: 20),
+              Center(
+                child: Text(
+                  'Last 7 Songs',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
-            ),
-            _latestSongs(songs, context),
-            const SizedBox(height: 10),
-            Center(
-              child: Text(
-                'Detailed Statistics',
-                style: Theme.of(context).textTheme.bodyLarge,
+              _latestSongs(songs, context),
+              const SizedBox(height: 10),
+              Center(
+                child: Text(
+                  'Detailed Statistics',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            TopATA(ata: ATA.artist, songs: songs),
-            TopATA(ata: ATA.track, songs: songs),
-            TopATA(ata: ATA.album, songs: songs),
-          ],
-        ),
-        onRefresh: () => _refresh());
+              const SizedBox(height: 10),
+              TopATA(ata: ATA.artist, songs: songs),
+              TopATA(ata: ATA.track, songs: songs),
+              TopATA(ata: ATA.album, songs: songs),
+            ],
+          ),
+          onRefresh: () => _refresh()),
+    );
   }
 
   Center dateChooser(BuildContext context) {
