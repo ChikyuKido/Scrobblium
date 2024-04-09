@@ -222,8 +222,9 @@ public class MusicListenerService extends NotificationListenerService {
                 currentSong.setEndTime(LocalDateTime.now());
                 if (database.isOpen()) {
                     database.musicTrackDao().insertTrack(currentSong);
+                    Log.i(TAG, "checkForUpdates: Inserted data into database");
                 }
-                Log.i(TAG, "fetchActiveNotifications: New song detected. Old song was: " + currentSong);
+                Log.i(TAG, "checkForUpdates: New song detected. Old song was: " + currentSong);
                 currentSong = SongData.of(currentMediaController);
                 saveArt();
                 notificationManager.notify(NOTIFICATION_ID,getNotification());
