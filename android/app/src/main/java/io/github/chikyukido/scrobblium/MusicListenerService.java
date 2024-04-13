@@ -35,6 +35,7 @@ import java.util.concurrent.Executors;
 public class MusicListenerService extends NotificationListenerService {
     public static MusicListenerServiceStatus status = MusicListenerServiceStatus.NOT_INITIALIZED;
     private static MusicListenerService INSTANCE = null;
+
     private static final String CHANNEL_ID = "MusicListenerServiceChannel";
     private static final int NOTIFICATION_ID = 1956;
     private static final String TAG = "MusicListenerService";
@@ -43,9 +44,11 @@ public class MusicListenerService extends NotificationListenerService {
 
     private int lastBackupTime;
     private String musicPackageName = "";
-    private StatusBarNotification currentNotification;
 
+    private boolean showNotificationStatus = false;
+    private StatusBarNotification currentNotification;
     private NotificationManager notificationManager;
+
     private SongDatabase database;
     private SongData currentSong = new SongData("", "", "", "", -1L, -1L, LocalDateTime.MIN,
             LocalDateTime.MIN, -1);
@@ -68,6 +71,7 @@ public class MusicListenerService extends NotificationListenerService {
     }
 
     public void connectToDatabase() {
+        if(database != null) database.close();
         database = Room.databaseBuilder(
                 getApplicationContext(),
                 SongDatabase.class,
@@ -97,14 +101,18 @@ public class MusicListenerService extends NotificationListenerService {
     }
 
     public void startForegroundService() {
-        musicPackageName = ConfigUtil.getMusicPackage(getBaseContext());
-        if (musicPackageName == null || musicPackageName.isEmpty()) {
+        Log.i(TAG, "startForegroundService: Start foreground service");
+        stopTimer();
+        musicPackageName = ConfigUtil.getString(getBaseContext(),"flutter.music-app-package","");
+        if (musicPackageName.isEmpty()) {
             Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
             setMusicListenerStatus(MusicListenerServiceStatus.NO_PACKAGE);
             return;
         }
+        showNotificationStatus = ConfigUtil.getBoolean(getBaseContext(),"flutter.show-status-notification",false);
         if (!isPermissionGranted()) {
             setMusicListenerStatus(MusicListenerServiceStatus.NO_PERMISSION);
+            Log.w(TAG, "startForegroundService: Permission not granted. Can't start the service");
             return;
         }
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
@@ -136,7 +144,6 @@ public class MusicListenerService extends NotificationListenerService {
             @Override
             public void run() {
                 incrementTimeListened();
-                //every 1hours backup
                 if(lastBackupTime <= 0) {
                     BackupDatabaseUtil.backupDatabase(getBaseContext());
                     lastBackupTime = 60*60;
@@ -212,7 +219,7 @@ public class MusicListenerService extends NotificationListenerService {
             Log.i(TAG, "fetchActiveNotifications: New song detected.");
             currentSong = SongData.of(currentMediaController);
             saveArt();
-            notificationManager.notify(NOTIFICATION_ID,getNotification());
+            if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());
         }
         if (!isSameSong()) {
             if (currentMediaController.getPlaybackState() != null) {
@@ -220,14 +227,14 @@ public class MusicListenerService extends NotificationListenerService {
             }
             executor.execute(() -> {
                 currentSong.setEndTime(LocalDateTime.now());
-                if (database.isOpen()) {
-                    database.musicTrackDao().insertTrack(currentSong);
-                    Log.i(TAG, "checkForUpdates: Inserted data into database");
+                if(!database.isOpen()) {
+                    connectToDatabase();
                 }
+                database.musicTrackDao().insertTrack(currentSong);
                 Log.i(TAG, "checkForUpdates: New song detected. Old song was: " + currentSong);
                 currentSong = SongData.of(currentMediaController);
                 saveArt();
-                notificationManager.notify(NOTIFICATION_ID,getNotification());
+                if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());
             });
         }
     }
@@ -268,16 +275,23 @@ public class MusicListenerService extends NotificationListenerService {
 
     public void setMusicListenerStatus(MusicListenerServiceStatus newStatus) {
         status = newStatus;
-        notificationManager.notify(NOTIFICATION_ID,getNotification());
+        if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());
     }
 
     private Notification getNotification() {
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setContentTitle("Status: " + status)
-                .setContentText("Current song: " + String.format("%s - %s",currentSong.getArtist(),currentSong.getTitle()))
-                .setOngoing(true)
-                .build();
+        if(showNotificationStatus) {
+            return new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                    .setContentTitle("Status: " + status)
+                    .setContentText("Current song: " + String.format("%s - %s", currentSong.getArtist(), currentSong.getTitle()))
+                    .setOngoing(true)
+                    .build();
+        }else {
+            return new NotificationCompat
+                    .Builder(this,CHANNEL_ID)
+                    .setPriority(NotificationManager.IMPORTANCE_MIN)
+                    .build();
+        }
     }
 
     public SongDatabase getDatabase() {

@@ -33,16 +33,18 @@ class _SongTileInfoPageState extends State<SongTileInfoPage>{
       appBar: AppBar(
         title: const Text("Song statistic"),
       ),
-      body: Column(
-        children: [
-          getSongInfo(),
-          MusicStatsRow(songStatistic: stats),
-          Column(
-            children: widget.songs.indexed
-                .map((e) => getSongTile(e.$2, e.$1 + 1))
-                .toList(),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            getSongInfo(),
+            MusicStatsRow(songStatistic: stats),
+            Column(
+              children: widget.songs.indexed
+                  .map((e) => getSongTile(e.$2, e.$1 + 1))
+                  .toList(),
+            ),
+          ],
+        ),
       ),
   );
   }

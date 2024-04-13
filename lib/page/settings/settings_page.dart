@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrobblium/page/settings/appearance_settings_page.dart';
 import 'package:scrobblium/page/settings/database_settings_page.dart';
+import 'package:scrobblium/page/settings/debug_settings_page.dart';
 import 'package:scrobblium/page/settings/integration_settings_page.dart';
 import 'package:scrobblium/page/settings/stats_settings_page.dart';
 import 'package:scrobblium/page/settings/tracking_settings_page.dart';
@@ -32,7 +33,8 @@ class _SettingsPageState extends State<SettingsPage> {
             addSettingsPage("Stats", Icons.insert_chart, const StatsSettingsPage()),
             addSettingsPage("Appearance", Icons.palette, const AppearanceSettingsPage()),
             addSettingsPage("Database", Icons.storage, DatabaseSettingsPage()),
-            addSettingsPage("Integrations", Icons.network_check, const IntegrationSettingsPage())
+            addSettingsPage("Integrations", Icons.network_check, const IntegrationSettingsPage()),
+            addSettingsPage("Debug", Icons.bug_report, const DebugSettingsPage())
           ])),
     );
   }

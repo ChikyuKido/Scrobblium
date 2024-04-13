@@ -43,7 +43,7 @@ class SongData {
   }
 
   SongTileData toSongTileData() {
-    return SongTileData(artist, title, album, albumAuthor, timeListened, 1);
+    return SongTileData(artist, title, album, albumAuthor, timeListened, 1,endTime);
   }
 
   @override
@@ -66,11 +66,12 @@ class SongTileData {
   final String title;
   final String album;
   final String albumAuthor;
+  DateTime lastActivity;
   int allTimeListened;
   int listenCount;
 
   SongTileData(this.artist, this.title, this.album, this.albumAuthor,
-      this.allTimeListened, this.listenCount);
+      this.allTimeListened, this.listenCount, this.lastActivity);
 
   String getIdentifier() {
     return "$artist,$title,$album";
@@ -92,4 +93,9 @@ class SongTileData {
       album.hashCode ^
       albumAuthor.hashCode ^
       listenCount.hashCode;
+
+  @override
+  String toString() {
+    return 'SongTileData{artist: $artist, title: $title, album: $album, albumAuthor: $albumAuthor, allTimeListened: $allTimeListened, listenCount: $listenCount}';
+  }
 }
