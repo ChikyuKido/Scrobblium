@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/page/songs/song_tile_info_page.dart';
 import 'package:scrobblium/service/song_data_service.dart';
 import 'package:scrobblium/song_data.dart';
@@ -23,9 +24,19 @@ class _SongsPageState extends State<SongsPage> {
   String _selectedSortOption = 'Times Listened';
   bool _isDescending = true;
 
+  double _searchAnimationHeight = 0;
+
+  String _selectedCombineOption = "Track";
+
   @override
   void initState() {
     super.initState();
+    if(getValueBool("search-save-options", true)) {
+      _isDescending = getValueBool("search-order-option", true);
+      _selectedSortOption =
+          getValueString("search-sort-option", "Times Listened");
+      _selectedCombineOption = getValueString("search-combine-option", "Track");
+    }
     if (_tiles.isEmpty) {
       _refresh(withoutFetch: true);
     }
@@ -52,96 +63,159 @@ class _SongsPageState extends State<SongsPage> {
           centerTitle: true,
           actions: _buildAppBarActions(),
         ),
-        body: RefreshIndicator(
-          onRefresh: () async => await _refresh(),
-          child: _filteredTiles.isEmpty
-              ? Container()
-              : ListView.builder(
-                  itemCount: _filteredTiles.length + (_isSearching ? 1 : 0),
-                  itemBuilder: (BuildContext context, int index) {
-                    if (_isSearching && index == 0) {
-                      return _extraSearchOptions();
-                    }
-                    return _filteredTiles[_isSearching ? index - 1 : index];
-                  },
+      body: RefreshIndicator(
+        onRefresh: () async => await _refresh(),
+        child: Column(
+          children: [
+            AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                height: _searchAnimationHeight,
+                child:  SingleChildScrollView(
+                  child: _extraSearchOptions(),
                 ),
-        ));
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _filteredTiles.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _filteredTiles[index];
+                },
+              ),
+            ),
+          ],
+        ),
+      ));
   }
 
   Widget _extraSearchOptions() {
     return Container(
-      padding: const EdgeInsets.only(left: 20, right: 5),
+      padding: const EdgeInsets.only(left: 20, right: 5,bottom: 10),
       margin: const EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
         color: Theme.of(context).secondaryHeaderColor,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Sort By: ',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: PopupMenuButton(
-              padding: EdgeInsets.zero,
-              child: Text(
-                _selectedSortOption,
-                style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Text(
+                  'Sort By: ',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-              onSelected: (String value) {
-                _selectedSortOption = value;
-                _filterTiles();
-                setState(() {});
-              },
-              itemBuilder: (BuildContext context) => const [
-                PopupMenuItem(
-                  value: 'Times Listened',
-                  child: Text('Times Listened'),
+              Expanded(
+                flex: 3,
+                child: PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  child: Text(
+                    _selectedSortOption,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  onSelected: (String value) {
+                    _selectedSortOption = value;
+                    _filterTiles();
+                    Settings.setValue("search-sort-option", value);
+                    setState(() {});
+                  },
+                  itemBuilder: (BuildContext context) => const [
+                    PopupMenuItem(
+                      value: 'Times Listened',
+                      child: Text('Times Listened'),
+                    ),
+                    PopupMenuItem(
+                      value: 'Time Listened',
+                      child: Text('Time Listened'),
+                    ),
+                    PopupMenuItem(
+                      value: 'Last Activity',
+                      child: Text('Last Activity'),
+                    ),
+                    PopupMenuItem(
+                      value: 'By Title',
+                      child: Text('By Title'),
+                    ),
+                    PopupMenuItem(
+                      value: 'By Author',
+                      child: Text('By Author'),
+                    ),
+                    PopupMenuItem(
+                      value: 'By Album',
+                      child: Text('By Album'),
+                    ),
+                  ],
                 ),
-                PopupMenuItem(
-                  value: 'Time Listened',
-                  child: Text('Time Listened'),
-                ),
-                PopupMenuItem(
-                  value: 'Last Activity',
-                  child: Text('Last Activity'),
-                ),
-                PopupMenuItem(
-                  value: 'By Title',
-                  child: Text('By Title'),
-                ),
-                PopupMenuItem(
-                  value: 'By Author',
-                  child: Text('By Author'),
-                ),
-                PopupMenuItem(
-                  value: 'By Album',
-                  child: Text('By Album'),
-                ),
-              ],
-            ),
+              ),
+              Expanded(
+                flex: 1,
+                child: IconButton(
+                    onPressed: () {
+                      _isDescending = !_isDescending;
+                      Settings.setValue("search-order-option", _isDescending);
+                      _filterTiles();
+                      setState(() {});
+                    },
+                    icon: Icon(
+                      _isDescending ? Icons.arrow_downward : Icons.arrow_upward,
+                      size: 24,
+                    ),
+                    color: Colors.white),
+              )
+            ],
           ),
-          Expanded(
-            flex: 1,
-            child: IconButton(
-                onPressed: () {
-                  _isDescending = !_isDescending;
-                  _filterTiles();
-                  setState(() {});
-                },
-                icon: Icon(
-                  _isDescending ? Icons.arrow_downward : Icons.arrow_upward,
-                  size: 24,
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Text(
+                  'Combine By: ',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                color: Colors.white),
-          )
+              ),
+              Expanded(
+                flex: 3,
+                child: PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  child: Text(
+                    _selectedCombineOption,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  onSelected: (String value) {
+                    _selectedCombineOption = value;
+                    _refresh(withoutFetch: true);
+                    Settings.setValue("search-combine-option", value);
+                  },
+                  itemBuilder: (BuildContext context) => const [
+                    PopupMenuItem(
+                      value: 'Track',
+                      child: Text('Track'),
+                    ),
+                    PopupMenuItem(
+                      value: 'Artist',
+                      child: Text('Artist'),
+                    ),
+                    PopupMenuItem(
+                      value: 'Album',
+                      child: Text('Album'),
+                    ),
+                    PopupMenuItem(
+                      value: 'Nothing',
+                      child: Text('Nothing'),
+                    ),
+                  ],
+                ),
+              ),
+              const Expanded(
+                flex: 1,
+                child: SizedBox(), // Placeholder for the IconButton to maintain layout consistency
+              )
+            ],
+          ),
         ],
-      ),
+      )
     );
   }
 
@@ -152,6 +226,7 @@ class _SongsPageState extends State<SongsPage> {
             onPressed: () {
               _isSearching = false;
               _query = "";
+              _searchAnimationHeight = 0;
               _filterTiles();
               setState(() {});
             },
@@ -162,6 +237,7 @@ class _SongsPageState extends State<SongsPage> {
         IconButton(
           onPressed: () {
             _isSearching = true;
+            _searchAnimationHeight = 100;
             setState(() {});
           },
           icon: const Icon(Icons.search),
@@ -171,10 +247,30 @@ class _SongsPageState extends State<SongsPage> {
   }
 
   _filterTiles() {
-    _filteredTiles = _tiles
-        .where((element) =>
+    switch(_selectedCombineOption) {
+      case "Artist": {
+        _filteredTiles = _tiles
+            .where((element) =>
+            element.songData.artist.toLowerCase().contains(_query.toLowerCase()))
+            .toList();
+        break;
+      }
+      case "Album": {
+        _filteredTiles = _tiles
+            .where((element) =>
+            element.songData.album.toLowerCase().contains(_query.toLowerCase()))
+            .toList();
+      }
+      case "Track":
+      default: {
+        _filteredTiles = _tiles
+            .where((element) =>
             element.songData.title.toLowerCase().contains(_query.toLowerCase()))
-        .toList();
+            .toList();
+        break;
+      }
+    }
+
     _filteredTiles.sort((a, b) {
       switch (_selectedSortOption) {
         case 'Times Listened':
@@ -234,10 +330,26 @@ class _SongsPageState extends State<SongsPage> {
     List<SongTileData> songs = [];
     for (var item in songDatas) {
       var songTileData = item.toSongTileData();
-      var index = songs.indexWhere((element) =>
+      var index = -1;
+      switch(_selectedCombineOption) {
+        case "Track": {
+          index = songs.indexWhere((element) =>
           element.title == songTileData.title &&
-          element.artist == songTileData.artist &&
-          element.album == songTileData.album);
+              element.artist == songTileData.artist &&
+              element.album == songTileData.album);
+          break;
+        }
+        case "Artist": {
+          index = songs.indexWhere((element) =>
+              element.artist == songTileData.artist);
+          break;
+        }
+        case "Album": {
+          index = songs.indexWhere((element) =>
+              element.album == songTileData.album);
+          break;
+        }
+      }
 
       if (index != -1) {
         songs[index].listenCount++;
@@ -247,9 +359,9 @@ class _SongsPageState extends State<SongsPage> {
         }
       } else {
         songs.add(songTileData);
+        songTileData.combineMode = _selectedCombineOption;
       }
     }
-    songs.sort((a, b) => b.listenCount.compareTo(a.listenCount));
     return songs;
   }
 

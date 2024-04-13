@@ -25,8 +25,10 @@ class SongListTile extends StatelessWidget {
               backgroundImage: snapshot.data,
               child: snapshot.data != null ? null : Text(songData.title[0]),
             ),
-            title: Text(songData.title, softWrap: false),
-            subtitle: Text(songData.artist, softWrap: false),
+            title: Text(songData.combineMode == "Track" ?
+              songData.title : songData.combineMode == "Artist" ?
+              songData.artist : songData.combineMode == "Album" ? songData.album : songData.title, softWrap: false),
+            subtitle: songData.combineMode == "Track" || songData.combineMode == "Nothing" ? Text(songData.artist, softWrap: false) : null,
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,

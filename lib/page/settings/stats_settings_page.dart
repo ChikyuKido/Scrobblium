@@ -9,6 +9,7 @@ class StatsSettingsPage extends StatelessWidget {
     return SettingsScreen(children: [
       _buildSkipCap(),
       _buildShowSkippedInSongs(),
+      _buildSearchSaveOptions(),
     ]);
   }
 
@@ -37,6 +38,16 @@ class StatsSettingsPage extends StatelessWidget {
       subtitle: 'Whether skipped songs should be shown in the songs page',
       settingKey: 'show-skipped-in-songs-page',
       defaultValue: false,
+    );
+  }
+
+  _buildSearchSaveOptions() {
+    return SwitchSettingsTile(
+      topPadding: 0.0,
+        title: "Save search options in songs page",
+        subtitle: "Whether the entered search options should be saved",
+        settingKey: "search-save-options",
+        defaultValue: true
     );
   }
 }
