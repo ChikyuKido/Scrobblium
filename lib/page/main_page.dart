@@ -21,7 +21,6 @@ class _MainPageState extends State<MainPage> {
     SongsPage(),
     SettingsPage(),
   ];
-  static const List<String> _titles = ["Stats", "Songs", "Settings"];
 
   @override
   void initState() {

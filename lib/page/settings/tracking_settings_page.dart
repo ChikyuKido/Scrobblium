@@ -1,27 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/settings_helper.dart';
-import 'package:scrobblium/util/widget_util.dart';
 import 'package:scrobblium/widgets/app_list_popup.dart';
 
 class TrackingSettingsPage extends StatefulWidget {
-  TrackingSettingsPage({Key? key}) : super(key: key);
+  const TrackingSettingsPage({super.key});
 
   @override
-  _TrackingSettingsPageState createState() => _TrackingSettingsPageState();
+  State<TrackingSettingsPage> createState() => _TrackingSettingsPageState();
 }
 
 class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
   late bool notificationPermissionGranted;
   late String status;
   late SongData? currentSong;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +36,9 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
   }
 
   _buildMusicPackage(BuildContext context) {
-    return showOnlyWhen(
-      notificationPermissionGranted,
-      SimpleSettingsTile(
+    return Visibility(
+      visible: notificationPermissionGranted,
+      child: SimpleSettingsTile(
         title: "Music app package",
         subtitle: getValueString("music-app-package", "No package selected"),
         onTap: () {
@@ -78,9 +72,9 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
   }
 
   _buildForegroundProcess() {
-    return showOnlyWhen(
-        notificationPermissionGranted,
-        SimpleSettingsTile(
+    return Visibility(
+        visible: notificationPermissionGranted,
+        child: SimpleSettingsTile(
           title: "Tracker status: $status",
           subtitle: "Tap to start the background process",
           onTap: () async {
@@ -91,9 +85,9 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
   }
 
   _buildValidationInfo() {
-    return showOnlyWhen(
-        status == "TRACKING",
-        SimpleSettingsTile(
+    return Visibility(
+        visible: status == "TRACKING",
+        child: SimpleSettingsTile(
           title: currentSong == null
               ? "Could not find currentSong"
               : "Found music App",
@@ -105,8 +99,7 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
   }
 
   Future<void> initVariables() async {
-    notificationPermissionGranted =
-    await MethodChannelService.isNotificationPermissionGranted();
+    notificationPermissionGranted = await MethodChannelService.isNotificationPermissionGranted();
     status = await MethodChannelService.getMusicListenerServiceStatus();
     currentSong = await MethodChannelService.getCurrentSong();
   }

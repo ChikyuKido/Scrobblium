@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/dao/song_data.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 
@@ -40,7 +40,7 @@ class TopATA extends StatelessWidget {
                       isVisible: true,
                       labelAlignment: ChartDataLabelAlignment.bottom,
                       textStyle: Theme.of(context).textTheme.bodySmall),
-                  dataSource: getData(),
+                  dataSource: _getData(),
                   xValueMapper: (_ChartData data, _) => data.x,
                   yValueMapper: (_ChartData data, _) => data.y,
                   name: getTextFromAta(),
@@ -60,7 +60,7 @@ class TopATA extends StatelessWidget {
                 : "";
   }
 
-  List<_ChartData> getData() {
+  List<_ChartData> _getData() {
     List<_ChartData> chartData = [];
     for (var song in songs) {
       if (song.timeListened < 20) continue;

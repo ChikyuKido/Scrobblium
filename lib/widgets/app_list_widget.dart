@@ -8,10 +8,10 @@ class AppListWidget extends StatefulWidget {
   final List<AppInfo> appList;
   final Function(AppInfo)? onAppSelected;
 
-  AppListWidget({required this.appList, this.onAppSelected});
+  const AppListWidget({super.key, required this.appList, this.onAppSelected});
 
   @override
-  _AppListWidgetState createState() => _AppListWidgetState();
+  State<AppListWidget> createState() => _AppListWidgetState();
 }
 
 class _AppListWidgetState extends State<AppListWidget> {

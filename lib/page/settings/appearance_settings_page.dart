@@ -23,15 +23,18 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   @override
   void initState() {
     var color = getValueString("theme-color", "amber");
-    selectedColor =
-        FlexScheme.values.where((element) => element.name == color).first;
+    selectedColor = FlexScheme.values.where((element) => element.name == color).first;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return SettingsScreen(
-        children: [_buildTrueDarkMode(), _buildMaterialTheme()]);
+        children: [
+          _buildTrueDarkMode(),
+          _buildMaterialTheme()
+        ]
+    );
   }
 
   Widget _buildTrueDarkMode() {

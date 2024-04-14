@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/util/util.dart';
 

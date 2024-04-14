@@ -6,7 +6,6 @@ class IntegrationSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(children: [
-    ]);
+    return SettingsScreen(children: const []);
   }
 }

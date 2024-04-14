@@ -12,14 +12,19 @@ class DatabaseSettingsPage extends StatelessWidget {
     return FutureBuilder(
         future: initVariables(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
+          }
           return SettingsScreen(children: [
             _buildExportDB(),
             _buildImportDB(),
             _buildBackupOption()
           ]);
         });
+  }
+
+  initVariables() async {
+    path = await MethodChannelService.getBackupDatabasePath();
   }
 
   Widget _buildExportDB() {
@@ -55,10 +60,6 @@ class DatabaseSettingsPage extends StatelessWidget {
       subtitle: "Path: ${path.isEmpty ? "Non" : path}",
       onTap: () => MethodChannelService.backupDatabasePathPicker(),
     );
-  }
-
-  initVariables() async {
-    path = await MethodChannelService.getBackupDatabasePath();
   }
 
   _buildMakeBackup() {

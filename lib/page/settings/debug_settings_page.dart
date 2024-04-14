@@ -20,7 +20,6 @@ class DebugSettingsPage extends StatelessWidget {
       settingKey: 'show-status-notification',
       defaultValue: false,
       onChange: (p0) {
-        //delay it a bit so it the value can be changed before restarted
         Future.delayed(const Duration(seconds: 1)).then((value) => MethodChannelService.startForegroundProcess());
       },
     );

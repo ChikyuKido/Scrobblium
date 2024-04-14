@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:scrobblium/song_data.dart';
+import 'package:scrobblium/dao/song_data.dart';
+import 'package:scrobblium/page/songs/song_tile_info_page.dart';
 import 'package:scrobblium/util/image_util.dart';
 import 'package:scrobblium/util/util.dart';
 
 class SongListTile extends StatelessWidget {
   final SongTileData songData;
-  final GestureTapCallback onTap;
 
-  const SongListTile({super.key, required this.songData, required this.onTap});
+
+  const SongListTile({super.key, required this.songData});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,12 @@ class SongListTile extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else {
           return ListTile(
-            onTap: onTap,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SongTileInfoPage(songs: songData.songs)));
+            },
             leading: CircleAvatar(
               backgroundImage: snapshot.data,
               child: snapshot.data != null ? null : Text(songData.title[0]),

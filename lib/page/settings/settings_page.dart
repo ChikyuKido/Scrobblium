@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body:  SafeArea(
           child: ListView(padding: const EdgeInsets.all(8.0), children:
           [
-            addSettingsPage("Tracking", Icons.music_note, TrackingSettingsPage()),
+            addSettingsPage("Tracking", Icons.music_note, const TrackingSettingsPage()),
             addSettingsPage("Stats", Icons.insert_chart, const StatsSettingsPage()),
             addSettingsPage("Appearance", Icons.palette, const AppearanceSettingsPage()),
             addSettingsPage("Database", Icons.storage, DatabaseSettingsPage()),

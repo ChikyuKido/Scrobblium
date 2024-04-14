@@ -43,7 +43,7 @@ class SongData {
   }
 
   SongTileData toSongTileData() {
-    return SongTileData(artist, title, album, albumAuthor, timeListened, 1,endTime,"");
+    return SongTileData(artist, title, album, albumAuthor, timeListened, 1,endTime,"",[]);
   }
 
   @override
@@ -66,6 +66,7 @@ class SongTileData {
   final String title;
   final String album;
   final String albumAuthor;
+  final List<SongData> songs;
   /// How the list tile is combined also if artist, album or tracks are merged
   String combineMode;
   DateTime lastActivity;
@@ -73,7 +74,7 @@ class SongTileData {
   int listenCount;
 
   SongTileData(this.artist, this.title, this.album, this.albumAuthor,
-      this.allTimeListened, this.listenCount, this.lastActivity, this.combineMode);
+      this.allTimeListened, this.listenCount, this.lastActivity, this.combineMode, this.songs);
 
   String getIdentifier() {
     return "$artist,$title,$album";

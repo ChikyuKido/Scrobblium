@@ -1,5 +1,5 @@
+import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/song_data.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 
 /// A singleton class for managing song data.
