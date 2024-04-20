@@ -102,6 +102,15 @@ class MethodChannelService {
     await platform.invokeMethod("backupDatabaseNow");
   }
 
+  static getRequiredFieldsFor(String s) async{
+
+    return (await platform.invokeMethod("getRequiredFieldsFor$s")).split(";");
+  }
+
+  static void loginFor(String s, Map<String, String> p0) async{
+    await platform.invokeMethod("loginFor$s",{"fields":jsonEncode(p0)});
+  }
+
 }
 
 class SongStatistic {

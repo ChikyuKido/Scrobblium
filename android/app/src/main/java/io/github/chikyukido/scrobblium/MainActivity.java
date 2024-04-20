@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
+import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 
@@ -17,6 +18,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
+        IntegrationHandler.getInstance().init(getApplicationContext());
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
     }
 

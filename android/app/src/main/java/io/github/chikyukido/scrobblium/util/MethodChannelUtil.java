@@ -7,16 +7,22 @@ import android.util.Log;
 import androidx.core.app.NotificationManagerCompat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.MusicListenerService;
 import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
+import io.github.chikyukido.scrobblium.intergrations.MalojaIntegration;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MethodChannelUtil {
@@ -41,6 +47,7 @@ public class MethodChannelUtil {
         methods.put("backupDatabasePicker",backupDatabasePicker(context));
         methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
+        IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods);
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
@@ -50,6 +57,7 @@ public class MethodChannelUtil {
             }
         });
     }
+
 
     private static MethodInterface backupDatabaseNow(Context context) {
         return (call, result) -> {
@@ -171,7 +179,7 @@ public class MethodChannelUtil {
         };
     }
 
-    private interface MethodInterface {
+    public interface MethodInterface {
         void run(MethodCall call, MethodChannel.Result result);
     }
 }
