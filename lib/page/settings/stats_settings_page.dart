@@ -6,7 +6,7 @@ class StatsSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(children: [
+    return SettingsScreen(title: "Stats",children: [
       _buildSkipCap(),
       _buildShowSkippedInSongs(),
       _buildSearchSaveOptions(),

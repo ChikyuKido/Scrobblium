@@ -1,15 +1,10 @@
 package io.github.chikyukido.scrobblium.intergrations;
 
 import android.content.Context;
-
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import io.github.chikyukido.scrobblium.database.SongData;
 
 public class MalojaIntegration extends Integration {
@@ -37,7 +32,8 @@ public class MalojaIntegration extends Integration {
     public boolean signIn(HashMap<String, String> fields) {
         json.add("url", new JsonPrimitive(fields.get("url")));
         json.add("api_key",new JsonPrimitive(fields.get("api_key")));
-        //TODO: send a request and see if its not forbidden
+
+
         saveJson();
         return true;
     }

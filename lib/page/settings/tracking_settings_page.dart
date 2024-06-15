@@ -25,7 +25,7 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         }
-        return SettingsScreen(children: [
+        return SettingsScreen(title: "Tracking",children: [
           _buildNotificationAccess(),
           _buildMusicPackage(context),
           _buildForegroundProcess(),

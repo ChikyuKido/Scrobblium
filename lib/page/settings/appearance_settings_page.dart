@@ -29,7 +29,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(
+    return SettingsScreen(title: "Appearance",
         children: [
           _buildTrueDarkMode(),
           _buildMaterialTheme()

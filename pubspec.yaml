@@ -50,6 +50,8 @@ dependencies:
   easy_debounce: ^2.0.3
   anim_search_bar:
     path: externel/anim_search_bar-2.0.3
+  fluttertoast: ^8.2.6
+  protobuf: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -7,22 +7,21 @@ import android.util.Log;
 import androidx.core.app.NotificationManagerCompat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.MusicListenerService;
+import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
-import io.github.chikyukido.scrobblium.intergrations.MalojaIntegration;
+import io.github.chikyukido.scrobblium.messages.SongDataListM;
+import io.github.chikyukido.scrobblium.messages.SongDataM;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class MethodChannelUtil {
@@ -48,6 +47,7 @@ public class MethodChannelUtil {
         methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
         IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods);
+
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
@@ -61,7 +61,7 @@ public class MethodChannelUtil {
 
     private static MethodInterface backupDatabaseNow(Context context) {
         return (call, result) -> {
-            BackupDatabaseUtil.backupDatabase(context);
+            result.success(new MethodChannelData(BackupDatabaseUtil.backupDatabase(context),null).toMap());
         };
     }
 
@@ -94,13 +94,38 @@ public class MethodChannelUtil {
 
     private static MethodInterface getSongList() {
         return (call, result) -> new Thread(() -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
             if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null) {
-                result.success("[]");
-                return;
+                methodChannelData.setError("Could not get Songs because the service is not running");
             }
+
+            long start = System.currentTimeMillis();
             List<SongData> tracks = MusicListenerService.getInstance().getDatabase().musicTrackDao().getAllTracks();
-            String json = gson.toJson(tracks);
-            result.success(json);
+
+            Log.i("test", "getSongList: database"+(System.currentTimeMillis() - start));
+            start = System.currentTimeMillis();
+            SongDataListM.Builder songDataListBuilder = SongDataListM.newBuilder();
+
+            for (SongData song : tracks) {
+                SongDataM.Builder songBuilder = SongDataM.newBuilder()
+                        .setId(song.getId())
+                        .setArtist(song.getArtist())
+                        .setTitle(song.getTitle())
+                        .setAlbum(song.getAlbum())
+                        .setAlbumAuthor(song.getAlbumAuthor() != null ? song.getAlbumAuthor() : "")
+                        .setMaxProgress(song.getMaxProgress())
+                        .setStartTime(song.getStartTime().atZone(ZoneOffset.UTC).toInstant().toEpochMilli())
+                        .setProgress(song.getProgress())
+                        .setEndTime(song.getEndTime().atZone(ZoneOffset.UTC).toInstant().toEpochMilli())
+                        .setTimeListened(song.getTimeListened());
+
+                songDataListBuilder.addSongs(songBuilder.build());
+            }
+            Log.i("test", "getSongList: created data"+(System.currentTimeMillis() - start));
+            start = System.currentTimeMillis();
+            methodChannelData.setData(songDataListBuilder.build().toByteArray());
+            Log.i("test", "getSongList: converted data"+(System.currentTimeMillis() - start));
+            result.success(methodChannelData.toMap());
         }).start();
     }
 

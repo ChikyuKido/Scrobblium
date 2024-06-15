@@ -78,7 +78,7 @@ public abstract class Integration {
         if(Files.exists(path)) {
             try {
                 return gson.fromJson(Files.newBufferedReader(path),JsonObject.class);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "loadJson: Could not load json for "+getName()+" return a empty json", e);
                 return new JsonObject();
             }

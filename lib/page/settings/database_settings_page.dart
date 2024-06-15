@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
+import 'package:scrobblium/util/util.dart';
 
 class DatabaseSettingsPage extends StatelessWidget {
   DatabaseSettingsPage({super.key});
@@ -15,8 +17,8 @@ class DatabaseSettingsPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           }
-          return SettingsScreen(children: [
-            _buildExportDB(),
+          return SettingsScreen(title: "Database",children: [
+            _buildExportDB(context),
             _buildImportDB(),
             _buildBackupOption()
           ]);
@@ -27,11 +29,12 @@ class DatabaseSettingsPage extends StatelessWidget {
     path = await MethodChannelService.getBackupDatabasePath();
   }
 
-  Widget _buildExportDB() {
+  Widget _buildExportDB(BuildContext context) {
     return SimpleSettingsTile(
         title: "Export Database",
         onTap: () async {
           await MethodChannelService.exportDatabase();
+          showToast("Successfully exported Database");
         });
   }
 
@@ -39,7 +42,7 @@ class DatabaseSettingsPage extends StatelessWidget {
     return SimpleSettingsTile(
         title: "Import Database",
         onTap: () async {
-          MethodChannelService.importDatabase();
+          await MethodChannelService.importDatabase();
         });
   }
 
@@ -65,7 +68,13 @@ class DatabaseSettingsPage extends StatelessWidget {
   _buildMakeBackup() {
     return SimpleSettingsTile(
         title: "Create backup now",
-        onTap: () => MethodChannelService.backupDatabaseNow(),
+        onTap: () async{
+            var result = await MethodChannelService.backupDatabaseNow();
+            result.showErrorAsToastIfAvailable();
+            if(result.hasNotError()) {
+              showToast("Successfully created backup now");
+            }
+        },
     );
   }
 }

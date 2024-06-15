@@ -23,7 +23,6 @@ public class IntegrationHandler {
     }
 
     public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods) {
-
         for (Integration integration : integrations.keySet()) {
             methods.put("loginFor"+integration.getName(),(call, result) -> {
                 String jsonContent = call.argument("fields");

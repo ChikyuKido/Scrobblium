@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class BackupDatabaseUtil {
@@ -79,9 +80,9 @@ public class BackupDatabaseUtil {
         }
     }
 
-    public static void backupDatabase(Context context) {
+    public static String backupDatabase(Context context) {
         Uri backupDatabasePath = readBackupDatabasePath(context);
-        if (backupDatabasePath == null) return;
+        if (backupDatabasePath == null) return "No backup path set";
 
         DocumentFile docFile = DocumentFile.fromTreeUri(context,backupDatabasePath);
         DocumentFile[] currentBackups = docFile.listFiles();
@@ -96,12 +97,12 @@ public class BackupDatabaseUtil {
             oldest.delete();
         }
 
-        String fileName = new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".db";
+        String fileName = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date()) + ".db";
         if(docFile.findFile(fileName) == null) {
             DocumentFile fileToWrite = docFile.createFile("application/vnd.sqlite3",fileName);
             if(fileToWrite == null) {
                 Log.w(TAG, "backupDatabase: Could not write document because could not create file");
-                return;
+                return "Could not write database";
             }
             exportDatabase(context,fileToWrite.getUri());
         }else {
@@ -109,6 +110,7 @@ public class BackupDatabaseUtil {
             exportDatabase(context,docFile.findFile(fileName).getUri());
         }
         Log.i(TAG, "backupDatabase: Successfully created a backup");
+        return null;
     }
 
     public static Uri readBackupDatabasePath(Context context) {

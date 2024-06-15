@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/widgets/LoginWidget.dart';
+import 'package:scrobblium/widgets/login_widget.dart';
 
 class IntegrationSettingsPage extends StatelessWidget {
   const IntegrationSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(children: [
-      FutureBuilder(future: _addIntegration("Maloja",context), builder: (context, snapshot) {
-        if(snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        }
-        return snapshot.data??const Text("Could not load Future");
-      })
+    return SettingsScreen(
+        title: "Integration",
+        children: [
+      _wrapFuture(_addIntegration("Maloja",context)),
     ]);
+  }
+
+  Widget _wrapFuture(Future<Widget> future) {
+    return FutureBuilder(future: future, builder: (context, snapshot) {
+      if(snapshot.connectionState == ConnectionState.waiting) {
+        return const CircularProgressIndicator();
+      }
+      return snapshot.data??const Text("Could not load Widget");
+    });
   }
 
   Future<Widget> _addIntegration(String s,BuildContext context) async{

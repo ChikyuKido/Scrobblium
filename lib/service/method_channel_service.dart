@@ -1,12 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:scrobblium/dao/method_channel_data.dart';
 import 'package:scrobblium/dao/song_data.dart';
+import 'package:scrobblium/messages/proto/song_datam.pb.dart';
 import 'package:scrobblium/util/settings_helper.dart';
 import 'package:scrobblium/util/util.dart';
 
 class MethodChannelService {
   static const platform = MethodChannel('MusicListener');
+
+
+  static Future<MethodChannelData> _callFunction(String function,[dynamic arguments]) async {
+    final Map<String, dynamic> result = Map<String, dynamic>.from(await platform.invokeMethod(function,arguments));
+    return MethodChannelData.fromMap(result);
+  }
 
   static Future<void> makeWALCheckpoint() async {
     await platform.invokeMethod("makeWALCheckpoint");
@@ -16,8 +24,25 @@ class MethodChannelService {
   }
 
   static Future<List<SongData>> getSongData() async {
-    String jsonData = await platform.invokeMethod('list');
-    List<SongData> songs = _parseSongDataList(jsonData);
+    var data = await _callFunction("list");
+    data.showErrorAsToastIfAvailable();
+    if(data.hasError()) return List.empty();
+    SongDataListM songDataListM = SongDataListM.fromBuffer(data.data??List.empty());
+
+    List<SongData> songs = [];
+    for(var value in songDataListM.songs) {
+      songs.add(SongData(id: value.id.toInt(),
+          artist: value.artist,
+          title: value.title,
+          album: value.album,
+          albumAuthor: value.albumAuthor,
+          progress: value.progress.toInt(),
+          maxProgress: value.maxProgress.toInt(),
+          startTime: DateTime.fromMillisecondsSinceEpoch(value.startTime.toInt()),
+          endTime: DateTime.fromMillisecondsSinceEpoch(value.endTime.toInt()),
+          timeListened: value.timeListened));
+    }
+
     return songs;
   }
 
@@ -31,11 +56,6 @@ class MethodChannelService {
   }
 
 
-
-  static List<SongData> _parseSongDataList(String responseBody) {
-    final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<SongData>((json) => SongData.fromJson(json)).toList();
-  }
 
   static SongStatistic getSongStatistics(List<SongData> songs) {
     int songsListened = 0;
@@ -98,8 +118,8 @@ class MethodChannelService {
     return await platform.invokeMethod("getBackupDatabasePath");
   }
 
-  static backupDatabaseNow() async {
-    await platform.invokeMethod("backupDatabaseNow");
+  static Future<MethodChannelData> backupDatabaseNow() async {
+    return _callFunction("backupDatabaseNow");
   }
 
   static getRequiredFieldsFor(String s) async{

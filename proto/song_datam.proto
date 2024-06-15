@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option optimize_for = CODE_SIZE;
+
+package  io.github.chikyukido.scrobblium.messages;
+
+message SongDataM {
+  int64 id = 1;
+  string artist = 2;
+  string title = 3;
+  string album = 4;
+  string albumAuthor = 5;
+  int64 maxProgress = 6;
+  int64 startTime = 7;
+  int64 progress = 8;
+  int64 endTime = 9;
+  int32 timeListened = 10;
+}
+
+message SongDataListM {
+  repeated SongDataM songs = 1;
+}

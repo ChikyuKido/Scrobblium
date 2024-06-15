@@ -8,7 +8,7 @@ class DebugSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(children: [
+    return SettingsScreen(title: "Debug",children: [
       _buildShowStatusNotification(),
     ]);
   }

@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 String formatDuration(int durationInSeconds) {
   Duration duration = Duration(seconds: durationInSeconds);
   int days = duration.inDays;
@@ -19,4 +22,15 @@ String formatDuration(int durationInSeconds) {
     formattedDuration += '${seconds}s';
   }
   return formattedDuration.trim();
+}
+
+void showToast(String text) {
+  Fluttertoast.showToast(
+      msg: "Successfully exported Database",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.grey.shade900,
+      textColor: Colors.white,
+      fontSize: 16.0
+  );
 }
