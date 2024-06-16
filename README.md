@@ -1,45 +1,53 @@
 # Scrobblium
 
-Scrobblium is your go-to Flutter app for effortlessly tracking the music you listen to on your Android phone, regardless of which music app you use. With Scrobblium, you can keep tabs on your listening habits and visualize your music data with simple graphs.
+Scrobblium is a handy Flutter app designed to seamlessly track the music you listen to on your Android device, no matter which music app you prefer. With Scrobblium, you can easily monitor your listening habits and visualize your music data using straightforward graphs.
 
 ## Screenshots
 
+_(Screenshots will be added here)_
 
 ## Features
 
 - **Track Music from Any App**: 
+  Scrobblium effortlessly tracks music playback from any music app installed on your Android phone.
 
 - **Simple Graphs**: 
+  Visualize your music listening trends with simple and easy-to-understand graphs.
 
-- **Backup and Restore**:
-
+- **Backup and Restore**: 
+  Backup your music tracking data and restore it whenever needed.
 
 ## Getting Started
 
-To get started with Scrobblium, follow these simple steps:
+To start using Scrobblium, follow these steps:
 
-1. **Install Flutter**: If you haven't already, install Flutter by following the instructions on the official Flutter website: [Flutter Installation Guide](https://flutter.dev/docs/get-started/install).
+1. **Install Flutter**: 
+   If you haven't already, install Flutter. You can find detailed installation instructions on the [official Flutter website](https://flutter.dev/docs/get-started/install).
 
-2. **Clone the Repository**: Clone this repository to your local machine using Git:
+2. **Clone the Repository**: 
+   Clone the Scrobblium repository to your local machine using Git:
 
    ```
    git clone https://github.com/ChikyuKido/Scrobblium.git
    ```
 
-3. **Run the App**: Navigate to the project directory and run the app on your Android device or emulator:
+3. **Run the App**: 
+   Navigate to the project directory and run the app on your Android device or emulator:
 
    ```
    cd Scrobblium
    flutter run
    ```
 
-4. **Start Tracking**: Once the app is installed and running, start listening to your favorite music, and let Scrobblium take care of the rest!
-
+4. **Start Tracking**: 
+   Once the app is up and running, start listening to your favorite music, and let Scrobblium handle the tracking for you!
 
 ## Support
 
-If you encounter any issues or have any questions about Scrobblium, please don't hesitate to contact us. Just [open an issue](https://github.com/yourusername/scrobblium/issues) on GitHub.
+If you have any questions or encounter issues with Scrobblium, please feel free to reach out to us. You can [open an issue](https://github.com/yourusername/scrobblium/issues) on GitHub for assistance.
 
 ## License
 
-This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL-3.0 License. See the [LICENSE](LICENSE) file for details.
+
+This version aims to be more casual and less formal, steering away from sounding automated.
