@@ -1,5 +1,6 @@
 package io.github.chikyukido.scrobblium.util;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,10 +17,8 @@ import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.messages.SongDataListM;
-import io.github.chikyukido.scrobblium.messages.SongDataM;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -27,17 +26,18 @@ import java.util.Set;
 public class MethodChannelUtil {
 
     private static final HashMap<String, MethodInterface> methods = new HashMap<>();
-    private static Gson gson = new Gson();
+    private static final String TAG = "MethodChannelUtil";
 
-    public static void configureMethodChannel(MethodChannel methodChannel, Context context) {
-        gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
-                (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context1) -> new JsonPrimitive(src.toString())).create();
+    private static MethodChannel methodChannel;
+
+    public static void configureMethodChannel(MethodChannel mc, Context context) {
+        methodChannel = mc;
         methods.put("list", getSongList());
         methods.put("currentSong", getCurrentSong());
         methods.put("setMusicPackage", setPackage());
         methods.put("makeWALCheckpoint", makeWALCheckpoint());
         methods.put("launchNotificationAccess", launchNotificationAccess(context));
-        methods.put("isNotificationGranted", isNotificationPermission(context));
+        methods.put("isNotificationGranted", hasNotificationPermission(context));
         methods.put("getMusicListenerServiceStatus", getMusicListenerServiceStatus());
         methods.put("startForegroundProcess", startForegroundProcess());
         methods.put("exportDatabase", exportDatabase(context));
@@ -46,6 +46,7 @@ public class MethodChannelUtil {
         methods.put("backupDatabasePicker",backupDatabasePicker(context));
         methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
+        methods.put("restartMusicListener",restartMusicListener());
         IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods);
 
         methodChannel.setMethodCallHandler((call, result) -> {
@@ -58,6 +59,19 @@ public class MethodChannelUtil {
         });
     }
 
+    private static MethodInterface restartMusicListener() {
+        return (call, result) -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
+            if(MusicListenerService.getInstance() == null) {
+                methodChannelData.setError("Music listener not initialized");
+                result.success(methodChannelData.toMap());
+                return;
+            }
+            MusicListenerService.getInstance().startForegroundService();
+            result.success(methodChannelData.toMap());
+        };
+    }
+
 
     private static MethodInterface backupDatabaseNow(Context context) {
         return (call, result) -> {
@@ -65,30 +79,52 @@ public class MethodChannelUtil {
         };
     }
 
-
-
     private static MethodInterface getBackupDatabasePath(Context context) {
         return (call, result) -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
             Uri u = BackupDatabaseUtil.readBackupDatabasePath(context);
-            result.success(u == null ? "" : u.getPath());
+            if(u == null) {
+                methodChannelData.setError("No backup path set");
+            }else {
+                methodChannelData.setData(u.getPath().getBytes());
+            }
+            result.success(methodChannelData.toMap());
         };
     }
 
     private static MethodInterface backupDatabasePicker(Context context) {
         return (call, result) -> {
             BackupDatabaseUtil.launchFileChooserForBackup(context);
-            result.success(null);
+            result.success(new MethodChannelData().toMap());
         };
     }
 
     private static MethodInterface deleteEntry() {
-        return (call, result) -> new Thread(() -> {
-            if (MusicListenerService.getInstance() == null) return;
-            String argument = call.argument("id");
-            if(argument == null) return;
-            int id = Integer.parseInt(argument);
-            MusicListenerService.getInstance().getDatabase().musicTrackDao().deleteTrack(id);
-        }).start();
+        return (call, result) -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
+            //Thread because can't execute a ddl in main thread
+            Thread t = new Thread(() -> {
+                if (MusicListenerService.getInstance() == null) {
+                    methodChannelData.setError("Music listener service not initialized yet");
+                    return;
+                }
+                String argument = call.argument("id");
+                if(argument == null) {
+                    methodChannelData.setError("No argument provide for delete Entry");
+                    return;
+                };
+                int id = Integer.parseInt(argument);
+                MusicListenerService.getInstance().getDatabase().musicTrackDao().deleteTrack(id);
+            });
+            try {
+                t.start();
+                t.join();
+            } catch (InterruptedException e) {
+                methodChannelData.setError("Smth went wrong deleting the entry. Check logs for more infos");
+                Log.e(TAG, "deleteEntry: ", e);
+            }
+            result.success(methodChannelData.toMap());
+        };
     }
 
 
@@ -97,111 +133,134 @@ public class MethodChannelUtil {
             MethodChannelData methodChannelData = new MethodChannelData();
             if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null) {
                 methodChannelData.setError("Could not get Songs because the service is not running");
+                result.success(methodChannelData.toMap());
+                return;
             }
 
-            long start = System.currentTimeMillis();
+
             List<SongData> tracks = MusicListenerService.getInstance().getDatabase().musicTrackDao().getAllTracks();
 
-            Log.i("test", "getSongList: database"+(System.currentTimeMillis() - start));
-            start = System.currentTimeMillis();
+
             SongDataListM.Builder songDataListBuilder = SongDataListM.newBuilder();
 
             for (SongData song : tracks) {
-                SongDataM.Builder songBuilder = SongDataM.newBuilder()
-                        .setId(song.getId())
-                        .setArtist(song.getArtist())
-                        .setTitle(song.getTitle())
-                        .setAlbum(song.getAlbum())
-                        .setAlbumAuthor(song.getAlbumAuthor() != null ? song.getAlbumAuthor() : "")
-                        .setMaxProgress(song.getMaxProgress())
-                        .setStartTime(song.getStartTime().atZone(ZoneOffset.UTC).toInstant().toEpochMilli())
-                        .setProgress(song.getProgress())
-                        .setEndTime(song.getEndTime().atZone(ZoneOffset.UTC).toInstant().toEpochMilli())
-                        .setTimeListened(song.getTimeListened());
-
-                songDataListBuilder.addSongs(songBuilder.build());
+                songDataListBuilder.addSongs(Converter.songDataToMessage(song));
             }
-            Log.i("test", "getSongList: created data"+(System.currentTimeMillis() - start));
-            start = System.currentTimeMillis();
             methodChannelData.setData(songDataListBuilder.build().toByteArray());
-            Log.i("test", "getSongList: converted data"+(System.currentTimeMillis() - start));
             result.success(methodChannelData.toMap());
         }).start();
     }
 
     private static MethodInterface getCurrentSong() {
         return (call, result) -> {
-            if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null
-                    || MusicListenerService.getInstance().getCurrentSong().getMaxProgress() == -1) {
-                result.success("[]");
+            MethodChannelData methodChannelData = new MethodChannelData();
+            if (MusicListenerService.getInstance() == null || MusicListenerService.getInstance().getDatabase() == null) {
+                methodChannelData.setError("Could not get current song because the service is not running");
+                result.success(methodChannelData.toMap());
                 return;
             }
-            result.success(gson.toJson(MusicListenerService.getInstance().getCurrentSong()));
+            if(MusicListenerService.getInstance().getCurrentSong().getMaxProgress() == -1) {
+                methodChannelData.setError("Could not get current Song because no song was started");
+                result.success(methodChannelData.toMap());
+                return;
+            }
+            methodChannelData.setData(Converter.songDataToMessage(MusicListenerService.getInstance().getCurrentSong()).toByteArray());
+            result.success(methodChannelData.toMap());
         };
     }
 
     private static MethodInterface setPackage() {
         return (call, result) -> {
-            if (MusicListenerService.getInstance() == null) return;
+            MethodChannelData methodChannelData = new MethodChannelData();
+            if (MusicListenerService.getInstance() == null) {
+                methodChannelData.setError("Music listener service not initialized yet");
+                result.success(methodChannelData.toMap());
+                return;
+            }
             String argument = call.argument("package");
             MusicListenerService.getInstance().setMusicPackage(argument);
-            result.success(null);
+            result.success(methodChannelData.toMap());
         };
     }
 
     private static MethodInterface makeWALCheckpoint() {
         return (call, result) -> {
-            if (MusicListenerService.getInstance() == null) return;
+            MethodChannelData methodChannelData = new MethodChannelData();
+            if (MusicListenerService.getInstance() == null) {
+                methodChannelData.setError("Music listener service not initialized yet");
+                result.success(methodChannelData.toMap());
+                return;
+            };
             if (MusicListenerService.getInstance().getDatabase() != null) {
                 MusicListenerService.getInstance().getDatabase().close();
             }
             MusicListenerService.getInstance().connectToDatabase();
-            Log.i("MainActivity", "configureFlutterEngine: checkpoint for database");
-            result.success(null);
+            Log.i("MethodChannelUtil", "makeWALCheckpoint: checkpoint for database");
+            result.success(methodChannelData.toMap());
         };
     }
 
     private static MethodInterface launchNotificationAccess(Context context) {
         return (call, result) -> {
-            Intent intent = new Intent();
-            intent.setAction("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-            result.success(null);
+            MethodChannelData methodChannelData = new MethodChannelData();
+            try {
+                Intent intent = new Intent();
+                intent.setAction("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }catch (ActivityNotFoundException e) {
+                methodChannelData.setError(e.getMessage());
+            }
+            result.success(methodChannelData.toMap());
         };
     }
 
-    private static MethodInterface isNotificationPermission(Context context) {
+    private static MethodInterface hasNotificationPermission(Context context) {
         return (call, result) -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
             Set<String> enabledListenerPackages = NotificationManagerCompat.getEnabledListenerPackages(context);
-            result.success(String.valueOf(enabledListenerPackages.contains(context.getPackageName())));
+            methodChannelData.setData(new byte[]{(byte) (enabledListenerPackages.contains(context.getPackageName()) ? 1: 0)});
+            result.success(methodChannelData.toMap());
         };
     }
 
     private static MethodInterface getMusicListenerServiceStatus() {
-        return (call, result) -> result.success(MusicListenerService.status.toString());
+        return (call, result) -> {
+            result.success( new MethodChannelData(null,MusicListenerService.status.toString().getBytes()).toMap());
+        };
     }
 
     private static MethodInterface startForegroundProcess() {
         return (call, result) -> {
-            if (MusicListenerService.getInstance() == null) return;
+            MethodChannelData methodChannelData = new MethodChannelData();
+            if (MusicListenerService.getInstance() == null) {
+                methodChannelData.setError("Music listener service not initialized yet");
+                result.success(methodChannelData.toMap());
+                return;
+            };
             MusicListenerService.getInstance().startForegroundService();
-            result.success(null);
+            result.success(methodChannelData.toMap());
         };
     }
 
     private static MethodInterface exportDatabase(Context context) {
         return (call, result) -> {
             BackupDatabaseUtil.launchDirectoryChooserForExport(context);
-            result.success(null);
+            result.success(new MethodChannelData().toMap());
         };
     }
 
     private static MethodInterface importDatabase(Context context) {
         return (call, result) -> {
             BackupDatabaseUtil.launchFileChooserForImport(context);
-            result.success(null);
+            result.success(new MethodChannelData().toMap());
         };
+    }
+
+    public static void showToast(String text) {
+        if(methodChannel != null) {
+            methodChannel.invokeMethod("showToast",text);
+        }
     }
 
     public interface MethodInterface {

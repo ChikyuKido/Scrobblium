@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/service/song_data_service.dart';
+import 'package:scrobblium/util/stats_util.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/latest_song_tile.dart';
 import 'package:scrobblium/widgets/music_stats_row.dart';
@@ -39,7 +40,7 @@ class _StatsPageState extends State<StatsPage> {
     var songs = SongDataService().getSongs(
         afterDate: selectedDate, withSkipped: false);
     songs.sort((a, b) => b.endTime.compareTo(a.endTime));
-    var allTimeStats = MethodChannelService.getSongStatistics(SongDataService().getSongs(afterDate: selectedDate));
+    var allTimeStats = StatsUtil.getSongStatistics(SongDataService().getSongs(afterDate: selectedDate));
 
     return Scaffold(
       appBar: AppBar(

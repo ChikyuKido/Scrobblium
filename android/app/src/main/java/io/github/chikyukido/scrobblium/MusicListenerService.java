@@ -145,7 +145,9 @@ public class MusicListenerService extends NotificationListenerService {
             public void run() {
                 incrementTimeListened();
                 if(lastBackupTime <= 0) {
-                    BackupDatabaseUtil.backupDatabase(getBaseContext());
+                    if(ConfigUtil.getBoolean(getBaseContext(),"flutter.backup-database",false)) {
+                        BackupDatabaseUtil.backupDatabase(getBaseContext());
+                    }
                     lastBackupTime = 60*60;
                 }
                 lastBackupTime--;

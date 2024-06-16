@@ -8,6 +8,7 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:provider/provider.dart';
 import 'package:scrobblium/page/main_page.dart';
 import 'package:scrobblium/service/app_theme_provider.dart';
+import 'package:scrobblium/service/method_channel_service.dart';
 
 void main() {
   initSettings().then((_) {
@@ -19,6 +20,7 @@ Future<void> initSettings() async {
   await Settings.init(
     cacheProvider: SharePreferenceCache(),
   );
+  MethodChannelService.init();
 }
 
 class MyApp extends StatelessWidget {

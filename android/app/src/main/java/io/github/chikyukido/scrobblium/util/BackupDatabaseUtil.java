@@ -23,9 +23,9 @@ public class BackupDatabaseUtil {
     public static final int REQUEST_CODE_PICK_DIRECTORY_BACKUP = 125;
 
 
-    public static void importDatabase(Context context, Uri databaseFile) {
-        if (MusicListenerService.getInstance() == null) return;
-        if (MusicListenerService.getInstance().getDatabase() == null) return;
+    public static boolean importDatabase(Context context, Uri databaseFile) {
+        if (MusicListenerService.getInstance() == null) return false;
+        if (MusicListenerService.getInstance().getDatabase() == null) return false;
 
         Log.i(TAG, "importDatabase: Import file: "+databaseFile);
         MusicListenerService.getInstance().getDatabase().close();
@@ -50,24 +50,30 @@ public class BackupDatabaseUtil {
             Log.i(TAG, "importDatabase: successfully imported database");
         } catch (IOException e) {
             Log.e(TAG, "importDatabase: Error while writing database file", e);
+            return false;
         }
         MusicListenerService.getInstance().connectToDatabase();
         Log.i(TAG, "importDatabase: connected to database");
+        return true;
     }
 
-    public static void exportDatabase(Context context, Uri outputDir) {
-        makeWALCheckpoint();
+    public static boolean exportDatabase(Context context, Uri outputDir) {
+        if(!makeWALCheckpoint()) {
+            return false;
+        }
         Path file = context.getDataDir().toPath().resolve("databases/song_database");
         try (OutputStream os = context.getContentResolver().openOutputStream(outputDir)) {
             os.write(Files.readAllBytes(file));
             Log.i(TAG, "exportDatabase: successfully exported database");
+            return true;
         } catch (IOException e) {
             Log.e(TAG, "exportDatabase: Could not export database", e);
+            return false;
         }
     }
 
 
-    public static void saveBackupDatabasePath(Context context, Uri path) {
+    public static boolean saveBackupDatabasePath(Context context, Uri path) {
         String filename = "backup_uri.txt";
         String data = path.toString();
         try {
@@ -75,8 +81,10 @@ public class BackupDatabaseUtil {
             fos.write(data.getBytes());
             fos.close();
             Log.i(TAG, "saveBackupDatabasePath: BackupDatabasePath saved successfully.");
+            return true;
         } catch (IOException e) {
             Log.e(TAG, "saveBackupDatabasePath: Error saving BackupDatabasePath: " + e.getMessage());
+            return false;
         }
     }
 
@@ -151,12 +159,13 @@ public class BackupDatabaseUtil {
         ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY_BACKUP);
     }
 
-    public static void makeWALCheckpoint() {
-        if (MusicListenerService.getInstance() == null) return;
+    public static boolean makeWALCheckpoint() {
+        if (MusicListenerService.getInstance() == null) return false;
         if (MusicListenerService.getInstance().getDatabase() != null) {
             MusicListenerService.getInstance().getDatabase().close();
         }
         MusicListenerService.getInstance().connectToDatabase();
         Log.i("BackupDatabaseUtil", "makeWALCheckpoint: checkpoint for database");
+        return true;
     }
 }

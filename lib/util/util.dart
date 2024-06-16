@@ -26,7 +26,7 @@ String formatDuration(int durationInSeconds) {
 
 void showToast(String text) {
   Fluttertoast.showToast(
-      msg: "Successfully exported Database",
+      msg: text,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       backgroundColor: Colors.grey.shade900,

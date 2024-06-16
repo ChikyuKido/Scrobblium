@@ -25,6 +25,7 @@ class DatabaseSettingsPage extends StatelessWidget {
         });
   }
 
+
   initVariables() async {
     path = await MethodChannelService.getBackupDatabasePath();
   }

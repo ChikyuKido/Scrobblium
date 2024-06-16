@@ -25,7 +25,11 @@ class IntegrationSettingsPage extends StatelessWidget {
   }
 
   Future<Widget> _addIntegration(String s,BuildContext context) async{
-    var fields = await MethodChannelService.getRequiredFieldsFor(s);
+    var data = await MethodChannelService.getRequiredFieldsFor(s);
+    if(data.hasError()) {
+      return SimpleTextSettingsTile(title: "Could not create Maloja",subtitle: data.error);
+    }
+    var fields = String.fromCharCodes(data.data??List.empty()).split(";");
     return SettingsGroup(
         title: s,
         children: [

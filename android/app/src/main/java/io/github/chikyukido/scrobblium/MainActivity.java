@@ -20,8 +20,8 @@ public class MainActivity extends FlutterActivity {
         super.configureFlutterEngine(flutterEngine);
         IntegrationHandler.getInstance().init(getApplicationContext());
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
-    }
 
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -29,11 +29,21 @@ public class MainActivity extends FlutterActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (data != null && data.getData() != null) {
                 if (requestCode == REQUEST_CODE_PICK_DIRECTORY_EXPORT) {
-                    BackupDatabaseUtil.exportDatabase(getApplicationContext(), data.getData());
+                    if(BackupDatabaseUtil.exportDatabase(getApplicationContext(), data.getData()))
+                        MethodChannelUtil.showToast("Exported database successfully");
+                    else
+                        MethodChannelUtil.showToast("Smth went wrong exporting the database");
                 } else if (requestCode == REQUEST_CODE_PICK_DIRECTORY_IMPORT) {
-                    BackupDatabaseUtil.importDatabase(getApplicationContext(), data.getData());
+                    if(BackupDatabaseUtil.importDatabase(getApplicationContext(), data.getData()))
+                        MethodChannelUtil.showToast("Imported database successfully");
+                    else
+                        MethodChannelUtil.showToast("Smth went wrong importing the database");
                 } else if(requestCode == REQUEST_CODE_PICK_DIRECTORY_BACKUP) {
-                    BackupDatabaseUtil.saveBackupDatabasePath(getApplicationContext(), data.getData());
+                    if(!BackupDatabaseUtil.saveBackupDatabasePath(getApplicationContext(), data.getData())) {
+                        MethodChannelUtil.showToast("Could not save backup path");
+                        return;
+                    }
+                    MethodChannelUtil.showToast("Backup path successfully set");
                     getContext().getContentResolver().takePersistableUriPermission(data.getData(),
                             Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 }

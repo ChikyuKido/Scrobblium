@@ -9,18 +9,32 @@ import 'package:scrobblium/util/util.dart';
 
 class MethodChannelService {
   static const platform = MethodChannel('MusicListener');
+  
+  static init() {
+    platform.setMethodCallHandler((call) async{
+      if(call.method == "showToast") {
+        print("pxlosion");
+        await _showToast(call.arguments);
+      }
+    });
+  }
 
+  static Future<void> _showToast(String text) async {
+    showToast(text);
+  }
 
+  
   static Future<MethodChannelData> _callFunction(String function,[dynamic arguments]) async {
     final Map<String, dynamic> result = Map<String, dynamic>.from(await platform.invokeMethod(function,arguments));
     return MethodChannelData.fromMap(result);
   }
 
-  static Future<void> makeWALCheckpoint() async {
-    await platform.invokeMethod("makeWALCheckpoint");
+
+  static Future<MethodChannelData> makeWALCheckpoint() async {
+    return await _callFunction("makeWALCheckpoint");
   }
-  static Future<void> setMusicPackage(String package) async {
-    await platform.invokeMethod("setMusicPackage", {"package": package});
+  static Future<MethodChannelData> setMusicPackage(String package) async {
+    return await _callFunction("setMusicPackage",{"package":package});
   }
 
   static Future<List<SongData>> getSongData() async {
@@ -47,107 +61,76 @@ class MethodChannelService {
   }
 
   static Future<SongData?> getCurrentSong() async {
-    String currentSongJson = await platform.invokeMethod('currentSong');
-    SongData? songData;
-    if (currentSongJson != "[]") {
-      songData = SongData.fromJson(jsonDecode(currentSongJson).cast<String, dynamic>());
-    }
-    return songData;
+    var data = await _callFunction("currentSong");
+    if(data.hasError()) return null;
+
+    SongDataM value = SongDataM.fromBuffer(data.data??List.empty());
+    return SongData(id: value.id.toInt(),
+        artist: value.artist,
+        title: value.title,
+        album: value.album,
+        albumAuthor: value.albumAuthor,
+        progress: value.progress.toInt(),
+        maxProgress: value.maxProgress.toInt(),
+        startTime: DateTime.fromMillisecondsSinceEpoch(value.startTime.toInt()),
+        endTime: DateTime.fromMillisecondsSinceEpoch(value.endTime.toInt()),
+        timeListened: value.timeListened);
   }
 
-
-
-  static SongStatistic getSongStatistics(List<SongData> songs) {
-    int songsListened = 0;
-    int songsListenedByProgress = 0;
-    int songsListenedByMaxProgress = 0;
-    int timeListened = 0;
-    int songsSkipped = 0;
-
-    for (var song in songs) {
-      int cap = getValueInt("skip-cap", 20);
-      if (song.timeListened < cap) {
-        songsSkipped++;
-      } else {
-        songsListened++;
-        songsListenedByProgress += song.progress ~/ 1000;
-        songsListenedByMaxProgress += song.maxProgress ~/ 1000;
-      }
-      timeListened += song.timeListened;
-    }
-    return SongStatistic(
-        songsListened,
-        formatDuration(timeListened),
-        songsSkipped,
-        formatDuration(songsListenedByProgress),
-        formatDuration(songsListenedByMaxProgress),
-        songsListenedByProgress / songsListenedByMaxProgress,
-        timeListened / songsListenedByMaxProgress);
-  }
-
-  static Future<void> launchNotificationAccess() async {
-    await platform.invokeMethod("launchNotificationAccess");
+  static Future<MethodChannelData> launchNotificationAccess() async {
+    return await _callFunction("launchNotificationAccess");
   }
 
   static Future<bool> isNotificationPermissionGranted() async {
-    return (await platform.invokeMethod("isNotificationGranted") == "true");
+    var data = await _callFunction("isNotificationGranted");
+    data.showErrorAsToastIfAvailable();
+    if(data.hasError()) return false;
+    return data.data?.first == 1;
   }
 
   static Future<String> getMusicListenerServiceStatus() async {
-    return (await platform.invokeMethod("getMusicListenerServiceStatus"));
+    var data = await _callFunction("getMusicListenerServiceStatus");
+    if(data.hasError()) return data.error??"";
+    return String.fromCharCodes(data.data??List.empty());
   }
 
-  static startForegroundProcess() async {
-    await platform.invokeMethod("startForegroundProcess");
+  static Future<MethodChannelData> startForegroundProcess() async {
+    return await _callFunction("restartMusicListener");
   }
   static exportDatabase() async {
-    await platform.invokeMethod("exportDatabase");
+    var data = await _callFunction("exportDatabase");
+    data.showErrorAsToastIfAvailable();
   }
 
   static importDatabase() async {
-    await platform.invokeMethod("importDatabase");
+    var data = await _callFunction("importDatabase");
+    data.showErrorAsToastIfAvailable();
   }
   static deleteEntry(int id) async {
-    await platform.invokeMethod("deleteEntry",{"id":"$id"});
+    var data = await _callFunction("deleteEntry",{"id":"$id"});
+    data.showErrorAsToastIfAvailable();
   }
 
   static backupDatabasePathPicker() async {
-    await platform.invokeMethod("backupDatabasePicker");
+    var data = await _callFunction("backupDatabasePicker");
+    data.showErrorAsToastIfAvailable();
   }
   static Future<String> getBackupDatabasePath() async {
-    return await platform.invokeMethod("getBackupDatabasePath");
+    var data = await _callFunction("getBackupDatabasePath");
+    if(data.hasError()) return data.error??"";
+    return String.fromCharCodes(data.data??List.empty());
   }
-
   static Future<MethodChannelData> backupDatabaseNow() async {
-    return _callFunction("backupDatabaseNow");
+    return await _callFunction("backupDatabaseNow");
   }
 
-  static getRequiredFieldsFor(String s) async{
-
-    return (await platform.invokeMethod("getRequiredFieldsFor$s")).split(";");
+  static Future<MethodChannelData> getRequiredFieldsFor(String s) async{
+    return await _callFunction("getRequiredFieldsFor$s");
   }
 
   static void loginFor(String s, Map<String, String> p0) async{
-    await platform.invokeMethod("loginFor$s",{"fields":jsonEncode(p0)});
+    var data = await _callFunction("loginFor$s",{"fields":jsonEncode(p0)});
+    data.showErrorAsToastIfAvailable();
   }
 
-}
-
-class SongStatistic {
-  final int songsListened;
-  final String timeListened;
-  final int songsSkipped;
-  final String timeListenedByProgress;
-  final String timeListenedByMaxProgress;
-  final double ratioBetweenProgressAndMaxProgress;
-  final double ratioBetweenTimeListenedAndMaxProgress;
-
-  SongStatistic(
-      this.songsListened,
-      this.timeListened,
-      this.songsSkipped,
-      this.timeListenedByProgress,
-      this.timeListenedByMaxProgress,
-      this.ratioBetweenProgressAndMaxProgress,
-      this.ratioBetweenTimeListenedAndMaxProgress);
 }
