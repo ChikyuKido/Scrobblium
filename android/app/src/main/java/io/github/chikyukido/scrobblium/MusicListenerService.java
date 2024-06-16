@@ -18,6 +18,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.room.Room;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.database.SongDatabase;
+import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.BitmapUtil;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
@@ -26,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -140,7 +142,7 @@ public class MusicListenerService extends NotificationListenerService {
         //run it once so if the music is already playing it also gets tracked
         fetchActiveNotifications();
         timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 incrementTimeListened();
@@ -234,6 +236,7 @@ public class MusicListenerService extends NotificationListenerService {
                 }
                 database.musicTrackDao().insertTrack(currentSong);
                 Log.i(TAG, "checkForUpdates: New song detected. Old song was: " + currentSong);
+                IntegrationHandler.getInstance().handleUpload(currentSong);
                 currentSong = SongData.of(currentMediaController);
                 saveArt();
                 if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());

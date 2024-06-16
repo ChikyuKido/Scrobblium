@@ -7,10 +7,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.dao.MethodChannelData;
+import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 
 public class IntegrationHandler {
@@ -20,6 +22,7 @@ public class IntegrationHandler {
 
     private IntegrationHandler() {}
     public void init(Context context) {
+        //TODO: actual check if the integration is active
         integrations.put(new MalojaIntegration(context),true);
     }
 
@@ -42,6 +45,18 @@ public class IntegrationHandler {
                 result.success(methodChannelData.toMap());
             });
         }
+    }
+    public void handleUpload(SongData songData) {
+        /*if(songData.getTimeListened()/songData.getMaxProgress() < 50 && songData.getTimeListened() < 240) {
+            return;
+        }*/
+        new Thread(() -> {
+            for (var integration : integrations.entrySet()) {
+                if(integration.getValue()) {
+                    integration.getKey().uploadTracks(List.of(songData));
+                }
+            }
+        }).start();
     }
 
     public static IntegrationHandler getInstance() {

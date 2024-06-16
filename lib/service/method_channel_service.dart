@@ -128,9 +128,10 @@ class MethodChannelService {
     return await _callFunction("getRequiredFieldsFor$s");
   }
 
-  static void loginFor(String s, Map<String, String> p0) async{
+  static Future<bool> loginFor(String s, Map<String, String> p0) async{
     var data = await _callFunction("loginFor$s",{"fields":jsonEncode(p0)});
-    data.showErrorAsToastIfAvailable();
+    if(data.hasError()) return false;
+    return data.data?.first == 1;
   }
 
 }

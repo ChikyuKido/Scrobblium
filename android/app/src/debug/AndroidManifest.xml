@@ -10,6 +10,7 @@
 
 
     <application
+        android:usesCleartextTraffic="true"
         android:label="Scrobblium"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

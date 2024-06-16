@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
+import 'package:scrobblium/util/util.dart';
 import 'package:scrobblium/widgets/login_widget.dart';
 
 class IntegrationSettingsPage extends StatelessWidget {
@@ -45,8 +46,13 @@ class IntegrationSettingsPage extends StatelessWidget {
                 onTap: () {
                   showDialog(
                       context: context,
-                      builder: (context) => LoginWidget(fields, s, onLogin: (p0) {
-                        MethodChannelService.loginFor(s,p0);
+                      builder: (context) => LoginWidget(fields, s, onLogin: (p0) async {
+                        var result = await MethodChannelService.loginFor(s,p0);
+                        if(result) {
+                          showToast("Successfully logged in to $s");
+                        }else {
+                          showToast("Could not log in to $s");
+                        }
                       }));
                 },
               )

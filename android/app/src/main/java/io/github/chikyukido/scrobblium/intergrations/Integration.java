@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import io.github.chikyukido.scrobblium.database.SongData;
+import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -20,9 +21,10 @@ import java.util.List;
  * The integration for a other scrobble service like last.fm
  */
 public abstract class Integration {
-    private static final String TAG = "INTEGRATION";
+    private static final String TAG = "Integration";
     protected JsonObject json;
-    private Gson gson = new Gson();
+    protected Gson gson = new Gson();
+    protected OkHttpClient client = new OkHttpClient();
     private Context context;
 
     public Integration(Context context) {

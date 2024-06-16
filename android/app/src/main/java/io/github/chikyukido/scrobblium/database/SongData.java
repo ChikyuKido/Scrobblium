@@ -25,25 +25,25 @@ public class SongData {
     private int timeListened;
 
     public SongData(String artist, String title, String album, String albumAuthor, long progress, long maxProgress, LocalDateTime startTime, LocalDateTime endTime, int timeListened) {
-        this.artist = artist;
-        this.title = title;
-        this.album = album;
-        this.albumAuthor = albumAuthor;
+        this.artist = artist != null ? artist : "Unknown Artist";
+        this.title = title != null ? title : "Unknown Title";
+        this.album = album != null ? album : "Unknown Album";
+        this.albumAuthor = albumAuthor != null ? albumAuthor : "Unknown Album Author";
         this.progress = progress;
         this.maxProgress = maxProgress;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startTime = startTime != null ? startTime : LocalDateTime.now();;
+        this.endTime = endTime != null ? endTime : LocalDateTime.now();
         this.timeListened = timeListened;
     }
 
     public static SongData of(MediaController mediaController) {
         MediaMetadata metadata = mediaController.getMetadata();
-        String artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST);
-        String title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE);
-        String album = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM);
-        String albumAuthor = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST);
+        String artist = metadata != null ? metadata.getString(MediaMetadata.METADATA_KEY_ARTIST) : "Unknown Artist";
+        String title = metadata != null ? metadata.getString(MediaMetadata.METADATA_KEY_TITLE) : "Unknown Title";
+        String album = metadata != null ? metadata.getString(MediaMetadata.METADATA_KEY_ALBUM) : "Unknown Album";
+        String albumAuthor = metadata != null ? metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST) : "Unknown Album Author";
         long progress = mediaController.getPlaybackState().getPosition();
-        long maxProgress = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION);
+        long maxProgress = metadata != null ? metadata.getLong(MediaMetadata.METADATA_KEY_DURATION) : 0;
         return new SongData(artist, title, album, albumAuthor, progress, maxProgress, LocalDateTime.now(), null, 0);
     }
 
