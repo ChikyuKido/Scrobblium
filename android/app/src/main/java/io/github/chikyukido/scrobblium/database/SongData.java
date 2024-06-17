@@ -4,6 +4,7 @@ package io.github.chikyukido.scrobblium.database;
 import android.media.MediaMetadata;
 import android.media.session.MediaController;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 

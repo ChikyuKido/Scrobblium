@@ -4,9 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
+import io.github.chikyukido.scrobblium.util.JsonUtil;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
@@ -14,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,13 +28,19 @@ import java.util.List;
 public abstract class Integration {
     private static final String TAG = "Integration";
     protected JsonObject json;
-    protected Gson gson = new Gson();
+    protected Gson gson = JsonUtil.getGson();
     protected OkHttpClient client = new OkHttpClient();
+    private List<SongData> cachedSongs = new ArrayList<>();
     private Context context;
 
     public Integration(Context context) {
         this.context = context;
         this.json = loadJson();
+        if(json.has("cached_songs")) {
+            for(JsonElement song : json.getAsJsonArray("cached_songs")) {
+                cachedSongs.add(gson.fromJson(song, SongData.class));
+            }
+        }
     }
 
     abstract String getName();
@@ -58,14 +69,31 @@ public abstract class Integration {
      * This method is called when a song changes
      * @param songData the songData of the current playing song
      */
-    abstract void nowPlaying(SongData songData);
+    public void nowPlaying(SongData songData){}
 
     /**
      * Upload a finished track to the server. If there was no internet connection it can happen that multiple tracks are cached
      * up so you need to upload multiple tracks
      * @param songData the song data to upload
+     * @return songs that could not be uploaded to due errors. These songs will be tried next time
      */
-    abstract void uploadTracks(List<SongData> songData);
+    abstract List<SongData> uploadTracks(List<SongData> songData);
+
+
+    public void uploadTrack(SongData songData) {
+        cachedSongs.add(songData);
+        cachedSongs = uploadTracks(cachedSongs);
+        json.add("cached_songs", new JsonArray());
+        JsonArray arr = json.get("cached_songs").getAsJsonArray();
+        for (SongData cachedSong : cachedSongs) {
+            arr.add(gson.toJsonTree(cachedSong));
+        }
+        saveJson();
+    }
+    public boolean isActive() {
+        if(!isLoggedIn()) return false;
+        return ConfigUtil.getBoolean(context,"flutter.activate-"+getName(),false);
+    }
 
     public JsonObject getJson() {
         return json;
@@ -75,6 +103,9 @@ public abstract class Integration {
         this.json = json;
     }
 
+    public int getCachedSongsSize() {
+        return cachedSongs.size();
+    }
     protected JsonObject loadJson() {
         Path path = context.getFilesDir().toPath().resolve(getName()+".json");
         if(Files.exists(path)) {
@@ -90,7 +121,8 @@ public abstract class Integration {
     protected void saveJson() {
         Path path = context.getFilesDir().toPath().resolve(getName()+".json");
         try {
-            Files.write(path,gson.toJson(json).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
+            Log.d(TAG, "saveJson: "+gson.toJson(json));
+            Files.write(path,gson.toJson(json).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             Log.e(TAG, "saveJson: Could not save json for "+getName(), e);
         }
