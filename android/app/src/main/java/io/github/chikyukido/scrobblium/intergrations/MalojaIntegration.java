@@ -108,8 +108,14 @@ public class MalojaIntegration extends Integration {
     public List<SongData> uploadTracks(List<SongData> songDatas) {
         if (!isLoggedIn()) return songDatas;
         List<SongData> failedSongs = new ArrayList<>();
+        boolean failedWithException = false;
         for (SongData songData : songDatas) {
-            String url = json.get("url").getAsString() + "/api/newscrobble";
+            // If a upload throw a exception its likely that the url is not available or the user does not have internet.
+            if(failedWithException) {
+                failedSongs.add(songData);
+                continue;
+            }
+            String url = json.get("url").getAsString() + "/api/newscobble";
             JsonObject jsonObject = new JsonObject();
             jsonObject.add("key", new JsonPrimitive(json.get("api_key").getAsString()));
             jsonObject.add("artist", new JsonPrimitive(songData.getArtist()));
@@ -135,6 +141,7 @@ public class MalojaIntegration extends Integration {
             } catch (Exception e) {
                 Log.e(TAG, "uploadTracks: Error sending login request", e);
                 failedSongs.add(songData);
+                failedWithException = true;
             }
         }
         Log.d(TAG, "uploadTracks: Could not upload " + failedSongs.size() + " songs");

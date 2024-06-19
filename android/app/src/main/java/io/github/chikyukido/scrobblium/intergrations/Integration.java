@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
 import io.github.chikyukido.scrobblium.util.JsonUtil;
+import io.github.chikyukido.scrobblium.util.NetworkUtils;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
@@ -82,7 +83,10 @@ public abstract class Integration {
 
     public void uploadTrack(SongData songData) {
         cachedSongs.add(songData);
-        cachedSongs = uploadTracks(cachedSongs);
+        //if no network there is no reason to attempt a upload
+        if(NetworkUtils.isConnected(context)) {
+            cachedSongs = uploadTracks(cachedSongs);
+        }
         json.add("cached_songs", new JsonArray());
         JsonArray arr = json.get("cached_songs").getAsJsonArray();
         for (SongData cachedSong : cachedSongs) {
@@ -121,7 +125,6 @@ public abstract class Integration {
     protected void saveJson() {
         Path path = context.getFilesDir().toPath().resolve(getName()+".json");
         try {
-            Log.d(TAG, "saveJson: "+gson.toJson(json));
             Files.write(path,gson.toJson(json).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             Log.e(TAG, "saveJson: Could not save json for "+getName(), e);

@@ -133,16 +133,19 @@ class MethodChannelService {
     if(data.hasError()) return false;
     return data.data?.first == 1;
   }
-  static Future<bool> isLoggedInFor(String s, Map<String, String> p0) async{
-    var data = await _callFunction("isLoggedInFor$s",{"fields":jsonEncode(p0)});
+  static Future<bool> isLoggedInFor(String s) async{
+    var data = await _callFunction("isLoggedInFor$s");
     if(data.hasError()) return false;
     return data.data?.first == 1;
   }
-  static Future<int> cachedSongsFor(String s, Map<String, String> p0) async{
-    var data = await _callFunction("cachedSongsFor$s",{"fields":jsonEncode(p0)});
+  static Future<int> cachedSongsFor(String s) async{
+    var data = await _callFunction("cachedSongsFor$s");
     if(data.hasError()) return 0;
     int result = data.data!.fold(0, (prev, elem) => (prev << 8) | elem);
     return result;
+  }
+  static Future<void> logoutFor(String s) async{
+    await _callFunction("logoutFor$s");
   }
 
 }

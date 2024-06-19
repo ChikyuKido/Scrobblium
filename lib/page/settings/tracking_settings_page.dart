@@ -76,9 +76,11 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
         visible: notificationPermissionGranted,
         child: SimpleSettingsTile(
           title: "Tracker status: $status",
-          subtitle: "Tap to start the background process",
+          subtitle: status == "NO_NOTIFICATION" ? "Tap to Refresh": "Tap to restart the background process",
           onTap: () async {
-            await MethodChannelService.startForegroundProcess();
+            if(status != "NO_NOTIFICATION") {
+              await MethodChannelService.startForegroundProcess();
+            }
             setState(() {});
           },
         ));

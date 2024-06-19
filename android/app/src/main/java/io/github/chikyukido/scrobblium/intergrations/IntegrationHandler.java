@@ -44,6 +44,11 @@ public class IntegrationHandler {
                 methodChannelData.setData(new byte[]{(byte)(integration.signIn(fields)?1:0)});
                 result.success(methodChannelData.toMap());
             });
+            methods.put("logoutFor"+integration.getName(),(call, result) -> {
+                MethodChannelData methodChannelData = new MethodChannelData();
+                integration.signOut();
+                result.success(methodChannelData.toMap());
+            });
             methods.put("isLoggedInFor"+integration.getName(),(call, result) -> {
                 MethodChannelData methodChannelData = new MethodChannelData();
                 methodChannelData.setData(new byte[]{(byte)(integration.isLoggedIn()?1:0)});
@@ -64,9 +69,9 @@ public class IntegrationHandler {
         }
     }
     public void handleUpload(SongData songData) {
-        if(songData.getTimeListened()/songData.getMaxProgress() < 50 && songData.getTimeListened() < 240) {
+      /*  if(songData.getTimeListened()/songData.getMaxProgress() < 50 && songData.getTimeListened() < 240) {
             return;
-        }
+        }*/
         executor.execute(() -> {
             for (Integration integration : integrations) {
                 if(integration.isActive()) {
