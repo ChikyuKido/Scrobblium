@@ -47,6 +47,7 @@ public class MethodChannelUtil {
         methods.put("getBackupDatabasePath",getBackupDatabasePath(context));
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
         methods.put("restartMusicListener",restartMusicListener());
+        methods.put("exportMaloja",exportMaloja(context));
         IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods);
 
         methodChannel.setMethodCallHandler((call, result) -> {
@@ -57,6 +58,14 @@ public class MethodChannelUtil {
                 result.notImplemented();
             }
         });
+    }
+
+    private static MethodInterface exportMaloja(Context context) {
+        return (call, result) -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
+            ExportUtil.launchFileChooserForExportMaloja(context);
+            result.success(methodChannelData.toMap());
+        };
     }
 
     private static MethodInterface restartMusicListener() {
@@ -139,8 +148,6 @@ public class MethodChannelUtil {
 
 
             List<SongData> tracks = MusicListenerService.getInstance().getDatabase().musicTrackDao().getAllTracks();
-
-
             SongDataListM.Builder songDataListBuilder = SongDataListM.newBuilder();
 
             for (SongData song : tracks) {

@@ -40,12 +40,13 @@ class MyApp extends StatelessWidget {
                 scheme: state.materialTheme ? null : state.colorScheme,
                 darkIsTrueBlack: state.trueDarkMode,
                 typography: Typography.material2021(
-                    platform: defaultTargetPlatform),);
+                    platform: defaultTargetPlatform));
               // somehow the canvas color is not true black when darkIsTrueBlack is set on.
-              data = data.copyWith(
-                  canvasColor: state.trueDarkMode
-                      ? const Color(0x00000000)
-                      : data.canvasColor);
+              if(state.trueDarkMode) {
+                data = data.copyWith(
+                    canvasColor:const Color(0x00000000),
+                    appBarTheme: data.appBarTheme.copyWith(backgroundColor: const Color(0x00000000)));
+              }
               return MaterialApp(
                 title: 'Scrobblium',
                 darkTheme: data,

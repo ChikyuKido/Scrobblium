@@ -148,4 +148,8 @@ class MethodChannelService {
     await _callFunction("logoutFor$s");
   }
 
+  static void exportMaloja() {
+    _callFunction("exportMaloja");
+  }
+
 }

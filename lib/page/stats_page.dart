@@ -90,7 +90,7 @@ class _StatsPageState extends State<StatsPage> {
             child: Container(
               height: 50,
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: Theme.of(context).canvasColor,
                 borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(10),
                     bottomRight: Radius.circular(10)),
