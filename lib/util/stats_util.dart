@@ -11,9 +11,10 @@ class StatsUtil {
     int timeListened = 0;
     int songsSkipped = 0;
 
+    int cap = getValueInt("skip-cap", 50);
+    int anywayCap = getValueInt("anyway-cap", 240);
     for (var song in songs) {
-      int cap = getValueInt("skip-cap", 20);
-      if (song.timeListened < cap) {
+      if (song.timeListened/(song.maxProgress/1000) < cap/100 && song.timeListened < anywayCap) {
         songsSkipped++;
       } else {
         songsListened++;

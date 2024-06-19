@@ -115,7 +115,7 @@ public class MalojaIntegration extends Integration {
                 failedSongs.add(songData);
                 continue;
             }
-            String url = json.get("url").getAsString() + "/api/newscobble";
+            String url = json.get("url").getAsString() + "/api/newscrobble";
             JsonObject jsonObject = new JsonObject();
             jsonObject.add("key", new JsonPrimitive(json.get("api_key").getAsString()));
             jsonObject.add("artist", new JsonPrimitive(songData.getArtist()));

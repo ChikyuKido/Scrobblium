@@ -611,6 +611,8 @@ class TextInputSettingsTile extends StatefulWidget {
   /// the padding on top of the settings tile widget. Set it to 0 so that every settings tile sticks together
   final double topPadding;
 
+  final String unit;
+
   TextInputSettingsTile({
     required this.title,
     required this.settingKey,
@@ -630,6 +632,7 @@ class TextInputSettingsTile extends StatefulWidget {
     this.helperText,
     this.inputFormatters,
     this.topPadding = 16.0,
+    this.unit = ''
   });
 
   @override
@@ -669,7 +672,7 @@ class _TextInputSettingsTileState extends State<TextInputSettingsTile> {
           children: [
             _ModalSettingsTile<String>(
               title: widget.title,
-              subtitle: widget.obscureText ? '' : value,
+              subtitle: widget.obscureText ? '' : value+widget.unit,
               titleTextStyle: widget.titleTextStyle,
               subtitleTextStyle: widget.subtitleTextStyle,
               enabled: widget.enabled,

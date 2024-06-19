@@ -21,8 +21,9 @@ class SongDataService {
   List<SongData> getSongs({withSkipped = true, DateTime? afterDate}) {
     List<SongData> songs = List.of(_songs);
     if (!withSkipped) {
-      int cap = getValueInt("skip-cap", 20);
-      songs.removeWhere((element) => element.timeListened <= cap);
+      int cap = getValueInt("skip-cap", 50);
+      int anywayCap = getValueInt("anyway-cap", 240);
+      songs.removeWhere((song) => song.timeListened/(song.maxProgress/1000) < cap/100 && song.timeListened < anywayCap);
     }
     if (afterDate != null) {
       songs.removeWhere((element) => element.endTime.isBefore(afterDate));
