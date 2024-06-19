@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scrobblium/page/settings/ExportSettingsPage.dart';
+import 'package:scrobblium/page/settings/export_settings_page.dart';
 import 'package:scrobblium/page/settings/appearance_settings_page.dart';
 import 'package:scrobblium/page/settings/database_settings_page.dart';
 import 'package:scrobblium/page/settings/debug_settings_page.dart';

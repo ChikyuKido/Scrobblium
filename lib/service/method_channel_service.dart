@@ -4,8 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:scrobblium/dao/method_channel_data.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/messages/proto/song_datam.pb.dart';
-import 'package:scrobblium/util/settings_helper.dart';
-import 'package:scrobblium/util/util.dart';
+import 'package:scrobblium/util/widget_util.dart';
 
 class MethodChannelService {
   static const platform = MethodChannel('MusicListener');
@@ -13,14 +12,13 @@ class MethodChannelService {
   static init() {
     platform.setMethodCallHandler((call) async{
       if(call.method == "showToast") {
-        print("pxlosion");
         await _showToast(call.arguments);
       }
     });
   }
 
   static Future<void> _showToast(String text) async {
-    showToast(text);
+    WidgetUtil.showToast(text);
   }
 
   

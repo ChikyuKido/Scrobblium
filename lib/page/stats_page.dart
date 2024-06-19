@@ -2,13 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:scrobblium/dao/song_data.dart';
-import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/service/song_data_service.dart';
 import 'package:scrobblium/util/stats_util.dart';
 import 'package:scrobblium/widgets/date_option.dart';
-import 'package:scrobblium/widgets/latest_song_tile.dart';
-import 'package:scrobblium/widgets/music_stats_row.dart';
-import 'package:scrobblium/widgets/top_ata.dart';
+import 'package:scrobblium/widgets/stats/latest_song_tile.dart';
+import 'package:scrobblium/widgets/stats/music_stats_row.dart';
+import 'package:scrobblium/widgets/stats/top_ata.dart';
 
 import 'songs/song_tile_info_page.dart';
 

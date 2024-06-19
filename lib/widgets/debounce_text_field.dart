@@ -2,8 +2,6 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 
 class DebounceTextField extends StatefulWidget {
-
-
   final ValueChanged<String> onDebounceChanged;
   final Duration bounceDuration;
   final InputDecoration? decoration;

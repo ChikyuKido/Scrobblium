@@ -1,7 +1,6 @@
-
 import 'package:scrobblium/dao/song_data.dart';
-import 'package:scrobblium/util/settings_helper.dart';
-import 'package:scrobblium/util/util.dart';
+import 'package:scrobblium/util/converter_util.dart';
+import 'package:scrobblium/util/settings_util.dart';
 
 class StatsUtil {
   static SongStatistic getSongStatistics(List<SongData> songs) {
@@ -11,8 +10,8 @@ class StatsUtil {
     int timeListened = 0;
     int songsSkipped = 0;
 
-    int cap = getValueInt("skip-cap", 50);
-    int anywayCap = getValueInt("anyway-cap", 240);
+    int cap = SettingsUtil.getValueInt("skip-cap", 50);
+    int anywayCap = SettingsUtil.getValueInt("anyway-cap", 240);
     for (var song in songs) {
       if (song.timeListened/(song.maxProgress/1000) < cap/100 && song.timeListened < anywayCap) {
         songsSkipped++;
@@ -25,10 +24,10 @@ class StatsUtil {
     }
     return SongStatistic(
         songsListened,
-        formatDuration(timeListened),
+        ConverterUtil.formatDuration(timeListened),
         songsSkipped,
-        formatDuration(songsListenedByProgress),
-        formatDuration(songsListenedByMaxProgress),
+        ConverterUtil.formatDuration(songsListenedByProgress),
+        ConverterUtil.formatDuration(songsListenedByMaxProgress),
         songsListenedByProgress / songsListenedByMaxProgress,
         timeListened / songsListenedByMaxProgress);
   }

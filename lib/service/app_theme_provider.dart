@@ -1,6 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:scrobblium/util/settings_helper.dart';
+import 'package:scrobblium/util/settings_util.dart';
 
 class AppThemeProvider extends ChangeNotifier {
   late bool _trueDarkMode;
@@ -33,9 +33,9 @@ class AppThemeProvider extends ChangeNotifier {
 
 
   _loadPrefs() {
-    _trueDarkMode = getValueBool("true-dark-mode", false);
-    _materialTheme = getValueBool("material-theme", false);
-    var c = getValueString("theme-color", "amber");
+    _trueDarkMode =  SettingsUtil.getValueBool("true-dark-mode", false);
+    _materialTheme =  SettingsUtil.getValueBool("material-theme", false);
+    var c =  SettingsUtil.getValueString("theme-color", "amber");
     _colorScheme = FlexScheme.values.where((element) => element.name == c).first;
     notifyListeners();
   }

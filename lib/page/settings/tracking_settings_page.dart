@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/util/settings_helper.dart';
+import 'package:scrobblium/util/settings_util.dart';
 import 'package:scrobblium/widgets/app_list_popup.dart';
 
 class TrackingSettingsPage extends StatefulWidget {
@@ -40,7 +40,7 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
       visible: notificationPermissionGranted,
       child: SimpleSettingsTile(
         title: "Music app package",
-        subtitle: getValueString("music-app-package", "No package selected"),
+        subtitle:  SettingsUtil.getValueString("music-app-package", "No package selected"),
         onTap: () {
           showDialog(
             context: context,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/util/util.dart';
+import 'package:scrobblium/util/widget_util.dart';
 
 class DatabaseSettingsPage extends StatelessWidget {
   DatabaseSettingsPage({super.key});
@@ -35,7 +34,7 @@ class DatabaseSettingsPage extends StatelessWidget {
         title: "Export Database",
         onTap: () async {
           await MethodChannelService.exportDatabase();
-          showToast("Successfully exported Database");
+          WidgetUtil.showToast("Successfully exported Database");
         });
   }
 
@@ -73,7 +72,7 @@ class DatabaseSettingsPage extends StatelessWidget {
             var result = await MethodChannelService.backupDatabaseNow();
             result.showErrorAsToastIfAvailable();
             if(result.hasNotError()) {
-              showToast("Successfully created backup now");
+              WidgetUtil.showToast("Successfully created backup now");
             }
         },
     );

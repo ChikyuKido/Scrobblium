@@ -2,7 +2,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/app_theme_provider.dart';
-import 'package:scrobblium/util/settings_helper.dart';
+import 'package:scrobblium/util/settings_util.dart';
 
 class AppearanceSettingsPage extends StatefulWidget {
   const AppearanceSettingsPage({super.key});
@@ -22,7 +22,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   @override
   void initState() {
-    var color = getValueString("theme-color", "amber");
+    var color = SettingsUtil.getValueString("theme-color", "amber");
     selectedColor = FlexScheme.values.where((element) => element.name == color).first;
     super.initState();
   }

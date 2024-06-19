@@ -33,6 +33,7 @@ class TopATA extends StatelessWidget {
                 enable: true),
             series: <CartesianSeries<_ChartData, String>>[
               BarSeries<_ChartData, String>(
+                  animationDuration: 0,
                   dataLabelMapper: (datum, index) {
                     return "${datum.x} (${datum.y})";
                   },

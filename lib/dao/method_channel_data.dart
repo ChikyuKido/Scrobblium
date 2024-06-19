@@ -1,7 +1,4 @@
-
-import 'dart:typed_data';
-
-import 'package:scrobblium/util/util.dart';
+import 'package:scrobblium/util/widget_util.dart';
 
 class MethodChannelData {
   String? error;
@@ -18,7 +15,7 @@ class MethodChannelData {
 
   void showErrorAsToastIfAvailable() {
     if(hasError()) {
-      showToast(error!);
+      WidgetUtil.showToast(error!);
     }
   }
 

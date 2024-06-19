@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/util/util.dart';
+import 'package:scrobblium/util/widget_util.dart';
 import 'package:scrobblium/widgets/login_widget.dart';
 
 
@@ -62,15 +62,15 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                               var result = await MethodChannelService.loginFor(s,
                                   p0);
                               if (result) {
-                                showToast("Successfully logged in to $s");
+                                WidgetUtil.showToast("Successfully logged in to $s");
                               } else {
-                                showToast("Could not login to $s");
+                                WidgetUtil.showToast("Could not login to $s");
                               }
                               setState(() {});
                             }));
                   }else {
                     await MethodChannelService.logoutFor(s);
-                    showToast("Successfully logged out from $s");
+                    WidgetUtil.showToast("Successfully logged out from $s");
                     setState(() {});
                   }
                 },

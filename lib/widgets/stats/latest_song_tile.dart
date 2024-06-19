@@ -11,7 +11,7 @@ class LatestSongTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FileImage?>(
-      future: getSongImage(songData),
+      future: ImageUtil.getSongImage(songData),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();

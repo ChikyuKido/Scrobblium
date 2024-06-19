@@ -3,10 +3,10 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
+import 'package:scrobblium/util/converter_util.dart';
 import 'package:scrobblium/util/image_util.dart';
 import 'package:scrobblium/util/stats_util.dart';
-import 'package:scrobblium/util/util.dart';
-import 'package:scrobblium/widgets/music_stats_row.dart';
+import 'package:scrobblium/widgets/stats/music_stats_row.dart';
 
 
 class SongTileInfoPage extends StatefulWidget {
@@ -62,7 +62,7 @@ class _SongTileInfoPageState extends State<SongTileInfoPage>{
         setState(() {});
       },
       title: Text(
-        "Time Listened: ${formatDuration(song.timeListened)}",
+        "Time Listened: ${ConverterUtil.formatDuration(song.timeListened)}",
       ),
       subtitle: Text(
         "Listened on: ${_formatDate(song.endTime)}",
@@ -77,7 +77,7 @@ class _SongTileInfoPageState extends State<SongTileInfoPage>{
 
   Widget getSongInfo() {
     return FutureBuilder<FileImage?>(
-      future: getSongImage(song),
+      future: ImageUtil.getSongImage(song),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();

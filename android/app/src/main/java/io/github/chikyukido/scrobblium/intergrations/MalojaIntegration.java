@@ -76,7 +76,7 @@ public class MalojaIntegration extends Integration {
                     result.set(true);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "signIn: Error sending login request", e);
+                Log.e(TAG, "signIn: Error sending login request:"+e.getMessage());
                 result.set(false);
             }
         });
@@ -87,7 +87,7 @@ public class MalojaIntegration extends Integration {
             throw new RuntimeException(e);
         }
 
-        saveJson();
+        if(result.get()) saveJson();
         return result.get();
     }
 
@@ -99,10 +99,6 @@ public class MalojaIntegration extends Integration {
         saveJson();
     }
 
-    @Override
-    public void nowPlaying(SongData songData) {
-        //has no now playing feature
-    }
 
     @Override
     public List<SongData> uploadTracks(List<SongData> songDatas) {

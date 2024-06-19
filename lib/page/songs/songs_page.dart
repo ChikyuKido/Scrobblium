@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/service/song_data_service.dart';
-import 'package:scrobblium/util/settings_helper.dart';
+import 'package:scrobblium/util/settings_util.dart';
 import 'package:scrobblium/widgets/song_list_tile.dart';
 
 class SongsPage extends StatefulWidget {
@@ -18,7 +18,7 @@ class _SongsPageState extends State<SongsPage> {
   List<SongListTile> _tiles = [];
   List<SongListTile> _filteredTiles = [];
 
-  TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   bool _isSearching = false;
   String _query = "";
@@ -31,11 +31,11 @@ class _SongsPageState extends State<SongsPage> {
   @override
   void initState() {
     super.initState();
-    if (getValueBool("search-save-options", true)) {
-      _isDescending = getValueBool("search-order-option", true);
+    if (SettingsUtil.getValueBool("search-save-options", true)) {
+      _isDescending =  SettingsUtil.getValueBool("search-order-option", true);
       _selectedSortOption =
-          getValueString("search-sort-option", "Times Listened");
-      _selectedCombineOption = getValueString("search-combine-option", "Track");
+          SettingsUtil.getValueString("search-sort-option", "Times Listened");
+      _selectedCombineOption =  SettingsUtil.getValueString("search-combine-option", "Track");
     }
     if (_tiles.isEmpty) {
       _refresh(withoutFetch: true);
@@ -365,7 +365,7 @@ class _SongsPageState extends State<SongsPage> {
       SongDataService().fetchData();
     }
     _tileSongs = _getSongTileData(SongDataService().getSongs(
-        withSkipped: getValueBool("show-skipped-in-songs-page", false)));
+        withSkipped:  SettingsUtil.getValueBool("show-skipped-in-songs-page", false)));
     _tiles = _getSongListTiles();
     _filterTiles();
     setState(() {});

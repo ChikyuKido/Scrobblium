@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/page/songs/song_tile_info_page.dart';
+import 'package:scrobblium/util/converter_util.dart';
 import 'package:scrobblium/util/image_util.dart';
-import 'package:scrobblium/util/util.dart';
+
 
 class SongListTile extends StatelessWidget {
   final SongTileData songData;
-
-
   const SongListTile({super.key, required this.songData});
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FileImage?>(
-      future: getSongImageFromTile(songData),
+      future: ImageUtil.getSongImageFromTile(songData),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -40,7 +39,7 @@ class SongListTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text("Listens: ${songData.listenCount}"),
-                Text("Time: ${formatDuration(songData.allTimeListened)}"),
+                Text("Time: ${ConverterUtil.formatDuration(songData.allTimeListened)}"),
               ],
             ),
           );
