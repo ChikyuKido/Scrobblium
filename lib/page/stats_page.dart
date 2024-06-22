@@ -7,8 +7,6 @@ import 'package:scrobblium/util/stats_util.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/stats/latest_song_tile.dart';
 import 'package:scrobblium/widgets/stats/music_stats_row.dart';
-import 'package:scrobblium/widgets/stats/top_ata.dart';
-
 import 'songs/song_tile_info_page.dart';
 
 class StatsPage extends StatefulWidget {
@@ -68,16 +66,6 @@ class _StatsPageState extends State<StatsPage> {
               ),
               _latestSongs(songs, context),
               const SizedBox(height: 10),
-              Center(
-                child: Text(
-                  'Detailed Statistics',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              const SizedBox(height: 10),
-              TopATA(ata: ATA.artist, songs: songs),
-              TopATA(ata: ATA.track, songs: songs),
-              TopATA(ata: ATA.album, songs: songs),
           ]),
           onRefresh: () => _refresh()),
     );

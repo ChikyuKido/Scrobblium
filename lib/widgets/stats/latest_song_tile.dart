@@ -27,14 +27,14 @@ class LatestSongTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 15,
+                    radius: 18,
                     backgroundImage: snapshot.data,
                     child: snapshot.data != null ? null : Text(songData.title[0]),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text("${songData.artist} - ${songData.title}",
-                        style: Theme.of(context).textTheme.labelSmall),
+                        style: Theme.of(context).textTheme.labelMedium),
                   ),
                 ],
               ),

@@ -37,20 +37,20 @@ dependencies:
   cupertino_icons: ^1.0.6
   intl: ^0.19.0
   path_provider: ^2.1.2
-  flutter_settings_screens:
-    path: externel/flutter_settings_screens-0.3.3-null-safety+2-hijacked
-  syncfusion_flutter_charts: ^24.2.9
   flex_color_scheme: ^7.3.1
   provider: ^6.1.2
   dynamic_color: ^1.7.0
   google_nav_bar: ^5.0.6
-  installed_apps:
-    path: externel/installed_apps
   easy_debounce: ^2.0.3
-  anim_search_bar:
-    path: externel/anim_search_bar-2.0.3
   fluttertoast: ^8.2.6
   protobuf: ^3.1.0
+
+  flutter_settings_screens:
+    path: externel/flutter_settings_screens-0.3.3-null-safety+2-hijacked
+  anim_search_bar:
+    path: externel/anim_search_bar-2.0.3
+  installed_apps:
+    path: externel/installed_apps
 dev_dependencies:
   flutter_test:
     sdk: flutter
