@@ -78,8 +78,7 @@ class _StatsPageState extends State<StatsPage> {
               TopATA(ata: ATA.artist, songs: songs),
               TopATA(ata: ATA.track, songs: songs),
               TopATA(ata: ATA.album, songs: songs),
-            ],
-          ),
+          ]),
           onRefresh: () => _refresh()),
     );
   }

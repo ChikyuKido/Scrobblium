@@ -146,7 +146,6 @@ public class MethodChannelUtil {
                 return;
             }
 
-
             List<SongData> tracks = MusicListenerService.getInstance().getDatabase().musicTrackDao().getAllTracks();
             SongDataListM.Builder songDataListBuilder = SongDataListM.newBuilder();
 

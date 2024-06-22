@@ -6,6 +6,7 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import android.widget.Toast.LENGTH_SHORT
@@ -71,8 +72,12 @@ class InstalledAppsPlugin() : MethodCallHandler, FlutterPlugin, ActivityAware {
                 val withIcon = call.argument("with_icon") ?: false
                 val packageNamePrefix: String = call.argument("package_name_prefix") ?: ""
                 Thread {
-                    val apps: List<Map<String, Any?>> =
-                        getInstalledApps(includeSystemApps, withIcon, packageNamePrefix)
+                    val startTime = System.currentTimeMillis() // Start the timer
+                    val apps: List<Map<String, Any?>> = getInstalledApps(includeSystemApps, withIcon, packageNamePrefix)
+                    val endTime = System.currentTimeMillis() // End the timer
+                    val duration = endTime - startTime // Calculate the duration
+
+                    Log.d("AppTimer", "Time taken to get installed apps: $duration ms")
                     result.success(apps)
                 }.start()
             }

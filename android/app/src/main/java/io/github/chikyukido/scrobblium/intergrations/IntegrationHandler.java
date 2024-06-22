@@ -69,9 +69,9 @@ public class IntegrationHandler {
         }
     }
     public void handleUpload(SongData songData) {
-      /*  if(songData.getTimeListened()/songData.getMaxProgress() < 50 && songData.getTimeListened() < 240) {
+        if(songData.getTimeListened()/songData.getMaxProgress() < 50 && songData.getTimeListened() < 240) {
             return;
-        }*/
+        }
         executor.execute(() -> {
             for (Integration integration : integrations) {
                 if(integration.isActive()) {

@@ -96,6 +96,7 @@ public class MusicListenerService extends NotificationListenerService {
         }
     }
 
+
     public void setMusicPackage(String musicPackage) {
         musicPackageName = musicPackage;
         startTimer();
@@ -214,7 +215,6 @@ public class MusicListenerService extends NotificationListenerService {
             currentMediaController = getMediaControllerFromNotification(sbn);
             if (currentMediaController == null) {
                 Log.e(TAG, "fetchActiveNotifications: Could not get MediaController from notification: " + sbn.getNotification().toString());
-
                 setMusicListenerStatus(MusicListenerServiceStatus.NO_MEDIA_CONTROLLER);
                 return;
             }
@@ -224,20 +224,23 @@ public class MusicListenerService extends NotificationListenerService {
             currentSong = SongData.of(currentMediaController);
             saveArt();
             if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());
+            return;
         }
         if (!isSameSong()) {
             if (currentMediaController.getPlaybackState() != null) {
                 currentSong.setProgress(currentMediaController.getPlaybackState().getPosition());
             }
+            currentSong.setEndTime(LocalDateTime.now());
+            SongData oldSong = currentSong;
+            currentSong = SongData.of(currentMediaController);
+            Log.i(TAG, "checkForUpdates: New song detected. Old song was: " + oldSong);
+            // extra thread because this can take some time
             executor.execute(() -> {
-                currentSong.setEndTime(LocalDateTime.now());
                 if(!database.isOpen()) {
                     connectToDatabase();
                 }
-                database.musicTrackDao().insertTrack(currentSong);
-                Log.i(TAG, "checkForUpdates: New song detected. Old song was: " + currentSong);
-                IntegrationHandler.getInstance().handleUpload(currentSong);
-                currentSong = SongData.of(currentMediaController);
+                database.musicTrackDao().insertTrack(oldSong);
+                IntegrationHandler.getInstance().handleUpload(oldSong);
                 saveArt();
                 if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());
             });
