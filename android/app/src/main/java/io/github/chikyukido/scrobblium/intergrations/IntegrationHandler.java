@@ -69,7 +69,7 @@ public class IntegrationHandler {
         }
     }
     public void handleUpload(SongData songData) {
-        if(songData.getTimeListened()/songData.getMaxProgress() < 50 && songData.getTimeListened() < 240) {
+        if((double) songData.getTimeListened() /((double) songData.getMaxProgress() /1000) < 0.5 && songData.getTimeListened() < 240) {
             return;
         }
         executor.execute(() -> {
