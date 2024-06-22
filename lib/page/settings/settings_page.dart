@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scrobblium/page/settings/about_settings_page.dart';
 import 'package:scrobblium/page/settings/export_settings_page.dart';
 import 'package:scrobblium/page/settings/appearance_settings_page.dart';
 import 'package:scrobblium/page/settings/database_settings_page.dart';
@@ -36,7 +37,8 @@ class _SettingsPageState extends State<SettingsPage> {
             addSettingsPage("Database", Icons.storage, DatabaseSettingsPage()),
             addSettingsPage("Integrations", Icons.network_check, const IntegrationSettingsPage()),
             addSettingsPage("Exports", Icons.import_export, const ExportsettingsPage()),
-            addSettingsPage("Debug", Icons.bug_report, const DebugSettingsPage())
+            addSettingsPage("Debug", Icons.bug_report, const DebugSettingsPage()),
+            addSettingsPage("About Scrobblium", Icons.question_mark, const AboutSettingsScreen())
           ])),
     );
   }
