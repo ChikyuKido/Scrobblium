@@ -16,11 +16,23 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(
-        title: "Integration",
-        children: [
-          _wrapFuture(_addIntegration("Maloja",context)),
-        ]);
+    return FutureBuilder(future: MethodChannelService.getIntegrations(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+          if (snapshot.hasError || snapshot.data == null) {
+            return Center(child: Text("No integrations available", style: Theme
+                .of(context)
+                .textTheme
+                .bodyLarge));
+          }
+          return SettingsScreen(
+            title: "Integration",
+            children: snapshot.data!.map((e) =>
+                _wrapFuture(_addIntegration(e, context))).toList(),
+          );
+        });
   }
 
   Widget _wrapFuture(Future<Widget> future) {
@@ -50,9 +62,14 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
             defaultValue: false,
             childrenPadding: EdgeInsets.zero,
             childrenIfEnabled: [
-              SimpleSettingsTile(
+              SimpleTrailingSettingsTile(
                 title: isLoggedIn ? "Logout from $s" : "Login to $s",
                 subtitle: isLoggedIn ? "Cached Songs: $cachedSongs" : "",
+                trailing: IconButton(icon: const Icon(Icons.upload),onPressed: () async{
+                  await MethodChannelService.uploadCachedSongsFor(s);
+                  WidgetUtil.showToast("Uploading cached songs");
+                  setState(() {});
+                }),
                 onTap: () async {
                   if(!isLoggedIn) {
                     showDialog(

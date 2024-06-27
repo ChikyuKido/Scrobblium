@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
-import io.flutter.plugin.common.MethodChannel;
+
 import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
@@ -24,7 +25,6 @@ public class IntegrationHandler {
     private final Gson gson = new Gson();
     private final List<Integration> integrations = new ArrayList<>();
     ExecutorService executor = Executors.newFixedThreadPool(1);
-
 
     private IntegrationHandler() {}
     public void init(Context context) {
@@ -66,7 +66,18 @@ public class IntegrationHandler {
                 methodChannelData.setData(String.join(";",integration.requiredFields()).getBytes());
                 result.success(methodChannelData.toMap());
             });
+            methods.put("uploadCachedSongsFor"+integration.getName(),(call, result) -> {
+                executor.execute(() -> {
+                    integration.uploadCachedSongs();
+                });
+                result.success(new MethodChannelData().toMap());
+            });
         }
+        methods.put("availableIntegrations",(call, result) -> {
+            MethodChannelData methodChannelData = new MethodChannelData();
+            methodChannelData.setData(integrations.stream().map(Integration::getName).collect(Collectors.joining(";")).getBytes());
+            result.success(methodChannelData.toMap());
+        });
     }
     public void handleUpload(SongData songData) {
         if((double) songData.getTimeListened() /((double) songData.getMaxProgress() /1000) < 0.5 && songData.getTimeListened() < 240) {

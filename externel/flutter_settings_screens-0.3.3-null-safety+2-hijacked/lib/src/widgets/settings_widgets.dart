@@ -99,7 +99,63 @@ class SimpleSettingsTile extends StatelessWidget {
     }
   }
 }
+class SimpleTrailingSettingsTile extends StatelessWidget {
+  /// title string for the tile
+  final String title;
 
+  /// subtitle string for the tile
+  final String? subtitle;
+
+  /// title text style
+  final TextStyle? titleTextStyle;
+
+  /// subtitle text style
+  final TextStyle? subtitleTextStyle;
+
+  /// widget to be placed at first in the tile
+  final Widget? leading;
+
+  /// flag which represents the state of the settings, if false the the tile will
+  /// ignore all the user inputs, default = true
+  final bool enabled;
+
+  /// widget that will be displayed on tap of the tile
+  final Widget? trailing;
+
+  final VoidCallback? onTap;
+
+  final EdgeInsetsGeometry? padding;
+
+  SimpleTrailingSettingsTile({
+    required this.title,
+    this.subtitle,
+    this.titleTextStyle,
+    this.subtitleTextStyle,
+    this.trailing,
+    this.enabled = true,
+    this.leading,
+    this.onTap,
+    this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(padding: padding??EdgeInsets.zero,
+        child: _SettingsTile(
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          titleTextStyle: titleTextStyle,
+          subtitleTextStyle: subtitleTextStyle,
+          enabled: enabled,
+          onTap: () => _handleTap(context),
+          child: trailing != null ? trailing! : Text(''),
+        ));
+  }
+  void _handleTap(BuildContext context) {
+    onTap?.call();
+  }
+}
 
 class SimpleTextSettingsTile extends StatelessWidget {
   /// title string for the tile

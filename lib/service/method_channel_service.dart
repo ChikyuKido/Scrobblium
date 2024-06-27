@@ -145,6 +145,16 @@ class MethodChannelService {
   static Future<void> logoutFor(String s) async{
     await _callFunction("logoutFor$s");
   }
+  static Future<void> uploadCachedSongsFor(String s) async {
+    await _callFunction("uploadCachedSongsFor$s");
+  }
+  static Future<List<String>> getIntegrations() async {
+    var data = await _callFunction("availableIntegrations");
+    if(data.hasError()) {
+      return List.empty();
+    }
+    return String.fromCharCodes(data.data??List.empty()).split(";");
+  }
 
   static void exportMaloja() {
     _callFunction("exportMaloja");

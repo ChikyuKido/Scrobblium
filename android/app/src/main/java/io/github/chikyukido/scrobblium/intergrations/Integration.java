@@ -81,6 +81,16 @@ public abstract class Integration {
     abstract List<SongData> uploadTracks(List<SongData> songData);
 
 
+    public void uploadCachedSongs() {
+        cachedSongs = uploadTracks(cachedSongs);
+        json.add("cached_songs", new JsonArray());
+        JsonArray arr = json.get("cached_songs").getAsJsonArray();
+        for (SongData cachedSong : cachedSongs) {
+            arr.add(gson.toJsonTree(cachedSong));
+        }
+        saveJson();
+    }
+
     public void uploadTrack(SongData songData) {
         cachedSongs.add(songData);
         //if no network there is no reason to attempt a upload
