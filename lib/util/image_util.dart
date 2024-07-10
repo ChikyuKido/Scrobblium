@@ -10,7 +10,7 @@ class ImageUtil {
 
   static Future<FileImage?> getSongImage(SongData songData) async {
     _appFilesPath ??= await _getAppFilesPath();
-    String imagePath = '$_appFilesPath/arts/${songData.getIdentifier()}.png';
+    String imagePath = '$_appFilesPath/arts/${songData.getIdentifier()}.jpeg';
     File f = File(imagePath);
     if (!f.existsSync()) {
       return null;
@@ -20,7 +20,7 @@ class ImageUtil {
 
   static Future<FileImage?> getSongImageFromTile(SongTileData songData) async {
     _appFilesPath ??= await _getAppFilesPath();
-    String imagePath = '$_appFilesPath/arts/${songData.getIdentifier()}.png';
+    String imagePath = '$_appFilesPath/arts/${songData.getIdentifier()}.jpeg';
     File f = File(imagePath);
     if (!f.existsSync()) {
       return null;

@@ -64,9 +64,8 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
       title:
       "Notification access is ${notificationPermissionGranted ? "granted" : "denied"}",
       subtitle: "Tap to open Notification settings",
-      onTap: () {
-        MethodChannelService.launchNotificationAccess();
-        setState(() {});
+      onTap: ()  {
+        MethodChannelService.callFunction(LAUNCH_NOTIFICATION_ACCESS).then((value) => setState(() {}));
       },
     );
   }
@@ -79,9 +78,8 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
           subtitle: status == "NO_NOTIFICATION" ? "Tap to Refresh": "Tap to restart the background process",
           onTap: () async {
             if(status != "NO_NOTIFICATION") {
-              await MethodChannelService.startForegroundProcess();
+              MethodChannelService.callFunction(RESTART_MUSIC_LISTENER_SERVICE).then((value) => setState(() {}));
             }
-            setState(() {});
           },
         ));
   }
@@ -101,8 +99,8 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
   }
 
   Future<void> initVariables() async {
-    notificationPermissionGranted = await MethodChannelService.isNotificationPermissionGranted();
-    status = await MethodChannelService.getMusicListenerServiceStatus();
+    notificationPermissionGranted = (await MethodChannelService.callFunction(IS_NOTIFICATION_PERMISSION_GRANTED)).getDataAsBool();
+    status = (await MethodChannelService.callFunction(GET_MUSIC_LISTENER_SERVICE_STATUS)).getDataAsString();
     currentSong = await MethodChannelService.getCurrentSong();
   }
 }

@@ -16,7 +16,7 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: MethodChannelService.getIntegrations(),
+    return FutureBuilder(future: MethodChannelService.callFunction(GET_INTEGRATIONS),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
@@ -27,10 +27,10 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                 .textTheme
                 .bodyLarge));
           }
+          List<String> integrations = snapshot.data!.getDataAsString().split(";");
           return SettingsScreen(
             title: "Integration",
-            children: snapshot.data!.map((e) =>
-                _wrapFuture(_addIntegration(e, context))).toList(),
+            children: integrations.map((e) => _wrapFuture(_addIntegration(e, context))).toList(),
           );
         });
   }
@@ -45,9 +45,9 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
   }
 
   Future<Widget> _addIntegration(String s,BuildContext context) async{
-    var fieldData = await MethodChannelService.getRequiredFieldsFor(s);
-    var isLoggedIn = await MethodChannelService.isLoggedInFor(s);
-    var cachedSongs = await MethodChannelService.cachedSongsFor(s);
+    var fieldData = (await MethodChannelService.callFunction(GET_REQUIRED_FIELDS_FOR(s)));
+    var isLoggedIn = (await MethodChannelService.callFunction(IS_LOGGED_IN_FOR(s))).getDataAsBool();
+    var cachedSongs = (await MethodChannelService.callFunction(GET_CACHED_SONGS_FOR(s))).getDataAsInt();
     if(fieldData.hasError()) {
       return SimpleTextSettingsTile(title: "Could not create $s",subtitle: fieldData.error);
     }
@@ -65,8 +65,8 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
               SimpleTrailingSettingsTile(
                 title: isLoggedIn ? "Logout from $s" : "Login to $s",
                 subtitle: isLoggedIn ? "Cached Songs: $cachedSongs" : "",
-                trailing: IconButton(icon: const Icon(Icons.upload),onPressed: () async{
-                  var data = await MethodChannelService.uploadCachedSongsFor(s);
+                trailing: IconButton(icon: const Icon(Icons.upload),onPressed: () async {
+                  var data = await MethodChannelService.callFunction(UPLOAD_CACHED_SONGS_FOR(s));
                   WidgetUtil.showToast(data.getDataAsString());
                   setState(() {});
                 }),
@@ -78,7 +78,7 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                             LoginWidget(fields, s, onLogin: (p0) async {
                               var result = await MethodChannelService.loginFor(s,
                                   p0);
-                              if (result) {
+                              if (result.getDataAsBool()) {
                                 WidgetUtil.showToast("Successfully logged in to $s");
                               } else {
                                 WidgetUtil.showToast("Could not login to $s");
@@ -86,7 +86,7 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                               setState(() {});
                             }));
                   }else {
-                    await MethodChannelService.logoutFor(s);
+                    await MethodChannelService.callFunction(LOGOUT_FOR(s));
                     WidgetUtil.showToast("Successfully logged out from $s");
                     setState(() {});
                   }

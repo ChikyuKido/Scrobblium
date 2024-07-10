@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:scrobblium/dao/method_channel_data.dart';
@@ -9,11 +7,34 @@ import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/messages/proto/song_datam.pb.dart';
 import 'package:scrobblium/util/widget_util.dart';
 
-class MethodChannelMethod {
+// method_channel_methods.dart
+const MAKE_WAL_CHECKPOINT = "makeWALCheckpoint";
+const SET_MUSIC_PACKAGE = "setMusicPackage";
+const GET_SONG_LIST = "getSongList";
+const GET_CURRENT_SONG = "getCurrentSong";
+const LAUNCH_NOTIFICATION_ACCESS = "launchNotificationAccess";
+const IS_NOTIFICATION_PERMISSION_GRANTED = "isNotificationPermissionGranted";
+const GET_MUSIC_LISTENER_SERVICE_STATUS = "getMusicListenerServiceStatus";
+const RESTART_MUSIC_LISTENER_SERVICE = "restartMusicListenerService";
+const EXPORT_DATABASE = "exportDatabase";
+const IMPORT_DATABASE = "importDatabase";
+const DELETE_ENTRY = "deleteEntry";
+const BACKUP_DATABASE_PICKER = "backupDatabasePicker";
+const GET_BACKUP_DATABASE_PATH = "getBackupDatabasePath";
+const BACKUP_DATABASE_NOW = "backupDatabaseNow";
+const GET_INTEGRATIONS = "getIntegrations";
+const EXPORT_MALOJA = "exportMaloja";
 
-}
+String GET_REQUIRED_FIELDS_FOR(String integration) => "getRequiredFieldsFor$integration";
+String LOGIN_FOR(String integration) => "loginFor$integration";
+String IS_LOGGED_IN_FOR(String integration) => "isLoggedInFor$integration";
+String GET_CACHED_SONGS_FOR(String integration) => "getCachedSongsFor$integration";
+String LOGOUT_FOR(String integration) => "logoutFor$integration";
+String UPLOAD_CACHED_SONGS_FOR(String integration) => "uploadCachedSongsFor$integration";
+
 
 class MethodChannelService {
+
   static final log = Logger("MethodChannelService");
   static const platform = MethodChannel('MusicListener');
   static Map<int,Completer> futures = {};
@@ -40,14 +61,10 @@ class MethodChannelService {
   static Future<void> _showToast(String text) async {
     WidgetUtil.showToast(text);
   }
-  
-  static Future<MethodChannelData> _callFunction(String function,[dynamic arguments]) async {
-    final Map<String, dynamic> result = Map<String, dynamic>.from(await platform.invokeMethod(function,arguments));
-    return MethodChannelData.fromMap(result);
-  }
-  static Future<MethodChannelData> _callFunctionn(String function,[dynamic arguments]) async {
+
+  static Future<MethodChannelData> callFunction(String function,[Map<String,dynamic>? arguments]) async {
     Completer<MethodChannelData> completer = Completer<MethodChannelData>();
-    if (arguments is! Map<String, dynamic>) {
+    if (arguments == null) {
       arguments = {"callbackId" : futureId};
     }else {
       arguments["callbackId"] = futureId;
@@ -57,17 +74,12 @@ class MethodChannelService {
     return completer.future;
   }
 
-
-  static Future<MethodChannelData> makeWALCheckpoint() async {
-    return await _callFunction("makeWALCheckpoint");
-  }
   static Future<MethodChannelData> setMusicPackage(String package) async {
-    return await _callFunction("setMusicPackage",{"package":package});
+    return callFunction(SET_MUSIC_PACKAGE,{"package":package});
   }
 
   static Future<List<SongData>> getSongData() async {
-    var data = await _callFunction("list");
-    data.showErrorAsToastIfAvailable();
+    var data = await callFunction(GET_SONG_LIST);
     if(data.hasError()) return List.empty();
     SongDataListM songDataListM = SongDataListM.fromBuffer(data.data??List.empty());
 
@@ -89,7 +101,7 @@ class MethodChannelService {
   }
 
   static Future<SongData?> getCurrentSong() async {
-    var data = await _callFunction("currentSong");
+    var data = await callFunction(GET_CURRENT_SONG);
     if(data.hasError()) return null;
 
     SongDataM value = SongDataM.fromBuffer(data.data??List.empty());
@@ -105,89 +117,17 @@ class MethodChannelService {
         timeListened: value.timeListened);
   }
 
-  static Future<MethodChannelData> launchNotificationAccess() async {
-    return await _callFunction("launchNotificationAccess");
+  static Future<MethodChannelData> deleteEntry(int id) {
+    return callFunction(DELETE_ENTRY,{"id":"$id"});
   }
 
-  static Future<bool> isNotificationPermissionGranted() async {
-    var data = await _callFunction("isNotificationGranted");
-    data.showErrorAsToastIfAvailable();
-    if(data.hasError()) return false;
-    return data.data?.first == 1;
-  }
-
-  static Future<String> getMusicListenerServiceStatus() async {
-    var data = await _callFunction("getMusicListenerServiceStatus");
-    if(data.hasError()) return data.error??"";
-    return String.fromCharCodes(data.data??List.empty());
-  }
-
-  static Future<MethodChannelData> startForegroundProcess() async {
-    return await _callFunction("restartMusicListener");
-  }
-  static exportDatabase() async {
-    var data = await _callFunction("exportDatabase");
-    data.showErrorAsToastIfAvailable();
-  }
-
-  static importDatabase() async {
-    var data = await _callFunction("importDatabase");
-    data.showErrorAsToastIfAvailable();
-  }
-  static deleteEntry(int id) async {
-    var data = await _callFunction("deleteEntry",{"id":"$id"});
-    data.showErrorAsToastIfAvailable();
-  }
-
-  static backupDatabasePathPicker() async {
-    var data = await _callFunction("backupDatabasePicker");
-    data.showErrorAsToastIfAvailable();
-  }
   static Future<String> getBackupDatabasePath() async {
-    var data = await _callFunction("getBackupDatabasePath");
+    var data = await callFunction(GET_BACKUP_DATABASE_PATH);
     if(data.hasError()) return data.error??"";
     return String.fromCharCodes(data.data??List.empty());
   }
-  static Future<MethodChannelData> backupDatabaseNow() async {
-    return await _callFunction("backupDatabaseNow");
-  }
 
-  static Future<MethodChannelData> getRequiredFieldsFor(String s) async{
-    return await _callFunction("getRequiredFieldsFor$s");
+  static Future<MethodChannelData> loginFor(String s, Map<String, String> p0) {
+    return callFunction(LOGIN_FOR(s),{"fields":jsonEncode(p0)});
   }
-
-  static Future<bool> loginFor(String s, Map<String, String> p0) async{
-    var data = await _callFunction("loginFor$s",{"fields":jsonEncode(p0)});
-    if(data.hasError()) return false;
-    return data.data?.first == 1;
-  }
-  static Future<bool> isLoggedInFor(String s) async{
-    var data = await _callFunction("isLoggedInFor$s");
-    if(data.hasError()) return false;
-    return data.data?.first == 1;
-  }
-  static Future<int> cachedSongsFor(String s) async{
-    var data = await _callFunction("cachedSongsFor$s");
-    if(data.hasError()) return 0;
-    int result = data.data!.fold(0, (prev, elem) => (prev << 8) | elem);
-    return result;
-  }
-  static Future<void> logoutFor(String s) async{
-    await _callFunction("logoutFor$s");
-  }
-  static Future<MethodChannelData> uploadCachedSongsFor(String s) {
-    return _callFunctionn("uploadCachedSongsFor$s");
-  }
-  static Future<List<String>> getIntegrations() async {
-    var data = await _callFunction("availableIntegrations");
-    if(data.hasError()) {
-      return List.empty();
-    }
-    return String.fromCharCodes(data.data??List.empty()).split(";");
-  }
-
-  static void exportMaloja() {
-    _callFunction("exportMaloja");
-  }
-
 }

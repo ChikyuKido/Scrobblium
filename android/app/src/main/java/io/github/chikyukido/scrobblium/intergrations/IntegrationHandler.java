@@ -17,7 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
-import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 
@@ -39,42 +38,37 @@ public class IntegrationHandler {
         alreadyInitialized = true;
     }
 
-    public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods,HashMap<String, MethodChannelUtil.MethodInterfac> methods2) {
+    public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods) {
         for (Integration integration : integrations) {
-            methods.put("loginFor"+integration.getName(),(call, result) -> {
-                MethodChannelData methodChannelData = new MethodChannelData();
+            methods.put("loginFor"+integration.getName(),(data, call) -> {
                 String jsonContent = call.argument("fields");
                 JsonObject json = gson.fromJson(jsonContent,JsonObject.class);
                 HashMap<String,String> fields = new HashMap<>();
                 for (Map.Entry<String, JsonElement> stringJsonElementEntry : json.entrySet()) {
                     fields.put(stringJsonElementEntry.getKey(),stringJsonElementEntry.getValue().getAsString());
                 }
-                methodChannelData.setData(new byte[]{(byte)(integration.signIn(fields)?1:0)});
-                result.success(methodChannelData.toMap());
+                data.setData(new byte[]{(byte)(integration.signIn(fields)?1:0)});
+                data.reply();
             });
-            methods.put("logoutFor"+integration.getName(),(call, result) -> {
-                MethodChannelData methodChannelData = new MethodChannelData();
+            methods.put("logoutFor"+integration.getName(),(data, call) -> {
                 integration.signOut();
-                result.success(methodChannelData.toMap());
+                data.reply();
             });
-            methods.put("isLoggedInFor"+integration.getName(),(call, result) -> {
-                MethodChannelData methodChannelData = new MethodChannelData();
-                methodChannelData.setData(new byte[]{(byte)(integration.isLoggedIn()?1:0)});
-                result.success(methodChannelData.toMap());
+            methods.put("isLoggedInFor"+integration.getName(),(data, call) -> {
+                data.setData(new byte[]{(byte)(integration.isLoggedIn()?1:0)}); //TODO: create a setBool function
+                data.reply();
             });
-            methods.put("cachedSongsFor"+integration.getName(),(call, result) -> {
-                MethodChannelData methodChannelData = new MethodChannelData();
+            methods.put("getCachedSongsFor"+integration.getName(),(data, call) -> {
                 ByteBuffer byteBuffer = ByteBuffer.allocate(4);
                 byteBuffer.putInt(integration.getCachedSongsSize());
-                methodChannelData.setData(byteBuffer.array());
-                result.success(methodChannelData.toMap());
+                data.setData(byteBuffer.array());
+                data.reply();
             });
-            methods.put("getRequiredFieldsFor"+integration.getName(),(call, result) -> {
-                MethodChannelData methodChannelData = new MethodChannelData();
-                methodChannelData.setData(String.join(";",integration.requiredFields()).getBytes());
-                result.success(methodChannelData.toMap());
+            methods.put("getRequiredFieldsFor"+integration.getName(),(data, call) -> {
+                data.setData(String.join(";",integration.requiredFields()).getBytes());
+                data.reply();
             });
-           methods2.put("uploadCachedSongsFor"+integration.getName(),(methodChannelData) -> {
+           methods.put("uploadCachedSongsFor"+integration.getName(),(methodChannelData,call) -> {
                 executor.execute(() -> {
                     integration.uploadCachedSongs();
                     methodChannelData.setData(("Uploaded songs to "+integration.getName()).getBytes());
@@ -82,10 +76,9 @@ public class IntegrationHandler {
                 });
             });
         }
-        methods.put("availableIntegrations",(call, result) -> {
-            MethodChannelData methodChannelData = new MethodChannelData();
-            methodChannelData.setData(integrations.stream().map(Integration::getName).collect(Collectors.joining(";")).getBytes());
-            result.success(methodChannelData.toMap());
+        methods.put("getIntegrations",(data, call) -> {
+            data.setData(integrations.stream().map(Integration::getName).collect(Collectors.joining(";")).getBytes());
+            data.reply();
         });
     }
     public void handleUpload(SongData songData) {

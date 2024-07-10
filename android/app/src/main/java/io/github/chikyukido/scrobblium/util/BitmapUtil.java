@@ -73,7 +73,7 @@ public class BitmapUtil {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
-            scaledBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             return true;
         } catch (IOException e) {

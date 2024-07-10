@@ -50,8 +50,6 @@ public class MalojaIntegration extends Integration {
             baseURL = "http://" + baseURL;
         }
 
-        json.add("url", new JsonPrimitive(baseURL));
-        json.add("api_key", new JsonPrimitive(fields.get("api_key")));
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("key", new JsonPrimitive(fields.get("api_key")));
         String url = baseURL + "/api/newscrobble";
@@ -87,7 +85,11 @@ public class MalojaIntegration extends Integration {
             throw new RuntimeException(e);
         }
 
-        if(result.get()) saveJson();
+        if(result.get()) {
+            json.add("url", new JsonPrimitive(baseURL));
+            json.add("api_key", new JsonPrimitive(fields.get("api_key")));
+            saveJson();
+        }
         return result.get();
     }
 

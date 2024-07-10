@@ -13,7 +13,7 @@ class ExportsettingsPage extends StatelessWidget {
         SimpleSettingsTile(
           title: "Export Maloja",
           onTap: () {
-             MethodChannelService.exportMaloja();
+             MethodChannelService.callFunction(EXPORT_MALOJA);
           })
       ],
     );

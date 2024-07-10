@@ -258,13 +258,14 @@ public class MusicListenerService extends NotificationListenerService {
     }
 
     private MediaController getMediaControllerFromNotification(StatusBarNotification sbn) {
+        if(sbn.getNotification() == null) return null;
         MediaSession.Token mediaSessionToken = sbn.getNotification().extras.getParcelable("android.mediaSession");
         if (mediaSessionToken == null) return null;
         return new MediaController(getApplicationContext(), mediaSessionToken);
     }
 
     private void saveArt() {
-        String filename = currentSong.getIdentifier() + ".png";
+        String filename = currentSong.getIdentifier() + ".jpeg";
         MediaMetadata metadata = currentMediaController.getMetadata();
         if (metadata == null) return;
         Bitmap bitmap = metadata.getBitmap(MediaMetadata.METADATA_KEY_ART);

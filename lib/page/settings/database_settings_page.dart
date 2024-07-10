@@ -33,7 +33,7 @@ class DatabaseSettingsPage extends StatelessWidget {
     return SimpleSettingsTile(
         title: "Export Database",
         onTap: () async {
-          await MethodChannelService.exportDatabase();
+          await MethodChannelService.callFunction(EXPORT_DATABASE);
           WidgetUtil.showToast("Successfully exported Database");
         });
   }
@@ -42,7 +42,7 @@ class DatabaseSettingsPage extends StatelessWidget {
     return SimpleSettingsTile(
         title: "Import Database",
         onTap: () async {
-          await MethodChannelService.importDatabase();
+          await MethodChannelService.callFunction(IMPORT_DATABASE);
         });
   }
 
@@ -61,15 +61,15 @@ class DatabaseSettingsPage extends StatelessWidget {
     return SimpleSettingsTile(
       title: "Backup path",
       subtitle: "Path: ${path.isEmpty ? "Non" : path}",
-      onTap: () => MethodChannelService.backupDatabasePathPicker(),
+      onTap: () => MethodChannelService.callFunction(BACKUP_DATABASE_PICKER),
     );
   }
 
   _buildMakeBackup() {
     return SimpleSettingsTile(
         title: "Create backup now",
-        onTap: () async{
-            var result = await MethodChannelService.backupDatabaseNow();
+        onTap: () async {
+            var result = await MethodChannelService.callFunction(BACKUP_DATABASE_NOW);
             result.showErrorAsToastIfAvailable();
             if(result.hasNotError()) {
               WidgetUtil.showToast("Successfully created backup now");

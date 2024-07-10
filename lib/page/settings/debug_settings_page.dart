@@ -20,7 +20,7 @@ class DebugSettingsPage extends StatelessWidget {
       settingKey: 'show-status-notification',
       defaultValue: false,
       onChange: (p0) {
-        Future.delayed(const Duration(seconds: 1)).then((value) => MethodChannelService.startForegroundProcess());
+        Future.delayed(const Duration(seconds: 1)).then((value) => MethodChannelService.callFunction(RESTART_MUSIC_LISTENER_SERVICE));
       },
     );
   }

@@ -16,6 +16,14 @@ class MethodChannelData {
   String getDataAsString() {
     return String.fromCharCodes(data??List.empty());
   }
+  int getDataAsInt() {
+    if(data == null) return 0;
+    return data!.fold(0, (prev, elem) => (prev << 8) | elem);
+  }
+  bool getDataAsBool() {
+    if(data == null) return false;
+    return data?.first == 1;
+  }
 
   void showErrorAsToastIfAvailable() {
     if(hasError()) {
@@ -36,4 +44,5 @@ class MethodChannelData {
         map['data']
     );
   }
+
 }
