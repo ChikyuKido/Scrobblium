@@ -53,6 +53,7 @@ dependencies:
     path: externel/anim_search_bar-2.0.3
   installed_apps:
     path: externel/installed_apps
+  logging: ^1.2.0
 
 dev_dependencies:
   flutter_test:

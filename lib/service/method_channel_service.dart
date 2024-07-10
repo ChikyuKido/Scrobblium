@@ -1,18 +1,38 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:scrobblium/dao/method_channel_data.dart';
 import 'package:scrobblium/dao/song_data.dart';
 import 'package:scrobblium/messages/proto/song_datam.pb.dart';
 import 'package:scrobblium/util/widget_util.dart';
 
+class MethodChannelMethod {
+
+}
+
 class MethodChannelService {
+  static final log = Logger("MethodChannelService");
   static const platform = MethodChannel('MusicListener');
+  static Map<int,Completer> futures = {};
+  static int futureId = 0;
   
   static init() {
     platform.setMethodCallHandler((call) async{
+      log.info("Executing following method: ${call.method}");
       if(call.method == "showToast") {
         await _showToast(call.arguments);
+      }else if(call.method == "reply") {
+        final Map<String, dynamic> resultMap = Map<String, dynamic>.from(call.arguments);
+        final int id = resultMap["callbackId"];
+        log.info("Reply from callback $id");
+        if(futures[id] == null) {
+          return;
+        }
+        futures[id]?.complete(MethodChannelData.fromMap(resultMap));
+        futures.remove(id);
       }
     });
   }
@@ -20,11 +40,21 @@ class MethodChannelService {
   static Future<void> _showToast(String text) async {
     WidgetUtil.showToast(text);
   }
-
   
   static Future<MethodChannelData> _callFunction(String function,[dynamic arguments]) async {
     final Map<String, dynamic> result = Map<String, dynamic>.from(await platform.invokeMethod(function,arguments));
     return MethodChannelData.fromMap(result);
+  }
+  static Future<MethodChannelData> _callFunctionn(String function,[dynamic arguments]) async {
+    Completer<MethodChannelData> completer = Completer<MethodChannelData>();
+    if (arguments is! Map<String, dynamic>) {
+      arguments = {"callbackId" : futureId};
+    }else {
+      arguments["callbackId"] = futureId;
+    }
+    platform.invokeMethod(function,arguments);
+    futures[futureId++] = completer;
+    return completer.future;
   }
 
 
@@ -145,8 +175,8 @@ class MethodChannelService {
   static Future<void> logoutFor(String s) async{
     await _callFunction("logoutFor$s");
   }
-  static Future<void> uploadCachedSongsFor(String s) async {
-    await _callFunction("uploadCachedSongsFor$s");
+  static Future<MethodChannelData> uploadCachedSongsFor(String s) {
+    return _callFunctionn("uploadCachedSongsFor$s");
   }
   static Future<List<String>> getIntegrations() async {
     var data = await _callFunction("availableIntegrations");

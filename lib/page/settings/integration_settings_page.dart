@@ -66,8 +66,8 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                 title: isLoggedIn ? "Logout from $s" : "Login to $s",
                 subtitle: isLoggedIn ? "Cached Songs: $cachedSongs" : "",
                 trailing: IconButton(icon: const Icon(Icons.upload),onPressed: () async{
-                  await MethodChannelService.uploadCachedSongsFor(s);
-                  WidgetUtil.showToast("Uploading cached songs");
+                  var data = await MethodChannelService.uploadCachedSongsFor(s);
+                  WidgetUtil.showToast(data.getDataAsString());
                   setState(() {});
                 }),
                 onTap: () async {

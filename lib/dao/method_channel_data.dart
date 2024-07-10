@@ -13,6 +13,10 @@ class MethodChannelData {
     return error == null;
   }
 
+  String getDataAsString() {
+    return String.fromCharCodes(data??List.empty());
+  }
+
   void showErrorAsToastIfAvailable() {
     if(hasError()) {
       WidgetUtil.showToast(error!);

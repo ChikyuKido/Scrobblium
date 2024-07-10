@@ -26,6 +26,7 @@ import java.util.Set;
 public class MethodChannelUtil {
 
     private static final HashMap<String, MethodInterface> methods = new HashMap<>();
+    private static final HashMap<String, MethodInterfac> methods2 = new HashMap<>();
     private static final String TAG = "MethodChannelUtil";
 
     private static MethodChannel methodChannel;
@@ -48,9 +49,16 @@ public class MethodChannelUtil {
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
         methods.put("restartMusicListener",restartMusicListener());
         methods.put("exportMaloja",exportMaloja(context));
-        IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods);
+        IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods,methods2);
 
         methodChannel.setMethodCallHandler((call, result) -> {
+            if (methods2.containsKey(call.method)) {
+                Log.i("MethodChannelUtil", "Execute following command: " + call.method);
+                MethodChannelData methodChannelData = new MethodChannelData(methodChannel);
+                methodChannelData.setCallbackId(call.argument("callbackId"));
+                new Thread(() -> methods2.get(call.method).run(methodChannelData)).start();
+                result.success("");
+            } else
             if (methods.containsKey(call.method)) {
                 Log.i("MethodChannelUtil", "Execute following command: " + call.method);
                 methods.get(call.method).run(call, result);
@@ -271,5 +279,8 @@ public class MethodChannelUtil {
 
     public interface MethodInterface {
         void run(MethodCall call, MethodChannel.Result result);
+    }
+    public interface MethodInterfac {
+        void run(MethodChannelData data);
     }
 }

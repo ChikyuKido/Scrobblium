@@ -28,6 +28,7 @@ public class MainActivity extends FlutterActivity {
         IntegrationHandler.getInstance().init(getApplicationContext());
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
 
+
     }
 
     @Override

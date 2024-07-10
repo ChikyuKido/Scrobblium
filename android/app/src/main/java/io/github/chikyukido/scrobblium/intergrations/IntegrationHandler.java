@@ -39,7 +39,7 @@ public class IntegrationHandler {
         alreadyInitialized = true;
     }
 
-    public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods) {
+    public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods,HashMap<String, MethodChannelUtil.MethodInterfac> methods2) {
         for (Integration integration : integrations) {
             methods.put("loginFor"+integration.getName(),(call, result) -> {
                 MethodChannelData methodChannelData = new MethodChannelData();
@@ -74,11 +74,12 @@ public class IntegrationHandler {
                 methodChannelData.setData(String.join(";",integration.requiredFields()).getBytes());
                 result.success(methodChannelData.toMap());
             });
-            methods.put("uploadCachedSongsFor"+integration.getName(),(call, result) -> {
+           methods2.put("uploadCachedSongsFor"+integration.getName(),(methodChannelData) -> {
                 executor.execute(() -> {
                     integration.uploadCachedSongs();
+                    methodChannelData.setData(("Uploaded songs to "+integration.getName()).getBytes());
+                    methodChannelData.reply();
                 });
-                result.success(new MethodChannelData().toMap());
             });
         }
         methods.put("availableIntegrations",(call, result) -> {
