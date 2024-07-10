@@ -1,6 +1,7 @@
 package io.github.chikyukido.scrobblium.intergrations;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -21,14 +22,21 @@ import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 
 public class IntegrationHandler {
+    private static final String TAG = "IntegrationHandler";
     private static IntegrationHandler INSTANCE;
     private final Gson gson = new Gson();
     private final List<Integration> integrations = new ArrayList<>();
-    ExecutorService executor = Executors.newFixedThreadPool(1);
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
+    private boolean alreadyInitialized = false;
 
     private IntegrationHandler() {}
     public void init(Context context) {
+        if(alreadyInitialized) {
+            Log.w(TAG, "init: IntegrationHandler is already initialized");
+            return;
+        }
         integrations.add(new MalojaIntegration(context));
+        alreadyInitialized = true;
     }
 
     public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods) {
