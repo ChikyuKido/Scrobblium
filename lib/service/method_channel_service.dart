@@ -24,6 +24,7 @@ const GET_BACKUP_DATABASE_PATH = "getBackupDatabasePath";
 const BACKUP_DATABASE_NOW = "backupDatabaseNow";
 const GET_INTEGRATIONS = "getIntegrations";
 const EXPORT_MALOJA = "exportMaloja";
+const CHECK_CONDITIONAL_UPLOAD = "checkConditionalUpload";
 
 String GET_REQUIRED_FIELDS_FOR(String integration) => "getRequiredFieldsFor$integration";
 String LOGIN_FOR(String integration) => "loginFor$integration";

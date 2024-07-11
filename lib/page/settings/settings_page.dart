@@ -4,7 +4,7 @@ import 'package:scrobblium/page/settings/export_settings_page.dart';
 import 'package:scrobblium/page/settings/appearance_settings_page.dart';
 import 'package:scrobblium/page/settings/database_settings_page.dart';
 import 'package:scrobblium/page/settings/debug_settings_page.dart';
-import 'package:scrobblium/page/settings/integration_settings_page.dart';
+import 'package:scrobblium/page/settings/integration/integration_settings_page.dart';
 import 'package:scrobblium/page/settings/stats_settings_page.dart';
 import 'package:scrobblium/page/settings/tracking_settings_page.dart';
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:scrobblium/page/settings/integration/integration_conditional_upload_page.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/util/widget_util.dart';
 import 'package:scrobblium/widgets/login_widget.dart';
@@ -27,10 +28,15 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                 .textTheme
                 .bodyLarge));
           }
-          List<String> integrations = snapshot.data!.getDataAsString().split(";");
+
+          List<Widget> widgets = snapshot.data!.getDataAsString().split(";")
+              .map((e) => _wrapFuture(_addIntegration(e, context))).toList();
+          widgets.insert(0, SettingsGroup(title: "Settings", children: [
+              SimpleSettingsTile(title: "Conditional upload",child: const IntegrationConditionalUploadPage())
+          ]));
           return SettingsScreen(
             title: "Integration",
-            children: integrations.map((e) => _wrapFuture(_addIntegration(e, context))).toList(),
+            children: widgets,
           );
         });
   }

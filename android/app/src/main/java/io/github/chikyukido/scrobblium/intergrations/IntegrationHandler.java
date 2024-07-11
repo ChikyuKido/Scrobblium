@@ -18,7 +18,10 @@ import java.util.stream.Collectors;
 
 
 import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.util.BatteryUtils;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
+import io.github.chikyukido.scrobblium.util.NetworkUtils;
 
 public class IntegrationHandler {
     private static final String TAG = "IntegrationHandler";
@@ -38,7 +41,7 @@ public class IntegrationHandler {
         alreadyInitialized = true;
     }
 
-    public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods) {
+    public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods,Context context) {
         for (Integration integration : integrations) {
             methods.put("loginFor"+integration.getName(),(data, call) -> {
                 String jsonContent = call.argument("fields");
@@ -80,22 +83,72 @@ public class IntegrationHandler {
             data.setData(integrations.stream().map(Integration::getName).collect(Collectors.joining(";")).getBytes());
             data.reply();
         });
+        methods.put("checkConditionalUpload",(data, call) -> {
+            String failure = checkUploadConditions(context);
+            data.setDataAsString(failure == null ? "All conditions are met" : failure);
+            data.reply();
+        });
+
     }
-    public void handleUpload(SongData songData) {
+    public void handleUpload(SongData songData,Context context) {
         if((double) songData.getTimeListened() /((double) songData.getMaxProgress() /1000) < 0.5 && songData.getTimeListened() < 240) {
             return;
         }
         executor.execute(() -> {
             for (Integration integration : integrations) {
                 if(integration.isActive()) {
-                    integration.uploadTrack(songData);
+                    boolean shouldUpload = !ConfigUtil.getBoolean("flutter.enable-conditional-upload",false)
+                                    && NetworkUtils.isConnected(context);
+                    integration.uploadTrack(songData,shouldUpload);
                 }
             }
         });
+    }
+    public void handleConditionalUpload(Context context) {
+        String failureReason = checkUploadConditions(context);
+        if (failureReason != null) {
+            Log.i(TAG, "handleConditionalUpload: " + failureReason);
+            return;
+        }
+
+        Log.i(TAG, "handleConditionalUpload: Conditional upload meets all conditions, start uploading");
+        executor.execute(() -> {
+            for (Integration integration : integrations) {
+                if (integration.isActive()) {
+                    integration.uploadCachedSongs();
+                }
+            }
+        });
+    }
+
+    private String checkUploadConditions(Context context) {
+        if (!NetworkUtils.isConnected(context)) {
+            return "Don't attempt to upload cached songs because there is no internet connection";
+        }
+
+        String networkMode = ConfigUtil.getString("flutter.condition-network-mode", "both");
+        boolean batteryChargingCondition = ConfigUtil.getBoolean("flutter.condition-battery-charging", false);
+
+        if (networkMode.equals("wlan")) {
+            if (!NetworkUtils.isUsingWIFI(context)) {
+                return "Conditional upload failed to meet network condition. Wifi is not on";
+            }
+        } else if (networkMode.equals("mobile")) {
+            if (!NetworkUtils.isUsingMobile(context)) {
+                return "Conditional upload failed to meet network condition. Mobile data is not on";
+            }
+        }
+        if (batteryChargingCondition) {
+            if (!BatteryUtils.isBatteryCharging(context)) {
+                return "Conditional upload failed to meet battery condition. Battery is not charging";
+            }
+        }
+        return null;
     }
 
     public static IntegrationHandler getInstance() {
         if(INSTANCE == null) INSTANCE = new IntegrationHandler();
         return INSTANCE;
     }
+
 }

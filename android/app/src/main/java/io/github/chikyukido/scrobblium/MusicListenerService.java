@@ -18,6 +18,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.room.Room;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.database.SongDatabase;
+import io.github.chikyukido.scrobblium.intergrations.Integration;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.BitmapUtil;
@@ -45,6 +46,7 @@ public class MusicListenerService extends NotificationListenerService {
     private final Executor executor = Executors.newSingleThreadExecutor();
 
     private int lastBackupTime;
+    private int lastConditionalUploadTime;
     private String musicPackageName = "";
 
     private boolean showNotificationStatus = false;
@@ -64,9 +66,11 @@ public class MusicListenerService extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
+        ConfigUtil.init(getApplicationContext());
         INSTANCE = this;
         //set it to zero so every time it starts it also makes a backup
         lastBackupTime = 0;
+        lastConditionalUploadTime = 0;
         connectToDatabase();
         startForegroundService();
 
@@ -106,13 +110,13 @@ public class MusicListenerService extends NotificationListenerService {
     public void startForegroundService() {
         Log.i(TAG, "startForegroundService: Start foreground service");
         stopTimer();
-        musicPackageName = ConfigUtil.getString(getBaseContext(),"flutter.music-app-package","");
+        musicPackageName = ConfigUtil.getString("flutter.music-app-package","");
         if (musicPackageName.isEmpty()) {
             Log.i(TAG, "onCreate: Do not start MusicListener service cause there is no MusicPackage");
             setMusicListenerStatus(MusicListenerServiceStatus.NO_PACKAGE);
             return;
         }
-        showNotificationStatus = ConfigUtil.getBoolean(getBaseContext(),"flutter.show-status-notification",false);
+        showNotificationStatus = ConfigUtil.getBoolean("flutter.show-status-notification",false);
         if (!isPermissionGranted()) {
             setMusicListenerStatus(MusicListenerServiceStatus.NO_PERMISSION);
             Log.w(TAG, "startForegroundService: Permission not granted. Can't start the service");
@@ -148,11 +152,18 @@ public class MusicListenerService extends NotificationListenerService {
             public void run() {
                 incrementTimeListened();
                 if(lastBackupTime <= 0) {
-                    if(ConfigUtil.getBoolean(getBaseContext(),"flutter.backup-database",false)) {
+                    if(ConfigUtil.getBoolean("flutter.backup-database",false)) {
                         BackupDatabaseUtil.backupDatabase(getBaseContext());
                     }
                     lastBackupTime = 60*60;
                 }
+                if(lastConditionalUploadTime <= 0) {
+                    if(ConfigUtil.getBoolean("flutter.enable-conditional-upload",false)) {
+                        IntegrationHandler.getInstance().handleConditionalUpload(getApplicationContext());
+                    }
+                    lastConditionalUploadTime = ConfigUtil.getInt("flutter.update-rate",60)*60;
+                }
+                lastConditionalUploadTime--;
                 lastBackupTime--;
             }
         }, 5000, 1000);
@@ -240,7 +251,7 @@ public class MusicListenerService extends NotificationListenerService {
                     connectToDatabase();
                 }
                 database.musicTrackDao().insertTrack(oldSong);
-                IntegrationHandler.getInstance().handleUpload(oldSong);
+                IntegrationHandler.getInstance().handleUpload(oldSong,getApplicationContext());
                 saveArt();
                 if(showNotificationStatus) notificationManager.notify(NOTIFICATION_ID,getNotification());
             });

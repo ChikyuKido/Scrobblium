@@ -11,8 +11,11 @@ import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
+import io.github.chikyukido.scrobblium.util.BatteryUtils;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
 import io.github.chikyukido.scrobblium.util.ExportUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
+import io.github.chikyukido.scrobblium.util.NetworkUtils;
 
 import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.*;
 import static io.github.chikyukido.scrobblium.util.ExportUtil.REQUEST_CODE_PICK_EXPORT_MALOJA;

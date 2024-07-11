@@ -15,33 +15,37 @@ import java.util.Optional;
 
 public class ConfigUtil {
     private static final String TAG = "ConfigUtil";
-    private static final String SHARED_PREFS_PATH = "shared_prefs/FlutterSharedPreferences.xml";
+    private static Path SHARED_PREFS_PATH;
+
+    public static void init(Context context) {
+        SHARED_PREFS_PATH = context.getDataDir().toPath().resolve("shared_prefs/FlutterSharedPreferences.xml");
+        Log.i(TAG, "init: "+SHARED_PREFS_PATH.toString());
+    }
 
     @NonNull
-    public static String getString(Context context, String key,String defaultValue) {
-        return getValue(context,key).orElse(defaultValue);
+    public static String getString( String key,String defaultValue) {
+        return getValue(key).orElse(defaultValue);
     }
 
-    public static boolean getBoolean(Context context, String key,boolean defaultValue) {
-        return Boolean.parseBoolean(getValue(context, key).orElse(String.valueOf(defaultValue)));
+    public static boolean getBoolean(String key,boolean defaultValue) {
+        return Boolean.parseBoolean(getValue(key).orElse(String.valueOf(defaultValue)));
 
     }
 
-    public static int getInt(Context context, String key,int defaultValue) {
+    public static int getInt(String key,int defaultValue) {
         try {
-            return Integer.parseInt(getValue(context, key).orElse(String.valueOf(defaultValue)));
+            return Integer.parseInt(getValue( key).orElse(String.valueOf(defaultValue)));
         }catch (NumberFormatException e) {
             Log.e(TAG, "getInt: could not convert key to a integer. Return default value", e);
             return defaultValue;
         }
     }
 
-    private static Optional<String> getValue(Context context, String key) {
+    private static Optional<String> getValue(String key) {
         try {
             XmlPullParserFactory xmlFactoryObject = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = xmlFactoryObject.newPullParser();
-            Path file = context.getDataDir().toPath().resolve(SHARED_PREFS_PATH);
-            xmlPullParser.setInput(new FileInputStream(file.toFile()), null);
+            xmlPullParser.setInput(new FileInputStream(SHARED_PREFS_PATH.toFile()), null);
             int eventType = xmlPullParser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG && xmlPullParser.getName() != null

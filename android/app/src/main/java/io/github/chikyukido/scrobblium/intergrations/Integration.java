@@ -91,10 +91,10 @@ public abstract class Integration {
         saveJson();
     }
 
-    public void uploadTrack(SongData songData) {
+    public void uploadTrack(SongData songData,boolean shouldUpload) {
         cachedSongs.add(songData);
         //if no network there is no reason to attempt a upload
-        if(NetworkUtils.isConnected(context)) {
+        if(shouldUpload) {
             cachedSongs = uploadTracks(cachedSongs);
         }
         json.add("cached_songs", new JsonArray());
@@ -106,7 +106,7 @@ public abstract class Integration {
     }
     public boolean isActive() {
         if(!isLoggedIn()) return false;
-        return ConfigUtil.getBoolean(context,"flutter.activate-"+getName(),false);
+        return ConfigUtil.getBoolean("flutter.activate-"+getName(),false);
     }
 
     public JsonObject getJson() {

@@ -45,7 +45,7 @@ public class MethodChannelUtil {
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
         methods.put("restartMusicListenerService",restartMusicListener());
         methods.put("exportMaloja",exportMaloja(context));
-        IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods);
+        IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods,context);
 
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
