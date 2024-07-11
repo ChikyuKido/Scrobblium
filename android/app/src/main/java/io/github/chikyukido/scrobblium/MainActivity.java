@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
+import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
 import io.github.chikyukido.scrobblium.util.ExportUtil;
@@ -16,19 +17,20 @@ import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.*;
 import static io.github.chikyukido.scrobblium.util.ExportUtil.REQUEST_CODE_PICK_EXPORT_MALOJA;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "MusicListener";
+    public static List<MethodChannelData> resumeCallbacks = new ArrayList<>();
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
         IntegrationHandler.getInstance().init(getApplicationContext());
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
-
-
     }
 
     @Override
@@ -70,8 +72,13 @@ public class MainActivity extends FlutterActivity {
                                 + success[0].getTime()+"ms\n Exported:"
                                 + success[0].getAmount());
                     }
-
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumeCallbacks.forEach(MethodChannelData::reply);
     }
 }

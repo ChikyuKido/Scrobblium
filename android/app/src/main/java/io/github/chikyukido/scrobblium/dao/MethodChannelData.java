@@ -4,6 +4,8 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Handler;
@@ -43,6 +45,16 @@ public class MethodChannelData {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public void setDataAsString(String s) {
+        this.data = s.getBytes();
+    }
+    public void setDataAsInt(int i) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+        byteBuffer.putInt(i);
+        this.data = byteBuffer.array();
+
     }
 
     public int getCallbackId() {

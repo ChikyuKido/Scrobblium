@@ -9,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
+import io.github.chikyukido.scrobblium.MainActivity;
 import io.github.chikyukido.scrobblium.MusicListenerService;
 import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
@@ -48,7 +49,7 @@ public class MethodChannelUtil {
 
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
-                Log.i("MethodChannelUtil", "Execute following command: " + call.method);
+                Log.i(TAG, "Execute following command: " + call.method);
                 MethodChannelData methodChannelData = new MethodChannelData(methodChannel);
                 methodChannelData.setCallbackId(call.argument("callbackId"));
                 new Thread(() -> methods.get(call.method).run(methodChannelData,call)).start();
@@ -169,6 +170,7 @@ public class MethodChannelUtil {
             }
             String argument = call.argument("package");
             MusicListenerService.getInstance().setMusicPackage(argument);
+            data.setDataAsString("Successfully set music package to "+argument);
             data.reply();
         };
     }
@@ -185,6 +187,7 @@ public class MethodChannelUtil {
             }
             MusicListenerService.getInstance().connectToDatabase();
             Log.i("MethodChannelUtil", "makeWALCheckpoint: checkpoint for database");
+            data.setDataAsString("Successfully created a wal checkpoint");
             data.reply();
         };
     }
@@ -192,14 +195,15 @@ public class MethodChannelUtil {
     private static MethodInterface launchNotificationAccess(Context context) {
         return (data, call) -> {
             try {
+                MainActivity.resumeCallbacks.add(data);
                 Intent intent = new Intent();
                 intent.setAction("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }catch (ActivityNotFoundException e) {
                 data.setError(e.getMessage());
+                data.reply();
             }
-            data.reply();
         };
     }
 
