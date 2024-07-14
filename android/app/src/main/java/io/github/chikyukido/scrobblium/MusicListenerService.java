@@ -195,7 +195,7 @@ public class MusicListenerService extends NotificationListenerService {
                     .findFirst().orElse(null);
         } catch (SecurityException e) {
             Log.w(TAG, "getMusicNotification: Could not get Music-notification because a security issue." +
-                    " This shouldn't be a issue this occurs on the app startup");
+                    " This shouldn't be a issue if this occurs on the app startup");
             return null;
         }
     }
@@ -325,16 +325,6 @@ public class MusicListenerService extends NotificationListenerService {
     private boolean isPermissionGranted() {
         Set<String> enabledListenerPackages = NotificationManagerCompat.getEnabledListenerPackages(getBaseContext());
         return enabledListenerPackages.contains(getBaseContext().getPackageName());
-    }
-
-    private boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public enum MusicListenerServiceStatus {

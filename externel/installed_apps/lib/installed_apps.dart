@@ -3,7 +3,7 @@ import 'package:installed_apps/app_info.dart';
 
 /// A utility class for interacting with installed apps on the device.
 class InstalledApps {
-  static const MethodChannel _channel = const MethodChannel('installed_apps');
+  static const MethodChannel _channel = MethodChannel('installed_apps');
 
   /// Retrieves a list of installed apps on the device.
   ///

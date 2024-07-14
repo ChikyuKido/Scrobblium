@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -60,6 +61,7 @@ class AnimSearchBar extends StatefulWidget {
 
 class _AnimSearchBarState extends State<AnimSearchBar>
     with SingleTickerProviderStateMixin {
+  static Logger log = Logger("_AnimeSearchBarState");
   late AnimationController _con;
   FocusNode focusNode = FocusNode();
   String textFieldValue = '';
@@ -140,7 +142,7 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                           });
                           if(widget.onSearchClose != null) widget.onSearchClose!();
                         } catch (e) {
-                          print(e);
+                          log.warning(e);
                         }
                       },
                       child: widget.suffixIcon ?? Icon(

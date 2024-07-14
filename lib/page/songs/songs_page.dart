@@ -67,6 +67,7 @@ class _SongsPageState extends State<SongsPage> {
               Expanded(
                 child: ListView.builder(
                   itemCount: _filteredTiles.length,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
                     return _filteredTiles[index];
                   },

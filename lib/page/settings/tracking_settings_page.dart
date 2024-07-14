@@ -79,9 +79,12 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
           onTap: () async {
             if(status != "NO_NOTIFICATION") {
               MethodChannelService.callFunction(RESTART_MUSIC_LISTENER_SERVICE).then((value) => setState(() {}));
+            }else {
+              setState(() {});
             }
           },
-        ));
+        )
+    );
   }
 
   _buildValidationInfo() {

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:scrobblium/page/settings/settings_page.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
-import 'package:scrobblium/util/settings_util.dart';
 
 class IntegrationConditionalUploadPage extends StatefulWidget {
   const IntegrationConditionalUploadPage({super.key});

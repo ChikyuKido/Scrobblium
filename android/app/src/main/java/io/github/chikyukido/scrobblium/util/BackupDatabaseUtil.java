@@ -12,7 +12,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -93,12 +95,23 @@ public class BackupDatabaseUtil {
         if (backupDatabasePath == null) return "No backup path set";
 
         DocumentFile docFile = DocumentFile.fromTreeUri(context,backupDatabasePath);
-        DocumentFile[] currentBackups = docFile.listFiles();
-        if(currentBackups.length >= 3) {
-            DocumentFile oldest = currentBackups[0];
-            for (int i = 1;i<currentBackups.length;i++) {
-                if(currentBackups[i].lastModified() < oldest.lastModified()) {
-                    oldest = currentBackups[i];
+        if(docFile == null) {
+            return "Backup path is invalid";
+        }
+        DocumentFile[] allFiles = docFile.listFiles();
+        List<DocumentFile> currentBackups = new ArrayList<>();
+        for (DocumentFile file : allFiles) {
+            if(file.isDirectory()) continue;
+            if(file.getName() == null) continue;
+            if(!file.getName().contains(".db")) continue;
+            currentBackups.add(file);
+        }
+
+        if(currentBackups.size() >= 3) {
+            DocumentFile oldest = currentBackups.get(0);
+            for (int i = 1;i<currentBackups.size();i++) {
+                if(currentBackups.get(i).lastModified() < oldest.lastModified()) {
+                    oldest = currentBackups.get(i);
                 }
             }
             Log.i(TAG, "backupDatabase: More than 3 backups found delete one");

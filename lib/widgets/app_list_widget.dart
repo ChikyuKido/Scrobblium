@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -27,10 +26,10 @@ class _AppListWidgetState extends State<AppListWidget> {
   void _filterApps(String query) {
     setState(() {
       _filteredAppList = widget.appList
-          .where((app) =>
-          app.name.toLowerCase().contains(query.toLowerCase()))
+          .where((app) => app.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
-      _filteredAppList.sort((a, b) => _getScoreForMusicApp(b)-_getScoreForMusicApp(a));
+      _filteredAppList
+          .sort((a, b) => _getScoreForMusicApp(b) - _getScoreForMusicApp(a));
     });
   }
 
@@ -47,36 +46,38 @@ class _AppListWidgetState extends State<AppListWidget> {
         ),
         const SizedBox(height: 25),
         Expanded(
-          child: ListView.builder(
-            itemCount: _filteredAppList.length,
-            itemBuilder: (context, index) {
-              final app = _filteredAppList[index];
-              return ListTile(
-                leading: SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: app.icon != null ? Image.memory(app.icon??Uint8List(0)) : const Icon(Icons.apps),
-                ),
-                title: Text(app.name),
-                onTap: () {
-                  if (widget.onAppSelected != null) {
-                    widget.onAppSelected!(app);
-                  }
-                },
-              );
-            },
+          child: SingleChildScrollView(
+            child: Column(
+              children: _filteredAppList.map((app) {
+                return ListTile(
+                  leading: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: app.icon != null
+                        ? Image.memory(app.icon ?? Uint8List(0))
+                        : const Icon(Icons.apps),
+                  ),
+                  title: Text(app.name),
+                  onTap: () {
+                    if (widget.onAppSelected != null) {
+                      widget.onAppSelected!(app);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
           ),
         ),
       ],
     );
   }
-  
+
   int _getScoreForMusicApp(AppInfo appInfo) {
     int score = 0;
-    if(appInfo.permissions.contains("android.permission.READ_MEDIA_AUDIO")) score++;
-    if(appInfo.permissions.contains("android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK")) score++;
-    if(appInfo.permissions.contains("android.permission.FOREGROUND_SERVICE")) score++;
-    if(appInfo.permissions.contains("android.permission.WAKE_LOCK")) score++;
+    if (appInfo.permissions.contains("android.permission.READ_MEDIA_AUDIO")) score++;
+    if (appInfo.permissions.contains("android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK")) score++;
+    if (appInfo.permissions.contains("android.permission.FOREGROUND_SERVICE")) score++;
+    if (appInfo.permissions.contains("android.permission.WAKE_LOCK")) score++;
     return score;
   }
 }

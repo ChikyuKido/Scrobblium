@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scrobblium/dao/song_data.dart';
 
 class ImageUtil {
-
+  static Logger log = Logger("ImageUtil");
   static String? _appFilesPath;
 
   static Future<FileImage?> getSongImage(SongData songData) async {
@@ -34,7 +35,7 @@ class ImageUtil {
       String appFilesPath = appDocDir.path;
       return appFilesPath;
     } catch (e) {
-      print("Error getting app files directory: $e");
+      log.shout("Error getting app files directory: $e");
       return '';
     }
   }

@@ -90,15 +90,14 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   Widget _buildColorPicker() {
     return Container(
-      constraints: const BoxConstraints(maxHeight: 200),
-      child: ListView.builder(
-        itemCount: colors.length,
-        itemBuilder: (context, row) {
+      constraints: const BoxConstraints(maxHeight: 220),
+      child: Column(
+        children: colors.map((colorRow) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: colors[row].map((color) {
+              children: colorRow.map((color) {
                 return GestureDetector(
                   onTap: () {
                     selectColor(color);
@@ -110,9 +109,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                       color: FlexThemeData.dark(scheme: color).primaryColor,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: selectedColor == color
-                            ? Colors.black
-                            : Colors.transparent,
+                        color: selectedColor == color ? Colors.black : Colors.transparent,
                         width: 4,
                       ),
                     ),
@@ -121,7 +118,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
               }).toList(),
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }
