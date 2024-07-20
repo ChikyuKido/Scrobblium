@@ -7,6 +7,7 @@ import 'package:scrobblium/util/stats_util.dart';
 import 'package:scrobblium/widgets/date_option.dart';
 import 'package:scrobblium/widgets/stats/latest_song_tile.dart';
 import 'package:scrobblium/widgets/stats/music_stats_row.dart';
+
 import 'songs/song_tile_info_page.dart';
 
 class StatsPage extends StatefulWidget {

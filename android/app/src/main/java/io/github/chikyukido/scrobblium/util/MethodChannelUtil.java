@@ -5,7 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+
 import androidx.core.app.NotificationManagerCompat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -15,10 +20,6 @@ import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.messages.SongDataListM;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 public class MethodChannelUtil {
 

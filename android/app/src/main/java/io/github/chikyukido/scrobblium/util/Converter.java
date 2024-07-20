@@ -1,5 +1,6 @@
 package io.github.chikyukido.scrobblium.util;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
 
 import io.github.chikyukido.scrobblium.database.SongData;
@@ -21,6 +22,18 @@ public class Converter {
                 .setEndTime(song.getEndTime() != null ? song.getEndTime().atZone(ZoneOffset.UTC).toInstant().toEpochMilli() : 0)
                 .setTimeListened(song.getTimeListened());
         return songDataBuilder.build();
+    }
+    static SongData messageToSongData(SongDataM song) {
+        return new SongData(
+                song.getArtist(),
+                song.getTitle(),
+                song.getAlbum(),
+                song.getAlbumAuthor(),
+                song.getProgress(),
+                song.getMaxProgress(),
+                Instant.ofEpochMilli(song.getStartTime()).atZone(ZoneOffset.UTC).toLocalDateTime(),
+                Instant.ofEpochMilli(song.getEndTime()).atZone(ZoneOffset.UTC).toLocalDateTime(),
+                song.getTimeListened());
     }
 
 }

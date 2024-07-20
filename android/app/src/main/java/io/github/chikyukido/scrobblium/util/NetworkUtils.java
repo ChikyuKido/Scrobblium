@@ -3,8 +3,6 @@ package io.github.chikyukido.scrobblium.util;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 
 public class NetworkUtils {
 
@@ -36,19 +34,19 @@ public class NetworkUtils {
         }
         return false;
     }
-    public static String getCurrentSSID(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (wifiManager != null) {
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            if (wifiInfo != null) {
-                String ssid = wifiInfo.getSSID();
-                if (ssid.length() > 2 && ssid.charAt(0) == '"' && ssid.charAt(ssid.length() - 1) == '"') {
-                    return ssid.substring(1, ssid.length() - 1);
-                } else {
-                    return ssid;
-                }
-            }
-        }
-        return null;
-    }
+//    public static String getCurrentSSID(Context context) {
+//        WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+//        if (wifiManager != null) {
+//            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//            if (wifiInfo != null) {
+//                String ssid = wifiInfo.getSSID();
+//                if (ssid.length() > 2 && ssid.charAt(0) == '"' && ssid.charAt(ssid.length() - 1) == '"') {
+//                    return ssid.substring(1, ssid.length() - 1);
+//                } else {
+//                    return ssid;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 }

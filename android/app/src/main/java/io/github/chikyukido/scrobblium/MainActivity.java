@@ -1,29 +1,26 @@
 package io.github.chikyukido.scrobblium;
 
+import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_BACKUP;
+import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_EXPORT;
+import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_IMPORT;
+import static io.github.chikyukido.scrobblium.util.ExportUtil.REQUEST_CODE_PICK_EXPORT_MALOJA;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
-import io.github.chikyukido.scrobblium.util.BatteryUtils;
-import io.github.chikyukido.scrobblium.util.ConfigUtil;
 import io.github.chikyukido.scrobblium.util.ExportUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
-import io.github.chikyukido.scrobblium.util.NetworkUtils;
-
-import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.*;
-import static io.github.chikyukido.scrobblium.util.ExportUtil.REQUEST_CODE_PICK_EXPORT_MALOJA;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "MusicListener";
@@ -32,6 +29,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
+
         IntegrationHandler.getInstance().init(getApplicationContext());
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
     }

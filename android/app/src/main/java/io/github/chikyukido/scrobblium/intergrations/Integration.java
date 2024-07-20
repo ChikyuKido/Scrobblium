@@ -8,12 +8,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import io.github.chikyukido.scrobblium.database.SongData;
-import io.github.chikyukido.scrobblium.util.ConfigUtil;
-import io.github.chikyukido.scrobblium.util.JsonUtil;
-import io.github.chikyukido.scrobblium.util.NetworkUtils;
-import okhttp3.OkHttpClient;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,6 +16,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
+import io.github.chikyukido.scrobblium.util.JsonUtil;
+import okhttp3.OkHttpClient;
 
 /**
  * The integration for a other scrobble service like last.fm
@@ -36,7 +35,7 @@ public abstract class Integration {
 
     public Integration(Context context) {
         this.context = context;
-        this.json = loadJson();
+       this.json = loadJson();
         if(json.has("cached_songs")) {
             for(JsonElement song : json.getAsJsonArray("cached_songs")) {
                 cachedSongs.add(gson.fromJson(song, SongData.class));
@@ -65,12 +64,6 @@ public abstract class Integration {
      */
     abstract void signOut();
 
-    /**
-     * Sends a now playing notify to the integration. NowPlaying should not change the history only display the current playing song.
-     * This method is called when a song changes
-     * @param songData the songData of the current playing song
-     */
-    public void nowPlaying(SongData songData){}
 
     /**
      * Upload a finished track to the server. If there was no internet connection it can happen that multiple tracks are cached

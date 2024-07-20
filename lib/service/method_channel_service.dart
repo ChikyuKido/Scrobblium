@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:scrobblium/dao/method_channel_data.dart';

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:scrobblium/dao/song_data.dart';
-import 'package:path/path.dart' as path;
 
 class ImageUtil {
   static Logger log = Logger("ImageUtil");

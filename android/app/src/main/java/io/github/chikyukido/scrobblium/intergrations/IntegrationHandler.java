@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.BatteryUtils;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;

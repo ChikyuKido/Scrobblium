@@ -5,10 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-import androidx.documentfile.provider.DocumentFile;
-import io.github.chikyukido.scrobblium.MusicListenerService;
 
-import java.io.*;
+import androidx.documentfile.provider.DocumentFile;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -16,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import io.github.chikyukido.scrobblium.MusicListenerService;
 
 
 public class BackupDatabaseUtil {

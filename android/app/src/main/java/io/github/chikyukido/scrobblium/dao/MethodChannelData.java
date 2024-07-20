@@ -1,17 +1,12 @@
 package io.github.chikyukido.scrobblium.dao;
 
-import android.os.HandlerThread;
 import android.os.Looper;
-import android.util.Log;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Handler;
 
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.util.HandlerCompat;
 
 public class MethodChannelData {
     private final MethodChannel methodChannel;
