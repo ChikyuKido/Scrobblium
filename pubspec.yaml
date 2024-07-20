@@ -25,7 +25,7 @@ dependencies:
   package_info_plus: ^8.0.0
 
   flutter_settings_screens:
-    path: externel/flutter_settings_screens-0.3.3-null-safety+2-hijacked
+    path: externel/flutter_settings_screens-0.3.4
   anim_search_bar:
     path: externel/anim_search_bar-2.0.3
   installed_apps:

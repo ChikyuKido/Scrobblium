@@ -3,9 +3,14 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/util/widget_util.dart';
 
-class DatabaseSettingsPage extends StatelessWidget {
-  DatabaseSettingsPage({super.key});
+class DatabaseSettingsPage extends StatefulWidget {
+  const DatabaseSettingsPage({super.key});
 
+  @override
+  State<DatabaseSettingsPage> createState() => _DatabaseSettingsPageState();
+}
+
+class _DatabaseSettingsPageState extends State<DatabaseSettingsPage> {
   late String path;
 
   @override
@@ -17,13 +22,16 @@ class DatabaseSettingsPage extends StatelessWidget {
             return const CircularProgressIndicator();
           }
           return SettingsScreen(title: "Database",children: [
-            _buildExportDB(context),
-            _buildImportDB(),
-            _buildBackupOption()
+            SettingsGroup(title: "Import/Export", children: [
+              _buildExportDB(context),
+              _buildImportDB(),
+            ]),
+            SettingsGroup(title: "Backup", children: [
+              _buildBackupOption(),
+            ])
           ]);
         });
   }
-
 
   initVariables() async {
     path = await MethodChannelService.getBackupDatabasePath();
@@ -48,7 +56,6 @@ class DatabaseSettingsPage extends StatelessWidget {
 
   Widget _buildBackupOption() {
     return SwitchSettingsTile(
-      topPadding: 0.0,
       title: 'Backup database',
       settingKey: 'backup-database',
       defaultValue: false,

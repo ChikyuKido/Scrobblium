@@ -10,12 +10,17 @@ class ExportsettingsPage extends StatelessWidget {
     return SettingsScreen(
       title: "Export Settings",
       children: [
-        SimpleSettingsTile(
-          title: "Export Maloja",
-          onTap: () {
-             MethodChannelService.callFunction(EXPORT_MALOJA);
-          })
+        SettingsGroup(title: "Export", children: [
+          malojaExport(),
+        ])
       ],
     );
+  }
+  Widget malojaExport() {
+    return SimpleSettingsTile(
+    title: "Export Maloja",
+    onTap: () {
+      MethodChannelService.callFunction(EXPORT_MALOJA);
+    });
   }
 }

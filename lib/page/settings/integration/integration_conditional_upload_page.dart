@@ -22,11 +22,11 @@ class _IntegrationConditionalUploadPageState extends State<IntegrationConditiona
   Widget enableConditionalUpload() {
     return SettingsGroup(title: "Enable", children: [
       SwitchSettingsTile(
-        topPadding: 0,
+        // topPadding: 0,
         title: "Enable Conditional Upload",
         defaultValue: false,
         settingKey: "enable-conditional-upload",
-        childrenPadding: EdgeInsets.zero,
+        // childrenPadding: EdgeInsets.zero,
         childrenIfEnabled: [
           SettingsGroup(title: "Settings", children: [
               updateRate(),
@@ -43,8 +43,8 @@ class _IntegrationConditionalUploadPageState extends State<IntegrationConditiona
     ]);
   }
   Widget updateRate() {
-    return TextInputSettingsTile(
-      topPadding: 0,
+    return const TextInputSettingsTile(
+      // topPadding: 0,
       title: "Update Rate",
       initialValue: "60",
       settingKey: "update-rate",
@@ -75,8 +75,7 @@ class _IntegrationConditionalUploadPageState extends State<IntegrationConditiona
   //       ));
   // }
   Widget batteryChargingCondition() {
-    return SwitchSettingsTile(
-        topPadding: 0,
+    return const SwitchSettingsTile(
         title: "Battery Charging",
         settingKey: "condition-battery-charging",
         defaultValue: false,

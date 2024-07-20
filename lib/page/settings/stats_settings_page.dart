@@ -7,10 +7,14 @@ class StatsSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SettingsScreen(title: "Stats",children: [
-      _buildSkipCap(),
-      _buildAnywayCap(),
-      _buildShowSkippedInSongs(),
-      _buildSearchSaveOptions(),
+      SettingsGroup(title: "Skip Cap", children: [
+        _buildSkipCap(),
+        _buildAnywayCap()
+      ]),
+      SettingsGroup(title: "Songs Page", children: [
+        _buildShowSkippedInSongs(),
+        _buildSearchSaveOptions()
+      ])
     ]);
   }
 
@@ -52,8 +56,7 @@ class StatsSettingsPage extends StatelessWidget {
   }
 
   Widget _buildShowSkippedInSongs() {
-    return SwitchSettingsTile(
-      topPadding: 0.0,
+    return const SwitchSettingsTile(
       title: 'Show skipped in songs page',
       subtitle: 'Whether skipped songs should be shown in the songs page',
       settingKey: 'show-skipped-in-songs-page',
@@ -62,8 +65,7 @@ class StatsSettingsPage extends StatelessWidget {
   }
 
   _buildSearchSaveOptions() {
-    return SwitchSettingsTile(
-      topPadding: 0.0,
+    return const SwitchSettingsTile(
         title: "Save search options in songs page",
         subtitle: "Whether the entered search options should be saved",
         settingKey: "search-save-options",

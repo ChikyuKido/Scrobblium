@@ -74,17 +74,23 @@ class SettingsScreen extends StatelessWidget {
   /// Content of the screen, body of the Scaffold.
   final List<Widget> children;
 
-  SettingsScreen({
+  final bool hasAppBar;
+
+  const SettingsScreen({
+    super.key,
     required this.children,
+    this.hasAppBar = true,
     this.title = 'Settings',
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: hasAppBar
+          ? AppBar(
+              title: Text(title),
+            )
+          : null,
       body: ListView.builder(
         shrinkWrap: true,
         itemCount: children.length,
@@ -127,7 +133,11 @@ class _SettingsTile extends StatefulWidget {
   // /// flag to show the child below the main tile elements
   // final bool showChildBelow;
 
-  _SettingsTile({
+  final bool showDivider;
+
+  final EdgeInsets padding;
+
+  const _SettingsTile({
     required this.title,
     required this.child,
     this.subtitle = '',
@@ -137,6 +147,8 @@ class _SettingsTile extends StatefulWidget {
     this.enabled = true,
     // this.showChildBelow = false,
     this.leading,
+    this.showDivider = false,
+    this.padding = EdgeInsets.zero
   });
 
   @override
@@ -151,41 +163,45 @@ class __SettingsTileState extends State<_SettingsTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          ListTile(
-            leading: widget.leading,
-            title: Text(
-              widget.title,
-              style: widget.titleTextStyle ?? headerTextStyle(context),
+    return Padding(
+        padding: widget.padding,
+      child: Material(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            ListTile(
+              leading: widget.leading,
+              title: Text(
+                widget.title,
+                style: widget.titleTextStyle ?? headerTextStyle(context),
+              ),
+              subtitle: widget.subtitle?.isEmpty ?? true
+                  ? null
+                  : Text(
+                widget.subtitle!,
+                style:
+                widget.subtitleTextStyle ?? subtitleTextStyle(context),
+              ),
+              enabled: widget.enabled,
+              onTap: widget.onTap,
+              // trailing: Visibility(
+              //   visible: !widget.showChildBelow,
+              //   child: widget.child,
+              // ),
+              trailing: widget.child,
+              dense: true,
+              // wrap only if the subtitle is longer than 70 characters
+              isThreeLine: (widget.subtitle?.isNotEmpty ?? false) &&
+                  widget.subtitle!.length > 70,
             ),
-            subtitle: widget.subtitle?.isEmpty ?? true
-                ? null
-                : Text(
-                    widget.subtitle!,
-                    style:
-                        widget.subtitleTextStyle ?? subtitleTextStyle(context),
-                  ),
-            enabled: widget.enabled,
-            onTap: widget.onTap,
-            // trailing: Visibility(
-            //   visible: !widget.showChildBelow,
+            // Visibility(
+            //   visible: widget.showChildBelow,
             //   child: widget.child,
             // ),
-            trailing: widget.child,
-            dense: true,
-            // wrap only if the subtitle is longer than 70 characters
-            isThreeLine: (widget.subtitle?.isNotEmpty ?? false) &&
-                widget.subtitle!.length > 70,
-          ),
-          // Visibility(
-          //   visible: widget.showChildBelow,
-          //   child: widget.child,
-          // ),
-        ],
-      ),
+            if (widget.showDivider) _SettingsTileDivider(),
+          ],
+        ),
+      )
     );
   }
 }
@@ -209,13 +225,12 @@ class _SimpleHeaderTile extends StatefulWidget {
   final Widget? leading;
 
   const _SimpleHeaderTile({
-    Key? key,
     this.title,
     this.subtitle = '',
     this.leading,
     this.titleTextStyle,
     this.subtitleTextStyle,
-  }) : super(key: key);
+  });
 
   @override
   __SimpleHeaderTileState createState() => __SimpleHeaderTileState();
@@ -282,7 +297,9 @@ class _ExpansionSettingsTile extends StatefulWidget {
   /// A Callback for the change of the Expansion state
   final Function(bool)? onExpansionChanged;
 
-  _ExpansionSettingsTile({
+  final bool showDivider;
+
+  const _ExpansionSettingsTile({
     required this.title,
     required this.child,
     this.subtitle = '',
@@ -292,6 +309,7 @@ class _ExpansionSettingsTile extends StatefulWidget {
     this.expanded = false,
     this.onExpansionChanged,
     this.leading,
+    this.showDivider = true,
   });
 
   @override
@@ -315,7 +333,8 @@ class _ExpansionSettingsTileState extends State<_ExpansionSettingsTile> {
       subtitle: widget.subtitle,
       enabled: false,
       leading: widget.leading,
-      child: Text(''),
+      showDivider: widget.showDivider,
+      child: const Text(''),
     );
   }
 
@@ -332,7 +351,7 @@ class _ExpansionSettingsTileState extends State<_ExpansionSettingsTile> {
           style: widget.subtitleTextStyle ?? subtitleTextStyle(context),
         ),
         initiallyExpanded: widget.expanded,
-        childrenPadding: EdgeInsets.only(left: 8.0),
+        childrenPadding: const EdgeInsets.only(left: 8.0),
         children: <Widget>[widget.child],
       ),
     );
@@ -393,7 +412,7 @@ class _ModalSettingsTile<T> extends StatefulWidget {
   /// the values from the callback & updating
   final OnConfirmedCallback? onConfirm;
 
-  _ModalSettingsTile({
+  const _ModalSettingsTile({
     required this.title,
     required this.children,
     this.subtitle = '',
@@ -442,7 +461,7 @@ class __ModalSettingsTileState extends State<_ModalSettingsTile> {
             title: Center(
               child: getTitle(),
             ),
-            titlePadding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 2.0),
+            titlePadding: const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 10.0),
             contentPadding: EdgeInsets.zero,
             children: _finalWidgets(dialogContext, children),
           );
@@ -516,7 +535,7 @@ class __ModalSettingsTileState extends State<_ModalSettingsTile> {
 class _SettingsTileDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Divider(
+    return const Divider(
       height: 0.0,
     );
   }
@@ -534,7 +553,7 @@ class _SettingsCheckbox extends StatelessWidget {
   /// ignore all the user inputs
   final bool enabled;
 
-  _SettingsCheckbox({
+  const _SettingsCheckbox({
     required this.value,
     required this.onChanged,
     required this.enabled,
@@ -562,10 +581,13 @@ class _SettingsSwitch extends StatelessWidget {
   /// ignore all the user inputs
   final bool enabled;
 
-  _SettingsSwitch({
+  final Color? activeColor;
+
+  const _SettingsSwitch({
     required this.value,
     required this.onChanged,
     required this.enabled,
+    required this.activeColor,
   });
 
   @override
@@ -573,7 +595,10 @@ class _SettingsSwitch extends StatelessWidget {
     return Switch.adaptive(
       value: value,
       onChanged: enabled ? onChanged : null,
-      activeColor: Theme.of(context).colorScheme.secondary,
+      activeColor:  Theme.of(context).colorScheme.secondary,
+      // thumbColor: WidgetStateProperty.all(
+      //     activeColor ?? Theme.of(context).colorScheme.primary),
+      // trackColor: WidgetStateProperty.all(Theme.of(context).colorScheme.onSecondary),
     );
   }
 }
@@ -593,11 +618,14 @@ class _SettingsRadio<T> extends StatelessWidget {
   /// ignore all the user inputs
   final bool enabled;
 
-  _SettingsRadio({
+  final Color? activeColor;
+
+  const _SettingsRadio({
     required this.groupValue,
     required this.value,
     required this.onChanged,
     required this.enabled,
+    required this.activeColor,
   });
 
   @override
@@ -606,6 +634,7 @@ class _SettingsRadio<T> extends StatelessWidget {
       groupValue: groupValue,
       value: value,
       onChanged: enabled ? onChanged : null,
+      activeColor: activeColor,
     );
   }
 }
@@ -631,7 +660,7 @@ class _SettingsDropDown<T> extends StatelessWidget {
   /// ignore all the user inputs
   final bool enabled;
 
-  _SettingsDropDown({
+  const _SettingsDropDown({
     required this.selected,
     required this.values,
     required this.onChanged,
@@ -699,7 +728,7 @@ class _SettingsSlider extends StatelessWidget {
   /// ignored & will not be executed
   final bool eagerUpdate;
 
-  _SettingsSlider({
+  const _SettingsSlider({
     required this.value,
     required this.min,
     required this.max,
@@ -755,7 +784,9 @@ class _SettingsColorPicker extends StatelessWidget {
   /// ignore all the user inputs
   final bool enabled;
 
-  _SettingsColorPicker({
+  final bool showDivider;
+
+  const _SettingsColorPicker({
     required this.value,
     required this.onChanged,
     required this.enabled,
@@ -764,6 +795,7 @@ class _SettingsColorPicker extends StatelessWidget {
     this.leading,
     this.titleTextStyle,
     this.subtitleTextStyle,
+    this.showDivider = true,
   });
 
   @override
@@ -776,6 +808,7 @@ class _SettingsColorPicker extends StatelessWidget {
       onTap: () => _showColorPicker(context, value),
       titleTextStyle: titleTextStyle,
       subtitleTextStyle: subtitleTextStyle,
+      showDivider: showDivider,
       child: FloatingActionButton(
         heroTag: null,
         backgroundColor: ConversionUtils.colorFromString(value),
@@ -799,7 +832,7 @@ class _SettingsColorPicker extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text('Pick a Color'),
+          title: const Text('Pick a Color'),
           content: dialogContent,
         );
       },

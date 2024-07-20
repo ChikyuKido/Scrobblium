@@ -9,13 +9,14 @@ class DebugSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SettingsScreen(title: "Debug",children: [
-      _buildShowStatusNotification(),
+      SettingsGroup(title: "Notification", children: [
+        _buildShowStatusNotification(),
+     ])
     ]);
   }
 
   Widget _buildShowStatusNotification() {
     return SwitchSettingsTile(
-      topPadding: 0.0,
       title: 'Show status notification',
       settingKey: 'show-status-notification',
       defaultValue: false,

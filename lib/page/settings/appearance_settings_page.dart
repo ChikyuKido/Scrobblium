@@ -31,15 +31,16 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget build(BuildContext context) {
     return SettingsScreen(title: "Appearance",
         children: [
-          _buildTrueDarkMode(),
-          _buildMaterialTheme()
+          SettingsGroup(title: "Theme", children: [
+            _buildTrueDarkMode(),
+            _buildMaterialTheme()
+          ])
         ]
     );
   }
 
   Widget _buildTrueDarkMode() {
     return SwitchSettingsTile(
-      topPadding: 0.0,
       title: "Use true dark mode",
       settingKey: "true-dark-mode",
       defaultValue: false,
@@ -49,7 +50,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   Widget _buildMaterialTheme() {
     return SwitchSettingsTile(
-      topPadding: 0.0,
       title: "Use material theme",
       settingKey: "material-theme",
       defaultValue: false,

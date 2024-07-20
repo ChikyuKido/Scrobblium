@@ -26,10 +26,14 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
           return const CircularProgressIndicator();
         }
         return SettingsScreen(title: "Tracking",children: [
-          _buildNotificationAccess(),
-          _buildMusicPackage(context),
-          _buildForegroundProcess(),
-          _buildValidationInfo()
+          SettingsGroup(title: "Settings", children: [
+            _buildNotificationAccess(),
+            _buildMusicPackage(context)
+          ]),
+          SettingsGroup(title: "Validation", children: [
+            _buildForegroundProcess(),
+            _buildValidationInfo()
+          ])
         ]);
       },
     );
@@ -60,7 +64,7 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
 
   _buildNotificationAccess() {
     return SimpleSettingsTile(
-      padding: const EdgeInsets.only(top: 16.0),
+      padding: const EdgeInsets.only(top: 0.0),
       title:
       "Notification access is ${notificationPermissionGranted ? "granted" : "denied"}",
       subtitle: "Tap to open Notification settings",

@@ -31,9 +31,16 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
 
           List<Widget> widgets = snapshot.data!.getDataAsString().split(";")
               .map((e) => _wrapFuture(_addIntegration(e, context))).toList();
-          widgets.insert(0, SettingsGroup(title: "Settings", children: [
-              SimpleSettingsTile(title: "Conditional upload",child: const IntegrationConditionalUploadPage())
-          ]));
+          widgets.insert(0,
+              const SettingsGroup(
+                  title: "Settings",
+                  children: [
+                    SimpleSettingsTile(
+                        title: "Conditional upload",
+                        child: IntegrationConditionalUploadPage())
+                  ]
+              )
+          );
           return SettingsScreen(
             title: "Integration",
             children: widgets,
@@ -62,7 +69,6 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
         title: s,
         children: [
           SwitchSettingsTile(
-            topPadding: 0.0,
             title: 'Activate $s',
             settingKey: 'activate-$s',
             defaultValue: false,
