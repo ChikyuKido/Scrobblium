@@ -245,6 +245,7 @@ class _SongsPageState extends State<SongsPage> {
     ];
   }
 
+  /// This method filters and sorts the SongTiles shown in the list view.
   _filterTiles() {
     switch (_selectedCombineOption) {
       case "Artist":
@@ -309,6 +310,8 @@ class _SongsPageState extends State<SongsPage> {
     });
   }
 
+
+  /// This method creates the Tiles for the list view.
   List<SongListTile> _getSongListTiles() {
     List<SongListTile> tiles = [];
     for (var song in _tileSongs) {
@@ -317,6 +320,7 @@ class _SongsPageState extends State<SongsPage> {
     return tiles;
   }
 
+  /// This method returns a list of SongTileData, each representing a single tile for the list. The data is combined based on the chosen method (track, artist, etc.).
   List<SongTileData> _getSongTileData(List<SongData> songDatas) {
     List<SongTileData> songs = [];
     for (var item in songDatas) {
