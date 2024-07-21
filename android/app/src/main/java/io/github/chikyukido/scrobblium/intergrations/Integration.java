@@ -43,13 +43,35 @@ public abstract class Integration {
         }
     }
 
+    /**
+     * @return the name of the integration
+     */
     abstract String getName();
+
+    /**
+     * @return The author of this integration
+     */
+    abstract String getAuthor();
+
+    /**
+     * @return The version of the integration
+     */
+    abstract String getVersion();
+
+    /**
+     * @return A small description for the integration
+     */
+    abstract String getDescription();
     /**
      * Checks if the user is still logged in with a valid session.
      * @return if the user is logged in
      */
     abstract boolean isLoggedIn();
 
+    /**
+     * These function should return the required fields for the login to the service. Also like password and username. Or a url and a token.
+     * @return A list of fields
+     */
     abstract List<String> requiredFields();
 
     /**
@@ -74,6 +96,9 @@ public abstract class Integration {
     abstract List<SongData> uploadTracks(List<SongData> songData);
 
 
+    /**
+     * Tries to upload all cached songs.
+     */
     public void uploadCachedSongs() {
         cachedSongs = uploadTracks(cachedSongs);
         json.add("cached_songs", new JsonArray());
@@ -100,14 +125,6 @@ public abstract class Integration {
     public boolean isActive() {
         if(!isLoggedIn()) return false;
         return ConfigUtil.getBoolean("flutter.activate-"+getName(),false);
-    }
-
-    public JsonObject getJson() {
-        return json;
-    }
-
-    public void setJson(JsonObject json) {
-        this.json = json;
     }
 
     public int getCachedSongsSize() {

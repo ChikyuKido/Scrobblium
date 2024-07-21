@@ -1,5 +1,6 @@
 package io.github.chikyukido.scrobblium;
 
+import static io.github.chikyukido.scrobblium.intergrations.IntegrationHandler.REQUEST_CODE_PICK_INTEGRATION_IMPORT;
 import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_BACKUP;
 import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_EXPORT;
 import static io.github.chikyukido.scrobblium.util.BackupDatabaseUtil.REQUEST_CODE_PICK_DIRECTORY_IMPORT;
@@ -30,7 +31,7 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
 
-        IntegrationHandler.getInstance().init(getApplicationContext());
+        IntegrationHandler.getInstance().init(this);
         MethodChannelUtil.configureMethodChannel(new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL), this);
     }
 
@@ -72,7 +73,13 @@ public class MainActivity extends FlutterActivity {
                         MethodChannelUtil.showToast("Successfully create a maloja export\nTook: "
                                 + success[0].getTime()+"ms\n Exported:"
                                 + success[0].getAmount());
+                }else if(requestCode == REQUEST_CODE_PICK_INTEGRATION_IMPORT){
+                    if(IntegrationHandler.getInstance().addIntegration(data.getData())) {
+                        MethodChannelUtil.showToast("Successfully added integration");
+                    }else {
+                        MethodChannelUtil.showToast("Failed to add integration");
                     }
+                }
             }
         }
     }

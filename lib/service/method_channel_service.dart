@@ -24,6 +24,7 @@ const BACKUP_DATABASE_PICKER = "backupDatabasePicker";
 const GET_BACKUP_DATABASE_PATH = "getBackupDatabasePath";
 const BACKUP_DATABASE_NOW = "backupDatabaseNow";
 const GET_INTEGRATIONS = "getIntegrations";
+const ADD_INTEGRATION = "addIntegration";
 const EXPORT_MALOJA = "exportMaloja";
 const CHECK_CONDITIONAL_UPLOAD = "checkConditionalUpload";
 
@@ -33,6 +34,7 @@ String IS_LOGGED_IN_FOR(String integration) => "isLoggedInFor$integration";
 String GET_CACHED_SONGS_FOR(String integration) => "getCachedSongsFor$integration";
 String LOGOUT_FOR(String integration) => "logoutFor$integration";
 String UPLOAD_CACHED_SONGS_FOR(String integration) => "uploadCachedSongsFor$integration";
+String GET_INTEGRATION_INFORMATIONS_FOR(String integration) => "getIntegrationInfoFor$integration";
 
 
 class MethodChannelService {

@@ -33,6 +33,21 @@ public class MalojaIntegration extends Integration {
     }
 
     @Override
+    String getAuthor() {
+        return "Chikyu Kido";
+    }
+
+    @Override
+    String getVersion() {
+        return "1.0.0";
+    }
+
+    @Override
+    String getDescription() {
+        return "A integration for the maloja scrobbler. It needs a url and a api key";
+    }
+
+    @Override
     public boolean isLoggedIn() {
         return json.has("api_key") && json.has("url");
     }

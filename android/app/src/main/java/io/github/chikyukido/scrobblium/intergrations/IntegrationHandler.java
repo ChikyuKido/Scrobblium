@@ -1,12 +1,20 @@
 package io.github.chikyukido.scrobblium.intergrations;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,19 +24,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import io.github.chikyukido.scrobblium.MainActivity;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.BatteryUtils;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
+import io.github.chikyukido.scrobblium.util.JsonUtil;
 import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 import io.github.chikyukido.scrobblium.util.NetworkUtils;
 
 public class IntegrationHandler {
+    public static int REQUEST_CODE_PICK_INTEGRATION_IMPORT = 6674;
     private static final String TAG = "IntegrationHandler";
     private static IntegrationHandler INSTANCE;
-    private final Gson gson = new Gson();
+    private final Gson gson = JsonUtil.getGson();
     private final List<Integration> integrations = new ArrayList<>();
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
+    private Context context;
     private boolean alreadyInitialized = false;
+    private HashMap<String, MethodChannelUtil.MethodInterface> methods;
 
     private IntegrationHandler() {}
     public void init(Context context) {
@@ -36,47 +49,15 @@ public class IntegrationHandler {
             Log.w(TAG, "init: IntegrationHandler is already initialized");
             return;
         }
+        this.context = context;
         integrations.add(new MalojaIntegration(context));
         alreadyInitialized = true;
     }
 
     public void addIntegrationsToMethodChannel(HashMap<String, MethodChannelUtil.MethodInterface> methods,Context context) {
+        this.methods = methods;
         for (Integration integration : integrations) {
-            methods.put("loginFor"+integration.getName(),(data, call) -> {
-                String jsonContent = call.argument("fields");
-                JsonObject json = gson.fromJson(jsonContent,JsonObject.class);
-                HashMap<String,String> fields = new HashMap<>();
-                for (Map.Entry<String, JsonElement> stringJsonElementEntry : json.entrySet()) {
-                    fields.put(stringJsonElementEntry.getKey(),stringJsonElementEntry.getValue().getAsString());
-                }
-                data.setData(new byte[]{(byte)(integration.signIn(fields)?1:0)});
-                data.reply();
-            });
-            methods.put("logoutFor"+integration.getName(),(data, call) -> {
-                integration.signOut();
-                data.reply();
-            });
-            methods.put("isLoggedInFor"+integration.getName(),(data, call) -> {
-                data.setData(new byte[]{(byte)(integration.isLoggedIn()?1:0)}); //TODO: create a setBool function
-                data.reply();
-            });
-            methods.put("getCachedSongsFor"+integration.getName(),(data, call) -> {
-                ByteBuffer byteBuffer = ByteBuffer.allocate(4);
-                byteBuffer.putInt(integration.getCachedSongsSize());
-                data.setData(byteBuffer.array());
-                data.reply();
-            });
-            methods.put("getRequiredFieldsFor"+integration.getName(),(data, call) -> {
-                data.setData(String.join(";",integration.requiredFields()).getBytes());
-                data.reply();
-            });
-           methods.put("uploadCachedSongsFor"+integration.getName(),(methodChannelData,call) -> {
-                executor.execute(() -> {
-                    integration.uploadCachedSongs();
-                    methodChannelData.setData(("Uploaded songs to "+integration.getName()).getBytes());
-                    methodChannelData.reply();
-                });
-            });
+            addIntegrationMethods(integration);
         }
         methods.put("getIntegrations",(data, call) -> {
             data.setData(integrations.stream().map(Integration::getName).collect(Collectors.joining(";")).getBytes());
@@ -87,7 +68,62 @@ public class IntegrationHandler {
             data.setDataAsString(failure == null ? "All conditions are met" : failure);
             data.reply();
         });
+        methods.put("removeIntegration",(data, call) -> {
+            String name = call.argument("name");
 
+            if(removeIntegration(name)) {
+                data.setDataAsString("Successfully deleted integration: "+ name);
+            }else {
+                data.setDataAsString("Could not find integration: "+name);
+            }
+            data.reply();
+        });
+        methods.put("addIntegration",(data, call) -> {
+            openIntegrationPicker();
+            data.reply();
+        });
+    }
+    private void addIntegrationMethods(Integration integration) {
+        methods.put("loginFor"+integration.getName(),(data, call) -> {
+            String jsonContent = call.argument("fields");
+            JsonObject json = gson.fromJson(jsonContent,JsonObject.class);
+            HashMap<String,String> fields = new HashMap<>();
+            for (Map.Entry<String, JsonElement> stringJsonElementEntry : json.entrySet()) {
+                fields.put(stringJsonElementEntry.getKey(),stringJsonElementEntry.getValue().getAsString());
+            }
+            data.setData(new byte[]{(byte)(integration.signIn(fields)?1:0)});
+            data.reply();
+        });
+        methods.put("logoutFor"+integration.getName(),(data, call) -> {
+            integration.signOut();
+            data.reply();
+        });
+        methods.put("isLoggedInFor"+integration.getName(),(data, call) -> {
+            data.setData(new byte[]{(byte)(integration.isLoggedIn()?1:0)}); //TODO: create a setBool function
+            data.reply();
+        });
+        methods.put("getCachedSongsFor"+integration.getName(),(data, call) -> {
+            ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+            byteBuffer.putInt(integration.getCachedSongsSize());
+            data.setData(byteBuffer.array());
+            data.reply();
+        });
+        methods.put("getRequiredFieldsFor"+integration.getName(),(data, call) -> {
+            data.setDataAsString(String.join(";",integration.requiredFields()));
+            data.reply();
+        });
+        methods.put("uploadCachedSongsFor"+integration.getName(),(methodChannelData,call) -> {
+            executor.execute(() -> {
+                integration.uploadCachedSongs();
+                methodChannelData.setData(("Uploaded songs to "+integration.getName()).getBytes());
+                methodChannelData.reply();
+            });
+        });
+        methods.put("getIntegrationInfoFor"+integration.getName(),(methodChannelData, call) -> {
+            List<String> data = List.of(integration.getName(),integration.getAuthor(),integration.getVersion(),integration.getDescription());
+            methodChannelData.setDataAsString(String.join(";",data));
+            methodChannelData.reply();
+        });
     }
     public void handleUpload(SongData songData,Context context) {
         if((double) songData.getTimeListened() /((double) songData.getMaxProgress() /1000) < 0.5 && songData.getTimeListened() < 240) {
@@ -143,6 +179,61 @@ public class IntegrationHandler {
             }
         }
         return null;
+    }
+
+    public void openIntegrationPicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        String[] mimeTypes = {"application/java-vm"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_INTEGRATION_IMPORT);
+    }
+    public boolean addIntegration(Uri uri) {
+        try(InputStream in = context.getContentResolver().openInputStream(uri);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            if(in == null) return false;
+            int bytesRead;
+            byte[] data = new byte[1024];
+            while ((bytesRead = in.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, bytesRead);
+            }
+
+            Class<?> c = loadClass(buffer.toByteArray(),uri.getLastPathSegment().replace(".class",""));
+            if(c == null) {
+                return false;
+            }else {
+                Object o = c.getDeclaredConstructor(Context.class).newInstance(context);
+                Integration integration = (Integration) o;
+                integrations.add(integration);
+                addIntegrationMethods(integration);
+                return true;
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, "addIntegration: Could not add integration because a io error", e);
+            return false;
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException |
+                 InstantiationException e) {
+            Log.e(TAG, "addIntegration: Could not add integration because it is not valid", e);
+            return false;
+        } catch (ClassNotFoundException e) {
+            Log.e(TAG, "addIntegration: Could not add integration because the classname is not the same as the file name", e);
+            return false;
+        }
+    }
+    private Class<?> loadClass(byte[] bytes,String className) throws ClassNotFoundException {
+        ClassLoader classLoader = new ClassLoader() {
+            @Override
+            protected Class<?> findClass(String name) {
+                return defineClass(name, bytes, 0, bytes.length);
+            }
+        };
+        return classLoader.loadClass(className);
+
+    }
+    public boolean removeIntegration(String name) {
+        return integrations.removeIf(integration -> integration.getName().equals(name));
     }
 
     public static IntegrationHandler getInstance() {
