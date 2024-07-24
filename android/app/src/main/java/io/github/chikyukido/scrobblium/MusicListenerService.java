@@ -102,6 +102,7 @@ public class MusicListenerService extends NotificationListenerService {
 
     public void setMusicPackage(String musicPackage) {
         musicPackageName = musicPackage;
+        stopTimer();
         startTimer();
         Log.i(TAG, "setMusicPackage: new package " + INSTANCE);
     }

@@ -130,6 +130,8 @@ class _SettingsTile extends StatefulWidget {
   /// call back for handling the tap event on tile
   final GestureTapCallback? onTap;
 
+  /// call back for handling the tap event on tile
+  final GestureTapCallback? onLongTap;
   // /// flag to show the child below the main tile elements
   // final bool showChildBelow;
 
@@ -144,6 +146,7 @@ class _SettingsTile extends StatefulWidget {
     this.titleTextStyle,
     this.subtitleTextStyle,
     this.onTap,
+    this.onLongTap,
     this.enabled = true,
     // this.showChildBelow = false,
     this.leading,
@@ -184,6 +187,7 @@ class __SettingsTileState extends State<_SettingsTile> {
               ),
               enabled: widget.enabled,
               onTap: widget.onTap,
+              onLongPress: widget.onLongTap,
               // trailing: Visibility(
               //   visible: !widget.showChildBelow,
               //   child: widget.child,

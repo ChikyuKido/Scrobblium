@@ -55,9 +55,12 @@ class SimpleSettingsTile extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  final VoidCallback? onLongTap;
+
   final bool showDivider;
 
   final EdgeInsets padding;
+
 
   const SimpleSettingsTile({
     super.key,
@@ -69,6 +72,7 @@ class SimpleSettingsTile extends StatelessWidget {
     this.enabled = true,
     this.leading,
     this.onTap,
+    this.onLongTap,
     this.showDivider = false,
     this.padding = EdgeInsets.zero,
   });
@@ -83,6 +87,7 @@ class SimpleSettingsTile extends StatelessWidget {
       subtitleTextStyle: subtitleTextStyle,
       enabled: enabled,
       onTap: () => _handleTap(context),
+      onLongTap: onLongTap,
       showDivider: showDivider,
       child: child != null ? getIcon(context) : const Text(''),
       padding: padding,

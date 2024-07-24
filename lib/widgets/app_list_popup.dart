@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:installed_apps/installed_apps.dart';
+import 'package:scrobblium/service/method_channel_service.dart';
 import 'package:scrobblium/widgets/app_list_widget.dart';
 
 class AppListPopup extends StatefulWidget {
@@ -26,6 +27,7 @@ class _AppListPopupState extends State<AppListPopup> {
               appList: snapshot.data??List.empty(),
               onAppSelected: (p0) {
                 Settings.setValue("music-app-package", p0.packageName);
+                MethodChannelService.setMusicPackage(p0.packageName);
                 Navigator.pop(context);
               },
           );

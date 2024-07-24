@@ -87,6 +87,9 @@ class _TrackingSettingsPageState extends State<TrackingSettingsPage> {
               setState(() {});
             }
           },
+          onLongTap: () {
+            MethodChannelService.callFunction(RESTART_MUSIC_LISTENER_SERVICE).then((value) => setState(() {}));
+          },
         )
     );
   }
