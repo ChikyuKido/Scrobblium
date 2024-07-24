@@ -10,11 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +19,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import io.github.chikyukido.scrobblium.MainActivity;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.util.BatteryUtils;
 import io.github.chikyukido.scrobblium.util.ConfigUtil;
@@ -39,7 +33,6 @@ public class IntegrationHandler {
     private final Gson gson = JsonUtil.getGson();
     private final List<Integration> integrations = new ArrayList<>();
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
-    private Context context;
     private boolean alreadyInitialized = false;
     private HashMap<String, MethodChannelUtil.MethodInterface> methods;
 
@@ -49,7 +42,6 @@ public class IntegrationHandler {
             Log.w(TAG, "init: IntegrationHandler is already initialized");
             return;
         }
-        this.context = context;
         integrations.add(new MalojaIntegration(context));
         alreadyInitialized = true;
     }
@@ -79,7 +71,7 @@ public class IntegrationHandler {
             data.reply();
         });
         methods.put("addIntegration",(data, call) -> {
-            openIntegrationPicker();
+            openIntegrationPicker(context);
             data.reply();
         });
     }
@@ -181,7 +173,7 @@ public class IntegrationHandler {
         return null;
     }
 
-    public void openIntegrationPicker() {
+    public void openIntegrationPicker(Context context) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
@@ -189,49 +181,11 @@ public class IntegrationHandler {
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_INTEGRATION_IMPORT);
     }
+
     public boolean addIntegration(Uri uri) {
-        try(InputStream in = context.getContentResolver().openInputStream(uri);
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-            if(in == null) return false;
-            int bytesRead;
-            byte[] data = new byte[1024];
-            while ((bytesRead = in.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, bytesRead);
-            }
-
-            Class<?> c = loadClass(buffer.toByteArray(),uri.getLastPathSegment().replace(".class",""));
-            if(c == null) {
-                return false;
-            }else {
-                Object o = c.getDeclaredConstructor(Context.class).newInstance(context);
-                Integration integration = (Integration) o;
-                integrations.add(integration);
-                addIntegrationMethods(integration);
-                return true;
-            }
-
-        } catch (IOException e) {
-            Log.e(TAG, "addIntegration: Could not add integration because a io error", e);
-            return false;
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException |
-                 InstantiationException e) {
-            Log.e(TAG, "addIntegration: Could not add integration because it is not valid", e);
-            return false;
-        } catch (ClassNotFoundException e) {
-            Log.e(TAG, "addIntegration: Could not add integration because the classname is not the same as the file name", e);
-            return false;
-        }
+       return false;
     }
-    private Class<?> loadClass(byte[] bytes,String className) throws ClassNotFoundException {
-        ClassLoader classLoader = new ClassLoader() {
-            @Override
-            protected Class<?> findClass(String name) {
-                return defineClass(name, bytes, 0, bytes.length);
-            }
-        };
-        return classLoader.loadClass(className);
 
-    }
     public boolean removeIntegration(String name) {
         return integrations.removeIf(integration -> integration.getName().equals(name));
     }
