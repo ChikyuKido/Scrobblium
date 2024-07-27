@@ -26,7 +26,7 @@ class _IntegrationConditionalUploadPageState extends State<IntegrationConditiona
         title: "Enable Conditional Upload",
         defaultValue: false,
         settingKey: "enable-conditional-upload",
-        // childrenPadding: EdgeInsets.zero,
+        childrenPadding: EdgeInsets.zero,
         childrenIfEnabled: [
           SettingsGroup(title: "Settings", children: [
               updateRate(),

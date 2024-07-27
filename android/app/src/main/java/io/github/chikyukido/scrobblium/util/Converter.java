@@ -8,8 +8,8 @@ import io.github.chikyukido.scrobblium.messages.SongDataM;
 
 public class Converter {
 
-    static SongDataM.Builder songDataBuilder = SongDataM.newBuilder();
-    static SongDataM songDataToMessage(SongData song) {
+    private static final SongDataM.Builder songDataBuilder = SongDataM.newBuilder();
+    public static SongDataM songDataToMessage(SongData song) {
         songDataBuilder
                 .setId(song.getId())
                 .setArtist(song.getArtist())
@@ -23,7 +23,7 @@ public class Converter {
                 .setTimeListened(song.getTimeListened());
         return songDataBuilder.build();
     }
-    static SongData messageToSongData(SongDataM song) {
+    public static SongData messageToSongData(SongDataM song) {
         return new SongData(
                 song.getArtist(),
                 song.getTitle(),

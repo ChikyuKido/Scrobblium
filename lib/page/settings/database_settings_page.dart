@@ -40,17 +40,20 @@ class _DatabaseSettingsPageState extends State<DatabaseSettingsPage> {
   Widget _buildExportDB(BuildContext context) {
     return SimpleSettingsTile(
         title: "Export Database",
-        onTap: () async {
-          await MethodChannelService.callFunction(EXPORT_DATABASE);
-          WidgetUtil.showToast("Successfully exported Database");
+        onTap: ()  {
+          MethodChannelService.callFunction(EXPORT_DATABASE).then((value) {
+            WidgetUtil.showToast(value.getDataAsString());
+          });
         });
   }
 
   Widget _buildImportDB() {
     return SimpleSettingsTile(
         title: "Import Database",
-        onTap: () async {
-          await MethodChannelService.callFunction(IMPORT_DATABASE);
+        onTap: () {
+          MethodChannelService.callFunction(IMPORT_DATABASE).then((value) {
+            WidgetUtil.showToast(value.getDataAsString());
+          });
         });
   }
 
@@ -68,7 +71,12 @@ class _DatabaseSettingsPageState extends State<DatabaseSettingsPage> {
     return SimpleSettingsTile(
       title: "Backup path",
       subtitle: "Path: ${path.isEmpty ? "Non" : path}",
-      onTap: () => MethodChannelService.callFunction(BACKUP_DATABASE_PICKER),
+      onTap: () {
+        MethodChannelService.callFunction(BACKUP_DATABASE_PICKER).then((value) {
+          WidgetUtil.showToast(value.getDataAsString());
+          setState(() {});
+        });
+      },
     );
   }
 

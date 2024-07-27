@@ -14,15 +14,39 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import io.github.chikyukido.scrobblium.MainActivity;
 import io.github.chikyukido.scrobblium.MusicListenerService;
+import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 
 public class ExportUtil {
-    public static final int REQUEST_CODE_PICK_EXPORT_MALOJA = 1125;
-
     private static final String TAG = "ExportUtil";
 
-    public static ExportInfo exportMaloja(Context context, Uri outputDir) {
+
+    public static void launchFileChooserForExportMaloja(Context context, MethodChannelData data) {
+        MainActivity.activityResultCallbacks.put(data.getCallbackId(),(c, intent, resultCode) -> {
+            if(resultCode != Activity.RESULT_OK && intent != null && intent.getData() != null) {
+                data.setDataAsString("Could not export data for Maloja");
+                data.reply();
+                return;
+            }
+            new Thread(() -> {
+                ExportInfo exportInfo = exportMaloja(context,intent.getData());
+                if(exportInfo == null) {
+                    data.setDataAsString("Could not export data for Maloja");
+                }else {
+                    data.setDataAsString("Successfully create a maloja export\nTook: "
+                            + exportInfo.getTime()+"ms\n Exported:"
+                            + exportInfo.getAmount());
+                }
+                data.reply();
+            }).start();
+        });
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        ((Activity) context).startActivityForResult(intent, data.getCallbackId());
+    }
+
+    private static ExportInfo exportMaloja(Context context, Uri outputDir) {
         if(!BackupDatabaseUtil.makeWALCheckpoint()) {
             return null;
         }
@@ -75,17 +99,11 @@ public class ExportUtil {
         return csvBuilder.toString();
     }
 
-    public static void launchFileChooserForExportMaloja(Context context) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_EXPORT_MALOJA);
-    }
-
    public static class ExportInfo {
         long time;
         long amount;
 
-        public ExportInfo() {
-        }
+        public ExportInfo() {}
 
         public long getTime() {
             return time;

@@ -27,15 +27,15 @@ import okhttp3.OkHttpClient;
  */
 public abstract class Integration {
     private static final String TAG = "Integration";
-    protected JsonObject json;
-    protected Gson gson = JsonUtil.getGson();
-    protected OkHttpClient client = new OkHttpClient();
+    protected final JsonObject json;
+    protected final Gson gson = JsonUtil.getGson();
+    protected final OkHttpClient client = new OkHttpClient();
     private List<SongData> cachedSongs = new ArrayList<>();
     private Context context;
 
     public Integration(Context context) {
         this.context = context;
-       this.json = loadJson();
+        this.json = loadJson();
         if(json.has("cached_songs")) {
             for(JsonElement song : json.getAsJsonArray("cached_songs")) {
                 cachedSongs.add(gson.fromJson(song, SongData.class));

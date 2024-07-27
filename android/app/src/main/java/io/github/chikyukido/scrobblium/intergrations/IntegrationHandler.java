@@ -1,9 +1,6 @@
 package io.github.chikyukido.scrobblium.intergrations;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -27,7 +24,6 @@ import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
 import io.github.chikyukido.scrobblium.util.NetworkUtils;
 
 public class IntegrationHandler {
-    public static int REQUEST_CODE_PICK_INTEGRATION_IMPORT = 6674;
     private static final String TAG = "IntegrationHandler";
     private static IntegrationHandler INSTANCE;
     private final Gson gson = JsonUtil.getGson();
@@ -58,20 +54,6 @@ public class IntegrationHandler {
         methods.put("checkConditionalUpload",(data, call) -> {
             String failure = checkUploadConditions(context);
             data.setDataAsString(failure == null ? "All conditions are met" : failure);
-            data.reply();
-        });
-        methods.put("removeIntegration",(data, call) -> {
-            String name = call.argument("name");
-
-            if(removeIntegration(name)) {
-                data.setDataAsString("Successfully deleted integration: "+ name);
-            }else {
-                data.setDataAsString("Could not find integration: "+name);
-            }
-            data.reply();
-        });
-        methods.put("addIntegration",(data, call) -> {
-            openIntegrationPicker(context);
             data.reply();
         });
     }
@@ -171,23 +153,6 @@ public class IntegrationHandler {
             }
         }
         return null;
-    }
-
-    public void openIntegrationPicker(Context context) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        String[] mimeTypes = {"application/java-vm"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_INTEGRATION_IMPORT);
-    }
-
-    public boolean addIntegration(Uri uri) {
-       return false;
-    }
-
-    public boolean removeIntegration(String name) {
-        return integrations.removeIf(integration -> integration.getName().equals(name));
     }
 
     public static IntegrationHandler getInstance() {

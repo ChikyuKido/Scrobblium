@@ -32,10 +32,32 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return SettingsScreen(title: "Appearance",
         children: [
           SettingsGroup(title: "Theme", children: [
-            _buildTrueDarkMode(),
+            _buildDarkMode(),
             _buildMaterialTheme()
           ])
         ]
+    );
+  }
+
+  Widget _buildMaterialTheme() {
+    return SwitchSettingsTile(
+      title: "Use material theme",
+      settingKey: "material-theme",
+      defaultValue: true,
+      onChange: (p0) => AppThemeProvider().setMaterialTheme(p0),
+      reverseChildrenIfEnabled: true,
+      childrenPadding: EdgeInsets.zero,
+      childrenIfEnabled: [_buildThemeColorPicker()],
+    );
+  }
+  Widget _buildDarkMode() {
+    return SwitchSettingsTile(
+      title: "Use dark mode",
+      settingKey: "dark-mode",
+      defaultValue: true,
+      onChange: (p0) => AppThemeProvider().setDarkMode(p0),
+      childrenPadding: EdgeInsets.zero,
+      childrenIfEnabled: [_buildTrueDarkMode()],
     );
   }
 
@@ -48,17 +70,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     );
   }
 
-  Widget _buildMaterialTheme() {
-    return SwitchSettingsTile(
-      title: "Use material theme",
-      settingKey: "material-theme",
-      defaultValue: false,
-      onChange: (p0) => AppThemeProvider().setMaterialTheme(p0),
-      reverseChildrenIfEnabled: true,
-      childrenPadding: EdgeInsets.zero,
-      childrenIfEnabled: [_buildThemeColorPicker()],
-    );
-  }
 
   Widget _buildThemeColorPicker() {
     return SimpleSettingsTile(

@@ -33,24 +33,42 @@ class MyApp extends StatelessWidget {
           create: (context) => AppThemeProvider(),
           child: Consumer<AppThemeProvider>(
             builder: (context, state, child) {
-              ThemeData data = FlexThemeData.dark(
-                useMaterial3: state.materialTheme,
-                //if darkcoloscheme is null just use the last selected scheme
-                colorScheme: state.materialTheme ? darkColorScheme ?? FlexColorScheme.dark(scheme: state.colorScheme).colorScheme : null,
-                scheme: state.materialTheme ? null : state.colorScheme,
-                darkIsTrueBlack: state.trueDarkMode,
-                typography: Typography.material2021(
-                    platform: defaultTargetPlatform));
-              // somehow the canvas color is not true black when darkIsTrueBlack is set on.
-              if(state.trueDarkMode) {
-                data = data.copyWith(
-                    canvasColor:const Color(0x00000000),
-                    appBarTheme: data.appBarTheme.copyWith(backgroundColor: const Color(0x00000000)));
+              ThemeData data = FlexThemeData.dark();
+              if(state.darkMode) {
+                data = FlexThemeData.dark(
+                    useMaterial3: state.materialTheme,
+                    //if darkcoloscheme is null just use the last selected scheme
+                    colorScheme: state.materialTheme ? darkColorScheme ??
+                        FlexColorScheme
+                            .dark(scheme: state.colorScheme)
+                            .colorScheme : null,
+                    scheme: state.materialTheme ? null : state.colorScheme,
+                    darkIsTrueBlack: state.trueDarkMode,
+                    typography: Typography.material2021(
+                        platform: defaultTargetPlatform));
+                // somehow the canvas color is not true black when darkIsTrueBlack is set on.
+                if (state.trueDarkMode) {
+                  data = data.copyWith(
+                      canvasColor: const Color(0x00000000),
+                      appBarTheme: data.appBarTheme.copyWith(
+                          backgroundColor: const Color(0x00000000)));
+                }
+              }else {
+                data = FlexThemeData.light(
+                    useMaterial3: state.materialTheme,
+                    //if darkcoloscheme is null just use the last selected scheme
+                    colorScheme: state.materialTheme ? lightColorScheme ??
+                        FlexColorScheme
+                            .light(scheme: state.colorScheme)
+                            .colorScheme : null,
+                    scheme: state.materialTheme ? null : state.colorScheme,
+                    typography: Typography.material2021(
+                        platform: defaultTargetPlatform));
               }
               return MaterialApp(
                 title: 'Scrobblium',
                 darkTheme: data,
-                themeMode: ThemeMode.dark,
+                themeMode: state.darkMode ?  ThemeMode.dark : ThemeMode.light,
                 debugShowCheckedModeBanner: false,
                 home: const MainPage(),
               );

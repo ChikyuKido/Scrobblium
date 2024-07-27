@@ -56,7 +56,6 @@ public class BitmapUtil {
         if(bitmap == null) {
             return false;
         }
-
         Bitmap scaledBitmap = scaleBitmap(bitmap, IMAGE_RESOLUTION, IMAGE_RESOLUTION);
 
         Path path = Paths.get(context.getCacheDir() + "/arts");

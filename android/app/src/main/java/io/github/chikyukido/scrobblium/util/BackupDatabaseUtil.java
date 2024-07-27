@@ -23,15 +23,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import io.github.chikyukido.scrobblium.MainActivity;
 import io.github.chikyukido.scrobblium.MusicListenerService;
+import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 
 
 public class BackupDatabaseUtil {
     private static final String TAG = "BackupDatabaseUtil";
-    public static final int REQUEST_CODE_PICK_DIRECTORY_EXPORT = 123;
-    public static final int REQUEST_CODE_PICK_DIRECTORY_IMPORT = 124;
-    public static final int REQUEST_CODE_PICK_DIRECTORY_BACKUP = 125;
-
 
     public static boolean importDatabase(Context context, Uri databaseFile) {
         if (MusicListenerService.getInstance() == null) return false;
@@ -160,24 +158,64 @@ public class BackupDatabaseUtil {
         }
         return backupDatabasePath;
     }
-    public static void launchDirectoryChooserForExport(Context context) {
+    public static void launchDirectoryChooserForExport(Context context,MethodChannelData data) {
+        MainActivity.activityResultCallbacks.put(data.getCallbackId(),(c, intent, resultCode) -> {
+            if(resultCode != Activity.RESULT_OK && intent != null && intent.getData() != null) {
+                data.setDataAsString("Could not start the export of the database");
+                data.reply();
+                return;
+            }
+            if(exportDatabase(c, intent.getData()))
+                data.setDataAsString("Export database successfully");
+            else
+                data.setDataAsString("Smth went wrong exporting the database");
+            data.reply();
+        });
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
                 .addCategory(Intent.CATEGORY_OPENABLE)
                 .setType("data/json")
                 .putExtra(Intent.EXTRA_TITLE, "song_database");
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY_EXPORT);
+        ((Activity) context).startActivityForResult(intent, data.getCallbackId());
     }
 
-    public static void launchFileChooserForImport(Context context) {
+    public static void launchFileChooserForImport(Context context,MethodChannelData data) {
+        MainActivity.activityResultCallbacks.put(data.getCallbackId(),(c, intent, resultCode) -> {
+            if(resultCode != Activity.RESULT_OK && intent != null && intent.getData() != null) {
+                data.setDataAsString("Could not start the import of the database");
+                data.reply();
+                return;
+            }
+            if(importDatabase(c, intent.getData()))
+                data.setDataAsString("Imported database successfully");
+            else
+                data.setDataAsString("Smth went wrong importing the database");
+            data.reply();
+        });
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY_IMPORT);
+        ((Activity) context).startActivityForResult(intent, data.getCallbackId());
     }
 
-    public static void launchFileChooserForBackup(Context context) {
+    public static void launchFileChooserForBackup(Context context, MethodChannelData data) {
+        MainActivity.activityResultCallbacks.put(data.getCallbackId(),(c, intent, resultCode) -> {
+            if(resultCode != Activity.RESULT_OK && intent != null && intent.getData() != null) {
+                data.setDataAsString("Could set backup path");
+                data.reply();
+                return;
+            }
+            if(!saveBackupDatabasePath(c, intent.getData())) {
+                data.setDataAsString("Could not save backup path");
+                data.reply();
+                return;
+            }
+            data.setDataAsString("Backup path successfully set");
+            c.getContentResolver().takePersistableUriPermission(intent.getData(),
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            data.reply();
+        });
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_PICK_DIRECTORY_BACKUP);
+        ((Activity) context).startActivityForResult(intent, data.getCallbackId());
     }
 
     public static boolean makeWALCheckpoint() {

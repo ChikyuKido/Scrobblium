@@ -31,7 +31,7 @@ public class SongData {
         this.albumAuthor = albumAuthor != null ? albumAuthor : "Unknown Album Author";
         this.progress = progress;
         this.maxProgress = maxProgress;
-        this.startTime = startTime != null ? startTime : LocalDateTime.now();;
+        this.startTime = startTime != null ? startTime : LocalDateTime.now();
         this.endTime = endTime != null ? endTime : LocalDateTime.now();
         this.timeListened = timeListened;
     }

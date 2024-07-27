@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
+import 'package:scrobblium/util/widget_util.dart';
 
 class IntegrationManagePage extends StatefulWidget {
   const IntegrationManagePage({super.key});
@@ -44,8 +45,9 @@ class _IntegrationManagePageState extends State<IntegrationManagePage> {
     return SimpleSettingsTile(
       title: "Add Integration",
       onTap: () async{
-        await MethodChannelService.callFunction(ADD_INTEGRATION);
-        setState(() {});
+        WidgetUtil.showToast("Not implemented yet. :)");
+       // await MethodChannelService.callFunction(ADD_INTEGRATION);
+       // setState(() {});
       },
     );
   }

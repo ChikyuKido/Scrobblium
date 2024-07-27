@@ -1,6 +1,7 @@
 package io.github.chikyukido.scrobblium.dao;
 
 import android.os.Looper;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodChannel;
 
 public class MethodChannelData {
+    private static final String TAG = "MethodChannelData";
     private final MethodChannel methodChannel;
     private String error;
     private byte[] data;
@@ -61,7 +63,10 @@ public class MethodChannelData {
     }
 
     public void reply() {
-        new android.os.Handler(Looper.getMainLooper()).post(() -> methodChannel.invokeMethod("reply",toMap()));
+        new android.os.Handler(Looper.getMainLooper()).post(() -> {
+            Log.d(TAG, "Replied to callback id: " + callbackId);
+            methodChannel.invokeMethod("reply",toMap());
+        });
     }
 
     public Map<String, Object> toMap() {

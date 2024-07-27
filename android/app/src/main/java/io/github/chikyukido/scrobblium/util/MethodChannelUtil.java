@@ -50,9 +50,14 @@ public class MethodChannelUtil {
 
         methodChannel.setMethodCallHandler((call, result) -> {
             if (methods.containsKey(call.method)) {
-                Log.i(TAG, "Execute following command: " + call.method);
+                if(!call.hasArgument("callbackId")) {
+                    result.notImplemented();
+                    return;
+                }
+                int callbackId = call.argument("callbackId");
+                Log.d(TAG, "Execute following command: " + call.method +" with the callback id: " + callbackId);
                 MethodChannelData methodChannelData = new MethodChannelData(methodChannel);
-                methodChannelData.setCallbackId(call.argument("callbackId"));
+                methodChannelData.setCallbackId(callbackId);
                 new Thread(() -> methods.get(call.method).run(methodChannelData,call)).start();
                 result.success("");
             } else {
@@ -62,10 +67,7 @@ public class MethodChannelUtil {
     }
 
     private static MethodInterface exportMaloja(Context context) {
-        return (data, call) -> {
-            ExportUtil.launchFileChooserForExportMaloja(context); // TODO: don't reply immediately instead reply later when the backup was finished
-            data.reply();
-        };
+        return (data, call) -> ExportUtil.launchFileChooserForExportMaloja(context,data);
     }
 
     private static MethodInterface restartMusicListener() {
@@ -101,10 +103,7 @@ public class MethodChannelUtil {
     }
 
     private static MethodInterface backupDatabasePicker(Context context) {
-        return (data, call) -> {
-            BackupDatabaseUtil.launchFileChooserForBackup(context);
-            data.reply(); // TODO: don't reply immediately instead reply later when the backup was finished
-        };
+        return (data, call) -> BackupDatabaseUtil.launchFileChooserForBackup(context,data);
     }
 
     private static MethodInterface deleteEntry() {
@@ -117,7 +116,7 @@ public class MethodChannelUtil {
             if(argument == null) {
                 data.setError("No argument provide for delete Entry");
                 return;
-            };
+            }
             int id = Integer.parseInt(argument);
             MusicListenerService.getInstance().getDatabase().musicTrackDao().deleteTrack(id);
 
@@ -229,7 +228,7 @@ public class MethodChannelUtil {
                 data.setError("Music listener service not initialized yet");
                 data.reply();
                 return;
-            };
+            }
             MusicListenerService.getInstance().startForegroundService();
             data.reply();
         };
@@ -237,15 +236,13 @@ public class MethodChannelUtil {
 
     private static MethodInterface exportDatabase(Context context) {
         return (data, call) -> {
-            BackupDatabaseUtil.launchDirectoryChooserForExport(context);
-            data.reply(); // TODO: don't reply immediately instead reply later when the backup was finished
+            BackupDatabaseUtil.launchDirectoryChooserForExport(context,data);
         };
     }
 
     private static MethodInterface importDatabase(Context context) {
         return (data, call) -> {
-            BackupDatabaseUtil.launchFileChooserForImport(context);
-            data.reply();// TODO: don't reply immediately instead reply later when the backup was finished
+            BackupDatabaseUtil.launchFileChooserForImport(context,data);
         };
     }
 
