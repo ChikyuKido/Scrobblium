@@ -28,7 +28,11 @@ Scrobblium is a simple music tracking app. It “should” be able to track from
 - Backup/import/export database
 - Exporting a file for Maloja to import
 - Generally almost no battery consumption. Own experience on a S20 with 4-5 hours of listening to music it used 0.5% battery. If the settings don't lie.
-
+### Apps that work
+- [Namida](https://github.com/namidaco/namida)
+- [Metro](https://github.com/MuntashirAkon/Metro)
+- Spotify also works. Even track ads :)
+- 
 ## Build
 
 1. **Install Flutter**: 
