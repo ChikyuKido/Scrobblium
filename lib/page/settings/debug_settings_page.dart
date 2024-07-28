@@ -18,6 +18,7 @@ class DebugSettingsPage extends StatelessWidget {
   Widget _buildShowStatusNotification() {
     return SwitchSettingsTile(
       title: 'Show status notification',
+      subtitle: "Needs notification permissions",
       settingKey: 'show-status-notification',
       defaultValue: false,
       onChange: (p0) {

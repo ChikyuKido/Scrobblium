@@ -1,25 +1,33 @@
 # Scrobblium
 
-Scrobblium is a handy Flutter app designed to seamlessly track the music you listen to on your Android device, no matter which music app you prefer. With Scrobblium, you can easily monitor your listening habits and visualize your music data using straightforward graphs.
-
+Scrobblium is a simple music tracking app. It “should” be able to track from any app that supports MediaSession and has a Token in its notification.
 ## Screenshots
 
-_(Screenshots will be added here)_
+<div style="display: flex; justify-content: space-around;">
+  <div style="text-align: center;">
+    <img src="./rmrsc/Screenshot_20240728_015749.png" alt="Screenshot1" style="width: 200px;">
+    <p>Start Page. Dark mode</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="./rmrsc/Screenshot_20240728_020028.png" alt="Screenshot2" style="width: 200px;">
+    <p>Start Page. White mode</p>
+  </div>
+  <div style="text-align: center;">
+    <img src="./rmrsc/Screenshot_20240728_020445.png" alt="Screenshot3" style="width: 200px;">
+    <p>Songs Page. With search</p>
+  </div>
+</div>
 
-## Features
+## Functions
+- Tracks music from any app that supports MediaSessions
+- Own small statistics in the app. (This app does not provide many statistics on its own. It is meant to be used with an integration like Maloja)
+- Integrations (currently only [Maloja](https://github.com/krateng/maloja))
+- Conditional upload for integrations to save battery
+- Backup/import/export database
+- Exporting a file for Maloja to import
+- Generally almost no battery consumption. Own experience on a S20 with 4-5 hours of listening to music it used 0.5% battery. If the settings don't lie.
 
-- **Track Music from Any App**: 
-  Scrobblium effortlessly tracks music playback from any music app installed on your Android phone.
-
-- **Simple Graphs**: 
-  Visualize your music listening trends with simple and easy-to-understand graphs.
-
-- **Backup and Restore**: 
-  Backup your music tracking data and restore it whenever needed.
-
-## Getting Started
-
-To start using Scrobblium, follow these steps:
+## Build
 
 1. **Install Flutter**: 
    If you haven't already, install Flutter. You can find detailed installation instructions on the [official Flutter website](https://flutter.dev/docs/get-started/install).
@@ -38,10 +46,6 @@ To start using Scrobblium, follow these steps:
    cd Scrobblium
    flutter run
    ```
-
-4. **Start Tracking**: 
-   Once the app is up and running, start listening to your favorite music, and let Scrobblium handle the tracking for you!
-
 ## Support
 
 If you have any questions or encounter issues with Scrobblium, please feel free to reach out to us. You can [open an issue](https://github.com/yourusername/scrobblium/issues) on GitHub for assistance.
@@ -49,5 +53,3 @@ If you have any questions or encounter issues with Scrobblium, please feel free 
 ## License
 
 This project is licensed under the GPL-3.0 License. See the [LICENSE](LICENSE) file for details.
-
-This version aims to be more casual and less formal, steering away from sounding automated.
