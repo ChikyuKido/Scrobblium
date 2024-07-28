@@ -3,20 +3,22 @@
 Scrobblium is a simple music tracking app. It “should” be able to track from any app that supports MediaSession and has a Token in its notification.
 ## Screenshots
 
-<div style="display: flex; justify-content: space-around;">
-  <div style="text-align: center;">
-    <img src="./rmrsc/Screenshot_20240728_015749.png" alt="Screenshot1" style="width: 200px;">
-    <p>Start Page. Dark mode</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="./rmrsc/Screenshot_20240728_020028.png" alt="Screenshot2" style="width: 200px;">
-    <p>Start Page. White mode</p>
-  </div>
-  <div style="text-align: center;">
-    <img src="./rmrsc/Screenshot_20240728_020445.png" alt="Screenshot3" style="width: 200px;">
-    <p>Songs Page. With search</p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td style="text-align: center;">
+      <img src="./rmrsc/Screenshot_20240728_015749.png" alt="Screenshot1" width="200">
+      <p>Start Page. White Mode</p>
+    </td>
+    <td style="text-align: center;">
+      <img src="./rmrsc/Screenshot_20240728_020028.png" alt="Screenshot2" width="200">
+      <p>Start Page. Dark Mode</p>
+    </td>
+    <td style="text-align: center;">
+      <img src="./rmrsc/Screenshot_20240728_020445.png" alt="Screenshot3" width="200">
+      <p>Songs Page. With Search</p>
+    </td>
+  </tr>
+</table>
 
 ## Functions
 - Tracks music from any app that supports MediaSessions
