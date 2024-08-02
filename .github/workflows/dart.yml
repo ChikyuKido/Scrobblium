@@ -1,0 +1,48 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Dart
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.0' 
+    - name: Set up protobuf
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y protobuf-compiler
+    - name: Set up protobuf dart
+      run: | 
+         dart pub global activate protoc_plugin
+         export PATH="$PATH:$HOME/.pub-cache/bin"
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run build script
+      run: bash tools/build.sh
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: flutter-apk
+        path: build/app/outputs/flutter-apk/Srobblium-release.apk
