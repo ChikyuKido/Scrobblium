@@ -2,7 +2,6 @@
 
 set -e
 
-tools/protoCreator.sh
 flutter clean
 flutter build apk --split-per-abi
 flutter build apk
