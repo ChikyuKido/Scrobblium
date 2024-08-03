@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           create: (context) => AppThemeProvider(),
           child: Consumer<AppThemeProvider>(
             builder: (context, state, child) {
-              ThemeData data = FlexThemeData.dark();
+              ThemeData? data;
               if(state.darkMode) {
                 data = FlexThemeData.dark(
                     useMaterial3: state.materialTheme,
@@ -56,7 +56,6 @@ class MyApp extends StatelessWidget {
               }else {
                 data = FlexThemeData.light(
                     useMaterial3: state.materialTheme,
-                    //if darkcoloscheme is null just use the last selected scheme
                     colorScheme: state.materialTheme ? lightColorScheme ??
                         FlexColorScheme
                             .light(scheme: state.colorScheme)
@@ -65,9 +64,11 @@ class MyApp extends StatelessWidget {
                     typography: Typography.material2021(
                         platform: defaultTargetPlatform));
               }
+
               return MaterialApp(
                 title: 'Scrobblium',
-                darkTheme: data,
+                darkTheme: state.darkMode?data:null,
+                theme: state.darkMode?null:data,
                 themeMode: state.darkMode ?  ThemeMode.dark : ThemeMode.light,
                 debugShowCheckedModeBanner: false,
                 home: const MainPage(),

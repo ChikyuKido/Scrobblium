@@ -1,7 +1,7 @@
 name: scrobblium
 description: "A app to track music in the background"
 publish_to: 'none'
-version: 2024.07.28-0-Beta
+version: 0.1.0-0-Beta
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

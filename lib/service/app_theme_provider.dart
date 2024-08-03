@@ -52,4 +52,9 @@ class AppThemeProvider extends ChangeNotifier {
     _colorScheme = color;
     notifyListeners();
   }
+
+  @override
+  String toString() {
+    return 'AppThemeProvider{_trueDarkMode: $_trueDarkMode, _darkMode: $_darkMode, _materialTheme: $_materialTheme, _colorScheme: $_colorScheme}';
+  }
 }
