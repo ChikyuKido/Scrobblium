@@ -31,7 +31,7 @@ Scrobblium is a simple music tracking app. It “should” be able to track from
 ### Apps I tested
 - [Namida](https://github.com/namidaco/namida)
 - [Metro](https://github.com/MuntashirAkon/Metro)
-- Spotify also works. Even track ads :)
+- Spotify also works! Even track ads :)
 ## Build
 
 1. **Install Flutter**: 
