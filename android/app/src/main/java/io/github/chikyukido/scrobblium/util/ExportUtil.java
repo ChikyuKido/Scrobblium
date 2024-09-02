@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import io.github.chikyukido.scrobblium.MainActivity;
 import io.github.chikyukido.scrobblium.MusicListenerService;
@@ -85,7 +86,7 @@ public class ExportUtil {
             if(song.getTimeListened() < 240 && (((double) song.getTimeListened()) / ((double) song.getMaxProgress()/1000)) < 0.5) {
                 continue;
             }
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm", Locale.ENGLISH);
 
             csvBuilder.append("\"")
                     .append(song.getArtist()).append("\",\"")
