@@ -2,10 +2,9 @@ package io.github.chikyukido.scrobblium.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.github.chikyukido.scrobblium.adapter.LocalDateTimeAdapter;
 
 import java.time.LocalDateTime;
-
-import io.github.chikyukido.scrobblium.adapter.LocalDateTimeAdapter;
 
 public class JsonUtil {
     private static final Gson gson = new GsonBuilder()

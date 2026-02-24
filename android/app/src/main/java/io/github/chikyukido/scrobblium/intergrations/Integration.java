@@ -2,11 +2,14 @@ package io.github.chikyukido.scrobblium.intergrations;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
+import io.github.chikyukido.scrobblium.util.JsonUtil;
+import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,11 +19,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import io.github.chikyukido.scrobblium.database.SongData;
-import io.github.chikyukido.scrobblium.util.ConfigUtil;
-import io.github.chikyukido.scrobblium.util.JsonUtil;
-import okhttp3.OkHttpClient;
 
 /**
  * The integration for a other scrobble service like last.fm

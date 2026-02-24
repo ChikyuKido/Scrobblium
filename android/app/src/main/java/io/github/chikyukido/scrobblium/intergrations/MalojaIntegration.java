@@ -2,9 +2,13 @@ package io.github.chikyukido.scrobblium.intergrations;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import io.github.chikyukido.scrobblium.database.SongData;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -12,12 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import io.github.chikyukido.scrobblium.database.SongData;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MalojaIntegration extends Integration {
 

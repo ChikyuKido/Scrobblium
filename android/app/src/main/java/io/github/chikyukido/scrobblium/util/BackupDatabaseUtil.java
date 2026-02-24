@@ -5,16 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-
 import androidx.documentfile.provider.DocumentFile;
+import io.github.chikyukido.scrobblium.MainActivity;
+import io.github.chikyukido.scrobblium.MusicListenerService;
+import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -23,17 +19,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import io.github.chikyukido.scrobblium.MainActivity;
-import io.github.chikyukido.scrobblium.MusicListenerService;
-import io.github.chikyukido.scrobblium.dao.MethodChannelData;
-
 
 public class BackupDatabaseUtil {
     private static final String TAG = "BackupDatabaseUtil";
 
     public static boolean importDatabase(Context context, Uri databaseFile) {
-        if (MusicListenerService.getInstance() == null) return false;
-        if (MusicListenerService.getInstance().getDatabase() == null) return false;
+        if (MusicListenerService.getInstance() == null) {
+            Log.e(TAG, "importDatabase: MusicListenerService is null");
+            return false;
+        }
+        if (MusicListenerService.getInstance().getDatabase() == null) {
+            Log.e(TAG, "importDatabase: Database is null");
+            return false;
+        }
 
         Log.i(TAG, "importDatabase: Import file: "+databaseFile);
         MusicListenerService.getInstance().getDatabase().close();
@@ -48,6 +46,14 @@ public class BackupDatabaseUtil {
         }
 
         Path file = context.getDataDir().toPath().resolve("databases/song_database");
+        if(!Files.exists(file)) {
+            try {
+                Files.createFile(file);
+            } catch (IOException e) {
+                Log.e(TAG, "importDatabase: Could not create file for database", e);
+                return false;
+            }
+        }
         try (FileOutputStream fos = new FileOutputStream(file.toFile());
              InputStream in = context.getContentResolver().openInputStream(databaseFile)) {
             int bytesRead;

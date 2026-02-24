@@ -13,6 +13,7 @@ class ExportsettingsPage extends StatelessWidget {
       children: [
         SettingsGroup(title: "Export", children: [
           malojaExport(),
+          listenBrainzExport(),
         ])
       ],
     );
@@ -25,5 +26,14 @@ class ExportsettingsPage extends StatelessWidget {
         WidgetUtil.showToast(value.getDataAsString());
       });
     });
+  }
+  Widget listenBrainzExport() {
+    return SimpleSettingsTile(
+        title: "Export ListenBrainz",
+        onTap: () {
+          MethodChannelService.callFunction(EXPORT_LISTEN_BRAINZ).then((value) {
+            WidgetUtil.showToast(value.getDataAsString());
+          });
+        });
   }
 }

@@ -2,11 +2,11 @@ package io.github.chikyukido.scrobblium.intergrations;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
+import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.util.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -16,12 +16,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import io.github.chikyukido.scrobblium.database.SongData;
-import io.github.chikyukido.scrobblium.util.BatteryUtils;
-import io.github.chikyukido.scrobblium.util.ConfigUtil;
-import io.github.chikyukido.scrobblium.util.JsonUtil;
-import io.github.chikyukido.scrobblium.util.MethodChannelUtil;
-import io.github.chikyukido.scrobblium.util.NetworkUtils;
 
 public class IntegrationHandler {
     private static final String TAG = "IntegrationHandler";
@@ -39,6 +33,7 @@ public class IntegrationHandler {
             return;
         }
         integrations.add(new MalojaIntegration(context));
+        integrations.add(new ListenBrainIntegration(context));
         alreadyInitialized = true;
     }
 

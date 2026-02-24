@@ -1,3 +1,4 @@
 -dontwarn io.flutter.plugin.**
 -dontwarn android.**
 -keep class io.github.chikyukido.scrobblium.messages.** { *; }
+-keep class io.github.chikyukido.scrobblium.database.** { *; }

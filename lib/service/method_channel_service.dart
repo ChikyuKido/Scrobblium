@@ -26,6 +26,7 @@ const BACKUP_DATABASE_NOW = "backupDatabaseNow";
 const GET_INTEGRATIONS = "getIntegrations";
 const ADD_INTEGRATION = "addIntegration";
 const EXPORT_MALOJA = "exportMaloja";
+const EXPORT_LISTEN_BRAINZ = "exportListenBrainz";
 const CHECK_CONDITIONAL_UPLOAD = "checkConditionalUpload";
 
 String GET_REQUIRED_FIELDS_FOR(String integration) => "getRequiredFieldsFor$integration";
@@ -42,17 +43,24 @@ class MethodChannelService {
   static final log = Logger("MethodChannelService");
   static const platform = MethodChannel('MusicListener');
   static Map<int,Completer> futures = {};
+  static Map<int, DateTime> startTimes = {};
   static int futureId = 0;
   
   static init() {
     platform.setMethodCallHandler((call) async{
-      log.info("Executing following method: ${call.method}");
       if(call.method == "showToast") {
         await _showToast(call.arguments);
       }else if(call.method == "reply") {
         final Map<String, dynamic> resultMap = Map<String, dynamic>.from(call.arguments);
         final int id = resultMap["callbackId"];
-        log.info("Reply from callback $id");
+        final start = startTimes[id];
+        if (start != null) {
+          final duration = DateTime.now().difference(start).inMilliseconds;
+          log.info("Reply from callback $id took $duration ms");
+          startTimes.remove(id);
+        } else {
+          log.info("Reply from callback $id");
+        }
         if(futures[id] == null) {
           return;
         }
@@ -74,7 +82,10 @@ class MethodChannelService {
       arguments["callbackId"] = futureId;
     }
     platform.invokeMethod(function,arguments);
-    futures[futureId++] = completer;
+    final currentId = futureId;
+    futures[currentId] = completer;
+    startTimes[currentId] = DateTime.now();
+    futureId++;
     return completer.future;
   }
 
@@ -86,21 +97,21 @@ class MethodChannelService {
     var data = await callFunction(GET_SONG_LIST);
     if(data.hasError()) return List.empty();
     SongDataListM songDataListM = SongDataListM.fromBuffer(data.data??List.empty());
-
-    List<SongData> songs = [];
-    for(var value in songDataListM.songs) {
-      songs.add(SongData(id: value.id.toInt(),
-          artist: value.artist,
-          title: value.title,
-          album: value.album,
-          albumAuthor: value.albumAuthor,
-          progress: value.progress.toInt(),
-          maxProgress: value.maxProgress.toInt(),
-          startTime: DateTime.fromMillisecondsSinceEpoch(value.startTime.toInt()),
-          endTime: DateTime.fromMillisecondsSinceEpoch(value.endTime.toInt()),
-          timeListened: value.timeListened));
-    }
-
+    final songs = List<SongData>.generate(songDataListM.songs.length, (i) {
+      final v = songDataListM.songs[i];
+      return SongData(
+        id: v.id,
+        artist: v.artist,
+        title: v.title,
+        album: v.album,
+        albumAuthor: v.albumAuthor,
+        progress: v.progress,
+        maxProgress: v.maxProgress,
+        startTime: DateTime.fromMillisecondsSinceEpoch(v.startTime.toInt()),
+        endTime: DateTime.fromMillisecondsSinceEpoch(v.endTime.toInt()),
+        timeListened: v.timeListened,
+      );
+    }, growable: false);
     return songs;
   }
 

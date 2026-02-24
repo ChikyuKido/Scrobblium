@@ -12,10 +12,15 @@ import android.media.session.PlaybackState;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.room.Room;
+import io.github.chikyukido.scrobblium.database.SongData;
+import io.github.chikyukido.scrobblium.database.SongDatabase;
+import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
+import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
+import io.github.chikyukido.scrobblium.util.BitmapUtil;
+import io.github.chikyukido.scrobblium.util.ConfigUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -26,13 +31,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import io.github.chikyukido.scrobblium.database.SongData;
-import io.github.chikyukido.scrobblium.database.SongDatabase;
-import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
-import io.github.chikyukido.scrobblium.util.BackupDatabaseUtil;
-import io.github.chikyukido.scrobblium.util.BitmapUtil;
-import io.github.chikyukido.scrobblium.util.ConfigUtil;
 
 public class MusicListenerService extends NotificationListenerService {
     public static MusicListenerServiceStatus status = MusicListenerServiceStatus.NOT_INITIALIZED;

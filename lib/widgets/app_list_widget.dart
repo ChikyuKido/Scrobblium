@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:installed_apps/app_category.dart';
 import 'package:installed_apps/app_info.dart';
 
 class AppListWidget extends StatefulWidget {
@@ -74,10 +75,7 @@ class _AppListWidgetState extends State<AppListWidget> {
 
   int _getScoreForMusicApp(AppInfo appInfo) {
     int score = 0;
-    if (appInfo.permissions.contains("android.permission.READ_MEDIA_AUDIO")) score++;
-    if (appInfo.permissions.contains("android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK")) score++;
-    if (appInfo.permissions.contains("android.permission.FOREGROUND_SERVICE")) score++;
-    if (appInfo.permissions.contains("android.permission.WAKE_LOCK")) score++;
+    if(appInfo.category.value == AppCategory.audio.value) score+=10;
     return score;
   }
 }

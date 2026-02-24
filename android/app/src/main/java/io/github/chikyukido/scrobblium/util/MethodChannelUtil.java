@@ -5,13 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-
 import androidx.core.app.NotificationManagerCompat;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.github.chikyukido.scrobblium.MainActivity;
@@ -20,6 +14,12 @@ import io.github.chikyukido.scrobblium.dao.MethodChannelData;
 import io.github.chikyukido.scrobblium.database.SongData;
 import io.github.chikyukido.scrobblium.intergrations.IntegrationHandler;
 import io.github.chikyukido.scrobblium.messages.SongDataListM;
+import io.github.chikyukido.scrobblium.messages.SongDataM;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class MethodChannelUtil {
 
@@ -46,6 +46,7 @@ public class MethodChannelUtil {
         methods.put("backupDatabaseNow",backupDatabaseNow(context));
         methods.put("restartMusicListenerService",restartMusicListener());
         methods.put("exportMaloja",exportMaloja(context));
+        methods.put("exportListenBrainz",exportListenBrainz(context));
         IntegrationHandler.getInstance().addIntegrationsToMethodChannel(methods,context);
 
         methodChannel.setMethodCallHandler((call, result) -> {
@@ -55,7 +56,7 @@ public class MethodChannelUtil {
                     return;
                 }
                 int callbackId = call.argument("callbackId");
-                Log.d(TAG, "Execute following command: " + call.method +" with the callback id: " + callbackId);
+                Log.i(TAG, "Execute following command: " + call.method +" with the callback id: " + callbackId);
                 MethodChannelData methodChannelData = new MethodChannelData(methodChannel);
                 methodChannelData.setCallbackId(callbackId);
                 new Thread(() -> methods.get(call.method).run(methodChannelData,call)).start();
@@ -68,6 +69,9 @@ public class MethodChannelUtil {
 
     private static MethodInterface exportMaloja(Context context) {
         return (data, call) -> ExportUtil.launchFileChooserForExportMaloja(context,data);
+    }
+    private static MethodInterface exportListenBrainz(Context context) {
+        return (data, call) -> ExportUtil.launchFileChooserForExportListenBrainz(context,data);
     }
 
     private static MethodInterface restartMusicListener() {
@@ -134,12 +138,15 @@ public class MethodChannelUtil {
             }
 
             List<SongData> tracks = MusicListenerService.getInstance().getDatabase().musicTrackDao().getAllTracks();
-            SongDataListM.Builder songDataListBuilder = SongDataListM.newBuilder();
 
+            List<SongDataM> out = new ArrayList<>(tracks.size());
             for (SongData song : tracks) {
-                songDataListBuilder.addSongs(Converter.songDataToMessage(song));
+                out.add(Converter.songDataToMessage(song));
             }
-            data.setData(songDataListBuilder.build().toByteArray());
+            SongDataListM msg = SongDataListM.newBuilder()
+                    .addAllSongs(out)
+                    .build();
+            data.setData(msg.toByteArray());
             data.reply();
         }).start();
     }

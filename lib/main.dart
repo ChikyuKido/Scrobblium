@@ -5,17 +5,30 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:scrobblium/page/main_page.dart';
 import 'package:scrobblium/service/app_theme_provider.dart';
 import 'package:scrobblium/service/method_channel_service.dart';
 
 void main() {
+  setupLogging();
   initSettings().then((_) {
     runApp(const MyApp());
   });
 }
-
+void setupLogging() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((rec) {
+    print('${rec.level.name}: ${rec.loggerName}: ${rec.time}: ${rec.message}');
+    if (rec.error != null) {
+      print('error: ${rec.error}');
+    }
+    if (rec.stackTrace != null) {
+      print('stack: ${rec.stackTrace}');
+    }
+  });
+}
 Future<void> initSettings() async {
   await Settings.init(
     cacheProvider: SharePreferenceCache(),

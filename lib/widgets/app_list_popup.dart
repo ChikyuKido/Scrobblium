@@ -15,7 +15,7 @@ class _AppListPopupState extends State<AppListPopup> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: InstalledApps.getInstalledApps(true,true,""),
+        future: InstalledApps.getInstalledApps(excludeSystemApps: true,excludeNonLaunchableApps: true,withIcon: true),
         builder: (context, snapshot) {
           if(snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
