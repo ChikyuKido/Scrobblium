@@ -9,8 +9,6 @@
 .history
 .svn/
 migrate_working_dir/
-lib/messages
-android/app/src/main/java/io/github/chikyukido/scrobblium/messages
 
 # IntelliJ related
 *.iml
