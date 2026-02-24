@@ -33,7 +33,7 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/*.apk"
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Scrobblium
           path: "build/app/outputs/flutter-apk/*.apk"
